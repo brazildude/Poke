@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/1a2841c1-26a7-4aee-aa0a-97e8b4af880b/resourceGroups/PokeResourceGroup-DEV/providers/Microsoft.Web/sites/poke-dev",
-    "appService.deploySubpath": "."
-}
