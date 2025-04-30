@@ -42,7 +42,7 @@ public static class UserEndpoints
         return TypedResults.Ok();
     }
 
-    static async Task<string> Test()
+    static string Test()
     {
         return "OK";
     }
