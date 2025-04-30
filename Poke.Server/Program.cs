@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Endpoints;
 
-var environment = Environments.Production;
+var environment = Environments.Development;
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     EnvironmentName = environment

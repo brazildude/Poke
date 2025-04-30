@@ -12,8 +12,9 @@ public static class UserEndpoints
     {
         var userEndpoints = app.MapGroup("/users");
 
-        app.MapGet("/user/{userID}", GetUser);
-        app.MapPost("/user/{name}", CreateUser);
+        userEndpoints.MapGet("{userID}", GetUser);
+        userEndpoints.MapPost("{name}", CreateUser);
+        userEndpoints.MapGet("test", Test);
     }
 
     static async Task<Results<Ok<User>, NotFound>> GetUser(int userID, PokeContext db) 
@@ -39,5 +40,10 @@ public static class UserEndpoints
         await db.SaveChangesAsync();
 
         return TypedResults.Ok();
+    }
+
+    static async Task<string> Test()
+    {
+        return "OK";
     }
 }
