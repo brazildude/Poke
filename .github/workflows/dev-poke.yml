@@ -50,7 +50,8 @@ jobs:
         tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_40635A5C718E49438AAD86BD91BF7482 }}
         subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C267756782844F849AC7D4272B0C7B19 }}
     - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: 'Production'
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
