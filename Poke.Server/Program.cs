@@ -2,24 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Endpoints;
 
-var environment = Environments.Development;
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    EnvironmentName = environment
-});
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddDbContext<PokeContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-if (environment == Environments.Development)
-{
-    builder.Services.AddDbContext<PokeContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-else
-{
-    builder.Services.AddDbContext<PokeContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,8 +20,8 @@ var app = builder.Build();
     using (var serviceScope = app.Services.CreateScope())
     using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PokeContext>())
     {
-        dbContext.Database.EnsureDeleted();
-        dbContext.Database.EnsureCreated();
+       //dbContext.Database.EnsureDeleted();
+       //dbContext.Database.EnsureCreated();
     }
 //}
 
