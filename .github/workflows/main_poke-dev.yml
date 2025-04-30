@@ -9,10 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./Poke.Server
-
 jobs:
   build:
     runs-on: ubuntu-latest
