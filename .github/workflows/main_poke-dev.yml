@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./Poke.Server
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +28,10 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
-        run: dotnet build ./Poke.Server/Poke.Server.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./Poke.Server/Poke.Server.csproj -c Release -property:PublishDir=myapp
+        run: dotnet publish -c Release -property:PublishDir=myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
