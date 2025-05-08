@@ -1,48 +1,92 @@
-using System;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
+using Poke.Server.Endpoints.ViewModels;
+using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
 
 public static class UserEndpoints
 {
+    public record class CreateUserViewModel(string Provider, string Token);
+
     public static void RegisterUserEndpoints(this WebApplication app)
     {
-        var userEndpoints = app.MapGroup("/users");
+        var userEndpoints = app.MapGroup("api/users");
 
         userEndpoints.MapGet("{userID}", GetUser);
         userEndpoints.MapPost("{name}", CreateUser);
-        userEndpoints.MapGet("test", Test);
+        userEndpoints.MapPost("/teams", GetTeams);
+        userEndpoints.MapGet("test", Test).RequireAuthorization();
     }
 
-    static async Task<Results<Ok<User>, NotFound>> GetUser(int userID, PokeContext db) 
+    public static async Task<Results<Ok<User>, NotFound>> GetUser(int userID, PokeContext db)
     {
-        var user = await db.Users.SingleOrDefaultAsync(x => x.UserID == userID);
+        var user = await db.Users
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
+        .SingleOrDefaultAsync(x => x.UserID == userID);
 
         if (user == null)
         {
             return TypedResults.NotFound();
         }
-            
+
         return TypedResults.Ok(user);
     }
 
-    static async Task<Results<Ok<string>, Ok>> CreateUser(string name, PokeContext db) 
+    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserViewModel viewModel, PokeContext db)
     {
-        if (db.Users.Any(x => x.Name == name))
+        if (viewModel == null)
         {
-            return TypedResults.Ok("Name already exists.");
+            return TypedResults.BadRequest("");
         }
 
-        db.Users.Add(new User { Name = name });
+        if (viewModel.Provider == null || viewModel.Token == null)
+        {
+            return TypedResults.BadRequest("");
+        }
+
+        var payload = await GoogleJsonWebSignature.ValidateAsync(viewModel.Token);
+
+        if (payload == null)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var user = new User
+        {
+            ExternalID = payload.Subject
+        };
+
+        db.Users.Add(user);
         await db.SaveChangesAsync();
 
         return TypedResults.Ok();
     }
 
-    static string Test()
+    public static async Task<Results<Ok<List<GetTeamViewModel>>, NotFound>> GetTeams(PokeContext db)
+    {
+        var userID = 1;
+
+        var teams = await db.Teams
+        .Include(x => x.Units)
+        .Where(x => x.UserID == userID)
+        .Select(t => new GetTeamViewModel
+        {
+            TeamID = t.TeamID,
+            Name = t.Name,
+            Units = t.Units.Select(p => p.Name).ToList()
+        })
+        .ToListAsync();
+
+        return TypedResults.Ok(teams);
+    }
+
+    public static string Test()
     {
         return "OK";
     }
