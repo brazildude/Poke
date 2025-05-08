@@ -14,7 +14,7 @@ public static class TeamEndpoints
     {
         var userEndpoints = app.MapGroup("api/teams");
 
-        userEndpoints.MapGet("{teamID}", GetTeam);
+        userEndpoints.MapGet("{teamID}", GetTeam).RequireAuthorization();
         userEndpoints.MapPost("", CreateTeam);
     }
 
@@ -48,6 +48,8 @@ public static class TeamEndpoints
         { 
             Name = viewModel.Name
         };
+
+
         
         //db.Users.Add(user);
         //await db.SaveChangesAsync();

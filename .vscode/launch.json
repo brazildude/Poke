@@ -12,9 +12,20 @@
         },
         {
             "name": "C#: Poke Server",
-            "type": "dotnet",
+            "type": "coreclr",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Poke.Server/Poke.Server.csproj"
-        }
+            "program": "${workspaceFolder}/Poke.Server/bin/Debug/net9.0/Poke.Server.dll",
+            "args": [
+                "--urls",
+                "http://localhost:80"
+            ],
+            "cwd": "${workspaceFolder}/Poke.Server",
+            "stopAtEntry": false,
+            "preLaunchTask": "dotnet: build",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        
     ]
 }

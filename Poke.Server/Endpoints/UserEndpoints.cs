@@ -1,11 +1,9 @@
-using Google.Apis.Auth;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Endpoints.ViewModels;
-using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
 
@@ -18,7 +16,7 @@ public static class UserEndpoints
         var userEndpoints = app.MapGroup("api/users");
 
         userEndpoints.MapGet("{userID}", GetUser);
-        userEndpoints.MapPost("{name}", CreateUser);
+        userEndpoints.MapPost("", CreateUser);
         userEndpoints.MapPost("/teams", GetTeams);
         userEndpoints.MapGet("test", Test).RequireAuthorization();
     }
@@ -50,7 +48,7 @@ public static class UserEndpoints
             return TypedResults.BadRequest("");
         }
 
-        var payload = await GoogleJsonWebSignature.ValidateAsync(viewModel.Token);
+        var payload = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(viewModel.Token);
 
         if (payload == null)
         {
@@ -59,7 +57,7 @@ public static class UserEndpoints
 
         var user = new User
         {
-            ExternalID = payload.Subject
+            ExternalID = payload.Uid
         };
 
         db.Users.Add(user);

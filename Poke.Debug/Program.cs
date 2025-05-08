@@ -1,11 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
-using Poke.Server.Data.Models.Units;
-using Poke.Server.Endpoints;
-using Poke.Server.Infrastructure.Auth;
+using static Poke.Server.Endpoints.UserEndpoints;
 
 internal class Program
 {
@@ -26,8 +23,8 @@ internal class Program
         pokeContext.Database.EnsureDeleted();
         pokeContext.Database.EnsureCreated();
 
-        await UserEndpoints.CreateUser(new CurrentUser(new HttpContextAccessor()) { ExternalUserID = "Google|0001" }, pokeContext);
-        await UserEndpoints.CreateUser(new CurrentUser(new HttpContextAccessor()) { ExternalUserID = "Google|0002" }, pokeContext);
+        await CreateUser(new CreateUserViewModel("Google", "0001"), pokeContext);
+        await CreateUser(new CreateUserViewModel("Google", "0001"), pokeContext);
 
         var user01 = pokeContext.Users.Single(x => x.UserID == 1);
         var user02 = pokeContext.Users.Single(x => x.UserID == 2);

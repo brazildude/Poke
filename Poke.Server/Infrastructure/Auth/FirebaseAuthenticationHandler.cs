@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using FirebaseAdmin.Auth;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -37,18 +38,18 @@ public class FirebaseAuthenticationHandler : AuthenticationHandler<Authenticatio
 
         try
         {
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+            var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idToken);
 
-            if (settings.ProjectId != (string)payload.Audience)
+            if (settings.ProjectId != decodedToken.Audience)
             {
                 return AuthenticateResult.Fail("Token audience mismatch");
             }
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, payload.Subject),
-                new Claim(ClaimTypes.Name, payload.Name ?? ""),
-                new Claim(ClaimTypes.Email, payload.Email ?? "")
+                new Claim(ClaimTypes.NameIdentifier, decodedToken.Uid),
+                new Claim(ClaimTypes.Name, decodedToken.Claims.Single(x => x.Key == "name").Value.ToString()!),
+                new Claim(ClaimTypes.Email, decodedToken.Claims.Single(x => x.Key == "email").Value.ToString()!)
             };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);

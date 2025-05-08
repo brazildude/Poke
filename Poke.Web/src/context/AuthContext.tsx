@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await getIdToken(user);
+        console.log(token);
         await serverConfig.authenticateUser(token);
       }
       setUser(user);

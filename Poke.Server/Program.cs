@@ -1,12 +1,17 @@
+using System.Text.Json.Serialization;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Endpoints;
-using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -14,7 +19,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<PokeContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<JsonOptions>(options =>
 {
-    //options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     options.SerializerOptions.PropertyNamingPolicy = null;
 });
 builder.Services.AddHttpContextAccessor();
@@ -30,8 +35,6 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -44,11 +47,20 @@ if (app.Environment.IsDevelopment())
        dbContext.Database.EnsureDeleted();
        dbContext.Database.EnsureCreated();
     }
+
+    app.MapReverseProxy();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 
+app.RegisterPlayEndpoints();
 app.RegisterUserEndpoints();
-app.UseDeveloperExceptionPage();
+app.RegisterTeamEndpoints();
+
+//FirebaseApp.Create(new AppOptions
+//{
+//    Credential = GoogleCredential.FromFile("firebase.json")
+//});
 
 app.Run();
