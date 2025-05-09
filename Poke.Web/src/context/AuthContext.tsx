@@ -27,12 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const token = await getIdToken(user);
-        console.log(token);
-        await serverConfig.authenticateUser(token);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -41,15 +36,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    const token = await getIdToken(result.user);
+    await serverConfig.authenticateUser(token);
   };
 
   const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const token = await getIdToken(result.user);
+    await serverConfig.authenticateUser(token);
   };
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const token = await getIdToken(result.user);
+    await serverConfig.authenticateUser(token);
   };
 
   const signOut = async () => {

@@ -1,6 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { GameState, Character, Skill, LogEntry } from '../types/game';
-import { initialGameState } from '../data/mockData';
 import { gameService } from '../services/gameService';
 import { useAuth } from './AuthContext';
 
@@ -281,7 +280,17 @@ const findCharacterById = (state: GameState, characterId: string): Character | u
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(gameReducer, { ...initialGameState, selectedTargets: [] });
+  const [state, dispatch] = useReducer(gameReducer, {
+    id: crypto.randomUUID(),
+    players: [],
+    currentPlayerId: '',
+    activeCharacterId: '',
+    log: [],
+    turnNumber: 1,
+    gameStatus: 'waiting',
+    selectedTargets: []
+  });
+  
   const { user } = useAuth();
   
   useEffect(() => {

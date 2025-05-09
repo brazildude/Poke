@@ -1,8 +1,8 @@
 import { Character, Skill, GameState } from '../types/game';
 import { mockCharacters, mockSkills } from '../data/mockServerData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.example.com';
-const USE_MOCK_SERVER = import.meta.env.VITE_USE_MOCK_SERVER === 'true';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.example.com';
+export const USE_MOCK_SERVER = import.meta.env.VITE_USE_MOCK_SERVER === 'true';
 const MOCK_API_DELAY = 500;
 
 async function mockApiCall<T>(mockData: T): Promise<T> {
@@ -11,11 +11,16 @@ async function mockApiCall<T>(mockData: T): Promise<T> {
 }
 
 export const serverConfig = {
+  API_BASE_URL,
+  
   async fetchCharacters(): Promise<Character[]> {
     if (USE_MOCK_SERVER) {
       return mockApiCall(mockCharacters);
     }
     const response = await fetch(`${API_BASE_URL}/characters`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch characters');
+    }
     return response.json();
   },
 
@@ -24,6 +29,9 @@ export const serverConfig = {
       return mockApiCall(mockSkills);
     }
     const response = await fetch(`${API_BASE_URL}/skills`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch skills');
+    }
     return response.json();
   },
 
@@ -31,25 +39,17 @@ export const serverConfig = {
     if (USE_MOCK_SERVER) {
       return mockApiCall(undefined);
     }
-    await fetch(`${API_BASE_URL}/auth`, {
+    const response = await fetch(`${API_BASE_URL}/auth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token })
     });
-  },
-
-  async saveGameState(gameId: string, state: GameState): Promise<void> {
-    if (USE_MOCK_SERVER) {
-      return mockApiCall(undefined);
+    
+    if (!response.ok) {
+      throw new Error('Authentication failed');
     }
-    await fetch(`${API_BASE_URL}/games/${gameId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(state),
-    });
-  },
+  }
 };

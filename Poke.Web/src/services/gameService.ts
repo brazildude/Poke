@@ -1,38 +1,63 @@
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { GameData, GameState } from '../types/game';
-import { db } from '../lib/firebase';
 import { serverConfig } from '../config/serverConfig';
 
 export const gameService = {
   async createGame(userId: string): Promise<GameData> {
-    const gameRef = doc(db, 'games', crypto.randomUUID());
-    const initialState = await this.generateInitialState(userId);
-    
-    const gameData: GameData = {
-      id: gameRef.id,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      players: initialState.players,
-      state: initialState,
-    };
-
-    await setDoc(gameRef, gameData);
-    return gameData;
+    try {
+      const response = await fetch(`${serverConfig.API_BASE_URL}/games`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create game');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating game:', error);
+      throw error;
+    }
   },
 
   async getGame(gameId: string): Promise<GameData | null> {
-    const gameRef = doc(db, 'games', gameId);
-    const gameDoc = await getDoc(gameRef);
-    return gameDoc.exists() ? gameDoc.data() as GameData : null;
+    try {
+      const response = await fetch(`${serverConfig.API_BASE_URL}/games/${gameId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error('Failed to fetch game');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching game:', error);
+      throw error;
+    }
   },
 
   async updateGameState(gameId: string, state: GameState): Promise<void> {
-    const gameRef = doc(db, 'games', gameId);
-    await updateDoc(gameRef, {
-      state,
-      updatedAt: Date.now(),
-    });
-    await serverConfig.saveGameState(gameId, state);
+    try {
+      const response = await fetch(`${serverConfig.API_BASE_URL}/games/${gameId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ state })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update game state');
+      }
+    } catch (error) {
+      console.error('Error updating game state:', error);
+      throw error;
+    }
   },
 
   async generateInitialState(userId: string): Promise<GameState> {
@@ -58,7 +83,7 @@ export const gameService = {
       }
 
       const initialState: GameState = {
-        id: "1",
+        id: crypto.randomUUID(),
         players: [
           {
             id: userId,

@@ -24,7 +24,7 @@ export interface Skill {
   type: 'attack' | 'heal' | 'buff' | 'debuff';
   targetType: TargetType;
   targetCount?: number;
-  characterClass: CharacterClass; // Added to link skills with character classes
+  characterClass: CharacterClass;
 }
 
 export interface StatusEffect {
@@ -52,7 +52,7 @@ export interface LogEntry {
 }
 
 export interface GameState {
-  id: string;
+  id: string; // Add ID to GameState interface
   players: Player[];
   currentPlayerId: string;
   activeCharacterId: string;

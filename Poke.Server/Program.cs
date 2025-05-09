@@ -29,38 +29,51 @@ builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("F
 builder.Services.AddAuthentication("Firebase")
     .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "_myAllowSpecificOrigins",
+    builder =>
+    {
+        builder.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("_myAllowSpecificOrigins");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseStaticFiles();
-    
+
     using (var serviceScope = app.Services.CreateScope())
     using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PokeContext>())
     {
-       dbContext.Database.EnsureDeleted();
-       dbContext.Database.EnsureCreated();
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
     }
 
-    app.MapReverseProxy();
+    //app.MapReverseProxy();
     app.UseDeveloperExceptionPage();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 app.RegisterPlayEndpoints();
 app.RegisterUserEndpoints();
 app.RegisterTeamEndpoints();
 
-//FirebaseApp.Create(new AppOptions
-//{
-//    Credential = GoogleCredential.FromFile("firebase.json")
-//});
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("firebase.json")
+});
 
 app.Run();

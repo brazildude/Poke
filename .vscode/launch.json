@@ -16,8 +16,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/Poke.Server/bin/Debug/net9.0/Poke.Server.dll",
             "args": [
-                "--urls",
-                "http://localhost:80"
+                //"--urls",
+                //"http://localhost:80"
             ],
             "cwd": "${workspaceFolder}/Poke.Server",
             "stopAtEntry": false,
