@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
+using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
 
@@ -9,12 +10,12 @@ public static class PlayEndpoints
 {
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
-        var userEndpoints = app.MapGroup("api/plays")
+        var endpoints = app.MapGroup("api/plays")
         .RequireAuthorization()
         .RequireCors("_myAllowSpecificOrigins");
 
-        userEndpoints.MapGet("", GetPlay);
-        userEndpoints.MapPost("", CreatePlay);
+        endpoints.MapGet("", GetPlay);
+        endpoints.MapPost("", Play);
     }
 
     public static async Task<Results<Ok<User>, NotFound>> GetPlay(int userID, PokeContext db) 
@@ -32,7 +33,7 @@ public static class PlayEndpoints
         return TypedResults.Ok(user);
     }
 
-    public static async Task<Results<Ok<string>, Ok>> CreatePlay(PlayDTO playDTO, PokeContext db) 
+    public static async Task<Results<Ok<string>, Ok>> Play(PlayDTO playDTO, ICurrentUser currentUser, PokeContext db) 
     {
         // if (db.Users.Any(x => x.Name == name))
         // {

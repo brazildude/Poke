@@ -13,10 +13,10 @@ public static class TeamEndpoints
 
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
-        var userEndpoints = app.MapGroup("api/teams");
+        var endpoints = app.MapGroup("api/teams");
 
-        userEndpoints.MapGet("{teamID}", GetTeam).RequireAuthorization();
-        userEndpoints.MapPost("", CreateTeam);
+        endpoints.MapGet("{teamID}", GetTeam).RequireAuthorization();
+        endpoints.MapPost("", CreateTeam);
     }
 
     public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db) 
@@ -34,8 +34,6 @@ public static class TeamEndpoints
 
         return TypedResults.Ok(team);
     }
-
-    
 
     public static Ok<List<GetTeamVM>> GetTeams(ICurrentUser currentUser, PokeContext db) 
     {

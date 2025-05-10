@@ -11,7 +11,8 @@ public abstract class BaseSkill
     public virtual ApplyValue SkillCost { get; set; } = null!;
     public virtual ApplyValue ApplyValue { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
-    public virtual int Cooldown { get; set; }
+    public virtual int TotalCooldown { get; set; }
+    public virtual int CurrentCooldown { get; set; }
 
     public virtual void Execute(BaseUnit unitInAction, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)
     {

@@ -63,9 +63,10 @@ else
     app.UseHttpsRedirection();
 }
 
+app.RegisterMatchmakingEndpoints();
 app.RegisterPlayEndpoints();
-app.RegisterUserEndpoints();
 app.RegisterTeamEndpoints();
+app.RegisterUserEndpoints();
 
 FirebaseApp.Create(new AppOptions
 {
