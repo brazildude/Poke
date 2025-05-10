@@ -1,15 +1,16 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
-using Poke.Server.Endpoints.ViewModels;
 using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
 
 public static class TeamEndpoints
 {
+    public record GetTeamVM(int TeamID, string Name, Dictionary<int, string> Units);
+    public record CreateTeamVM(string Name, List<int> UnitIDs);
+
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
         var userEndpoints = app.MapGroup("api/teams");
@@ -18,11 +19,13 @@ public static class TeamEndpoints
         userEndpoints.MapPost("", CreateTeam);
     }
 
-    public static async Task<Results<Ok<Team>, NotFound>> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db) 
     {
-        var team = await db
-        .Teams
-        .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID && x.TeamID == teamID);
+        var team = db
+            .Teams
+            .Where(x => x.UserID == currentUser.UserID && x.TeamID == teamID)
+            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.BaseUnitID, u => u.Name)))
+            .SingleOrDefault();
 
         if (team == null)
         {
@@ -32,7 +35,20 @@ public static class TeamEndpoints
         return TypedResults.Ok(team);
     }
 
-    public static async Task<Results<Ok<string>, BadRequest<string>>> CreateTeam(CreateTeamViewModel viewModel, ICurrentUser currentUser, PokeContext db) 
+    
+
+    public static Ok<List<GetTeamVM>> GetTeams(ICurrentUser currentUser, PokeContext db) 
+    {
+        var teams = db.Teams
+            .Include(x => x.Units)
+            .Where(x => x.UserID == currentUser.UserID)
+            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.BaseUnitID, u => u.Name)))
+            .ToList();
+
+        return TypedResults.Ok(teams);
+    }
+
+    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db) 
     {
         if (viewModel.UnitIDs.Count != 4)
         {
@@ -48,35 +64,10 @@ public static class TeamEndpoints
         { 
             Name = viewModel.Name
         };
-
-
         
-        //db.Users.Add(user);
-        //await db.SaveChangesAsync();
+        db.Teams.Add(team);
+        db.SaveChangesAsync();
 
-        return TypedResults.Ok("");
-    }
-
-    public static async Task<Results<Ok<List<GetTeamViewModel>>, NotFound>> GetTeams(PokeContext db) 
-    {
-        var userID = 1;
-
-        var teams = await db.Teams
-        .Include(x => x.Units)
-        .Where(x => x.UserID == userID)
-        .Select(t => new GetTeamViewModel
-        {
-            TeamID = t.TeamID,
-            Name = t.Name,
-            Units = t.Units.Select(p => p.Name).ToList()
-        })
-        .ToListAsync();
-
-        return TypedResults.Ok(teams);
-    }
-
-    public static string Test()
-    {
-        return "OK";
+        return TypedResults.Ok();
     }
 }

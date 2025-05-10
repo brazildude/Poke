@@ -8,6 +8,7 @@ public abstract class BaseUnit
     public string Name { get; set; } = null!;
     public virtual int Life { get; set; }
     public virtual int Mana { get; set; }
+    public virtual bool IsAbleToAttack { get; set; }
     public virtual IList<BaseSkill> Skills { get; set; } = new List<BaseSkill>();
 
     public virtual void Defend(ApplyValue applyValue)
@@ -28,6 +29,16 @@ public abstract class BaseUnit
             case ApplyToProperty.Mana: Mana += applyValue.Value(); break;
             default: throw new ArgumentOutOfRangeException(nameof(applyValue.ToProperty));
         }
+    }
+
+    public virtual bool IsAlive()
+    {
+        if (Life <= 0)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public virtual void UseSkill(int skillID, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)

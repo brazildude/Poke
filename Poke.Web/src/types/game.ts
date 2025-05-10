@@ -42,24 +42,25 @@ export interface Player {
   isCurrentTurn: boolean;
 }
 
-export interface LogEntry {
+export interface Move {
   id: string;
+  gameId: string;
+  playerId: string;
+  characterId: string;
+  skillId: string;
+  targets: string[];
   timestamp: number;
-  text: string;
-  type: 'attack' | 'heal' | 'buff' | 'debuff' | 'system';
-  sourceCharacterId?: string;
-  targetCharacterId?: string;
 }
 
 export interface GameState {
-  id: string; // Add ID to GameState interface
+  id: string;
   players: Player[];
   currentPlayerId: string;
   activeCharacterId: string;
-  log: LogEntry[];
   turnNumber: number;
   gameStatus: 'waiting' | 'in-progress' | 'completed';
   selectedTargets: string[];
+  lastMove?: Move;
 }
 
 export interface GameData {
@@ -69,4 +70,5 @@ export interface GameData {
   players: Player[];
   state: GameState;
   winnerId?: string;
+  lastMove?: Move;
 }

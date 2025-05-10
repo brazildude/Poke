@@ -10,9 +10,6 @@ using Poke.Server.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
-
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -59,7 +56,6 @@ if (app.Environment.IsDevelopment())
         dbContext.Database.EnsureCreated();
     }
 
-    //app.MapReverseProxy();
     app.UseDeveloperExceptionPage();
 }
 else

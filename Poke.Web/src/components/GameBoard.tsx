@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CharacterList from './CharacterList';
 import GameLog from './GameLog';
 import SkillBar from './SkillBar';
 import TurnIndicator from './TurnIndicator';
 import { useGame } from '../context/GameContext';
+import { Move } from '../types/game';
 
 const GameBoard: React.FC = () => {
-  const { state, selectCharacter, useSkill, endTurn } = useGame();
-  const [targetingMode, setTargetingMode] = useState(false);
+  const { state, selectCharacter, makeMove, endTurn, clearSelection } = useGame();
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [targetingMode, setTargetingMode] = useState(false);
+  const [moves, setMoves] = useState<Move[]>([]);
   
   const currentPlayer = state.players.find(p => p.id === state.currentPlayerId);
   const otherPlayer = state.players.find(p => p.id !== state.currentPlayerId);
@@ -16,6 +18,12 @@ const GameBoard: React.FC = () => {
     .flatMap(p => p.characters)
     .find(c => c.id === state.activeCharacterId);
   
+  useEffect(() => {
+    if (state.lastMove) {
+      setMoves(prevMoves => [...prevMoves, state.lastMove!]);
+    }
+  }, [state.lastMove]);
+
   if (!currentPlayer || !otherPlayer || !activeCharacter) {
     return <div>Loading game...</div>;
   }
@@ -40,21 +48,31 @@ const GameBoard: React.FC = () => {
     }
   };
   
-  const handleTargetSelect = (targetId: string) => {
-    if (targetingMode && selectedSkillId) {
-      const skill = activeCharacter.skills.find(s => s.id === selectedSkillId);
-      if (!skill) return;
+  const handleTargetSelect = async (targetId: string) => {
+    if (!targetingMode || !selectedSkillId) return;
 
-      // Check if the target is valid based on skill type
-      const isTargetFriendly = currentPlayer.characters.some(c => c.id === targetId);
-      const isHealingSkill = skill.type === 'heal';
+    const skill = activeCharacter.skills.find(s => s.id === selectedSkillId);
+    if (!skill) return;
 
-      if ((isHealingSkill && isTargetFriendly) || (!isHealingSkill && !isTargetFriendly)) {
-        useSkill(selectedSkillId, targetId);
+    // Check if the target is valid based on skill type
+    const isTargetFriendly = currentPlayer.characters.some(c => c.id === targetId);
+    const isHealingSkill = skill.type === 'heal';
+
+    if ((isHealingSkill && isTargetFriendly) || (!isHealingSkill && !isTargetFriendly)) {
+      try {
+        await makeMove(activeCharacter.id, [targetId], selectedSkillId);
         setTargetingMode(false);
         setSelectedSkillId(null);
+      } catch (error) {
+        console.error('Failed to make move:', error);
       }
     }
+  };
+  
+  const handleCancelTargeting = () => {
+    setTargetingMode(false);
+    setSelectedSkillId(null);
+    clearSelection();
   };
   
   return (
@@ -69,12 +87,12 @@ const GameBoard: React.FC = () => {
         characters={otherPlayer.characters} 
         isCurrentTurn={otherPlayer.isCurrentTurn}
         position="top"
-        onSelectCharacter={handleTargetSelect}
+        onSelectCharacter={handleCharacterSelect}
       />
       
       {/* Game log in the middle */}
       <div className="flex-1 my-4">
-        <GameLog entries={state.log} />
+        <GameLog moves={moves} />
       </div>
       
       {/* Bottom player (current user) */}
@@ -95,7 +113,7 @@ const GameBoard: React.FC = () => {
       {/* Game controls */}
       <div className="flex justify-center mt-2">
         <button 
-          onClick={endTurn}
+          onClick={() => endTurn()}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
         >
           End Turn
@@ -103,10 +121,7 @@ const GameBoard: React.FC = () => {
         
         {targetingMode && (
           <button 
-            onClick={() => {
-              setTargetingMode(false);
-              setSelectedSkillId(null);
-            }}
+            onClick={handleCancelTargeting}
             className="ml-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
           >
             Cancel
@@ -132,4 +147,4 @@ const GameBoard: React.FC = () => {
   );
 };
 
-export default GameBoard;
+export default GameBoard

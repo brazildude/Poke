@@ -9,7 +9,9 @@ public static class PlayEndpoints
 {
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
-        var userEndpoints = app.MapGroup("api/plays");
+        var userEndpoints = app.MapGroup("api/plays")
+        .RequireAuthorization()
+        .RequireCors("_myAllowSpecificOrigins");
 
         userEndpoints.MapGet("", GetPlay);
         userEndpoints.MapPost("", CreatePlay);

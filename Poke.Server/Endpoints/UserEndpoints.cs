@@ -3,40 +3,36 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
-using Poke.Server.Endpoints.ViewModels;
+using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
 
 public static class UserEndpoints
 {
-    public record class CreateUserViewModel(string Provider, string Token);
+    public record UserVM(int UserID, string? Name, string? Email);
+    public record CreateUserVM(string Provider, string Token);
+    public record GetTeamVM(int TeamID , string Name, List<string> Units);
 
     public static void RegisterUserEndpoints(this WebApplication app)
     {
         var userEndpoints = app.MapGroup("api/users");
 
-        userEndpoints.MapGet("{userID}", GetUser);
-        userEndpoints.MapPost("", CreateUser).RequireCors("_myAllowSpecificOrigins");
-        userEndpoints.MapPost("/teams", GetTeams);
-        userEndpoints.MapGet("test", Test).RequireAuthorization();
+        userEndpoints.MapGet("{userID}", GetUser).RequireAuthorization();;
+        userEndpoints.MapPost("", CreateUser);
+        userEndpoints.MapPost("/teams", GetTeams).RequireAuthorization();
     }
 
-    public static async Task<Results<Ok<User>, NotFound>> GetUser(int userID, PokeContext db)
+    public static Results<Ok<UserVM>, NotFound> GetUser(ICurrentUser currentUser, PokeContext db)
     {
-        var user = await db.Users
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
-        .SingleOrDefaultAsync(x => x.UserID == userID);
-
-        if (user == null)
-        {
-            return TypedResults.NotFound();
-        }
-
+        var user = db.Users
+            .Select(x => new UserVM(x.UserID, x.Name, x.Email))
+            .Where(x => x.UserID == currentUser.UserID)
+            .Single();
+        
         return TypedResults.Ok(user);
     }
 
-    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserViewModel viewModel, PokeContext db)
+    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserVM viewModel, PokeContext db)
     {
         if (viewModel == null)
         {
@@ -60,32 +56,22 @@ public static class UserEndpoints
             ExternalID = payload.Uid
         };
 
-        db.Users.Add(user);
+        await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
 
         return TypedResults.Ok();
     }
 
-    public static async Task<Results<Ok<List<GetTeamViewModel>>, NotFound>> GetTeams(PokeContext db)
+    public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(PokeContext db)
     {
         var userID = 1;
 
-        var teams = await db.Teams
+        var teams = db.Teams
         .Include(x => x.Units)
         .Where(x => x.UserID == userID)
-        .Select(t => new GetTeamViewModel
-        {
-            TeamID = t.TeamID,
-            Name = t.Name,
-            Units = t.Units.Select(p => p.Name).ToList()
-        })
-        .ToListAsync();
+        .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.Select(p => p.Name).ToList()))
+        .ToList();
 
         return TypedResults.Ok(teams);
-    }
-
-    public static string Test()
-    {
-        return "OK";
     }
 }
