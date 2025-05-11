@@ -6,6 +6,7 @@ import { AuthGuard } from './components/AuthGuard';
 import GameBoard from './components/GameBoard';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { TeamSelect } from './pages/TeamSelect';
 
 function App() {
   return (
@@ -14,6 +15,14 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/team-select"
+            element={
+              <AuthGuard>
+                <TeamSelect />
+              </AuthGuard>
+            }
+          />
           <Route
             path="/"
             element={

@@ -147,4 +147,4 @@ const GameBoard: React.FC = () => {
   );
 };
 
-export default GameBoard
+export default GameBoard;

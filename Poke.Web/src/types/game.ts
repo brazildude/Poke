@@ -1,3 +1,13 @@
+export interface Team {
+  id: string;
+  name: string;
+  icon: string;
+  characters: {
+    name: string;
+    class: CharacterClass;
+  }[];
+}
+
 export type CharacterClass = 'warrior' | 'mage' | 'healer' | 'archer' | 'assassin' | 'tank';
 export type TargetType = 'single' | 'multiple' | 'random' | 'all' | 'self';
 

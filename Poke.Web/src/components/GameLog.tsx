@@ -41,4 +41,4 @@ const GameLog: React.FC<GameLogProps> = ({ moves }) => {
   );
 };
 
-export default GameLog
+export default GameLog;
