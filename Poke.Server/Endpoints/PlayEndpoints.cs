@@ -3,11 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
+using Poke.Server.Infrastructure.Matchmaking;
 
 namespace Poke.Server.Endpoints;
 
 public static class PlayEndpoints
 {
+    public record PlayDTO(int MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
+
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/plays")
@@ -33,32 +36,15 @@ public static class PlayEndpoints
         return TypedResults.Ok(user);
     }
 
-    public static async Task<Results<Ok<string>, Ok>> Play(PlayDTO playDTO, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok<PlayDTO>, BadRequest> Play(PlayDTO playDTO, ICurrentUser currentUser, PokeContext db) 
     {
-        // if (db.Users.Any(x => x.Name == name))
-        // {
-        //     return TypedResults.Ok("Name already exists.");
-        // }
-// 
-        // var user = new User 
-        // { 
-        //     Name = name,
-        //     Teams = new List<Team>
-        //     {
-        //         new Team { Units = new List<BaseUnit> { new Mage(), new Warrior() }}
-        //     }
-        // };
-        // 
-        // db.Users.Add(user);
-        // await db.SaveChangesAsync();
+        if (!MatchmakingState.Matches.TryGetValue(playDTO.MatchID, out var match))
+        {
+            return TypedResults.BadRequest();
+        }
 
-        return TypedResults.Ok();
-    }
+        match.Play(currentUser.UserID, playDTO.UnitID, playDTO.SkillID, playDTO.TargetIDs);
 
-    public class PlayDTO
-    {
-        public int UnitID { get; set; }
-        public int SkillID { get; set; }
-        public List<int> TargetIDs { get; set; } = new List<int>();
+        return TypedResults.Ok(playDTO);
     }
 }

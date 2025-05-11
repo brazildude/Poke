@@ -42,7 +42,8 @@ public static class MatchmakingEndpoints
 
         var match = new Match
         {
-            User01ID = opponent.UserID
+            User01ID = opponent.UserID,
+            RandomSeed = Random.Shared.Next()
         };
 
         db.Matches.Add(match);
@@ -91,10 +92,8 @@ public static class MatchmakingEndpoints
         }
         catch (OperationCanceledException)
         {
-            // Timeout or client closed connection — cleanup
             MatchmakingState.Waiters.TryRemove(currentUser.UserID, out _);
 
-            // Remove from queue
             var remaining = MatchmakingState.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
             MatchmakingState.Queue.Clear();
             

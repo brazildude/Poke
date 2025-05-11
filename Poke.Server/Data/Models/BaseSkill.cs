@@ -14,11 +14,9 @@ public abstract class BaseSkill
     public virtual int TotalCooldown { get; set; }
     public virtual int CurrentCooldown { get; set; }
 
-    public virtual void Execute(BaseUnit unitInAction, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)
+    public virtual void Execute(BaseUnit unitInAction, HashSet<int> targetIDs, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits, int randomSeed)
     {
-        ApplySkillCost(unitInAction);
-
-        var unitTargets = SelectTargets(ownUnits, enemyUnits);
+        var unitTargets = SelectTargets(unitInAction, targetIDs, ownUnits, enemyUnits);
 
         switch (ApplyValue.Type)
         {
@@ -28,20 +26,13 @@ public abstract class BaseSkill
         }
     }
 
-    public virtual bool ApplySkillCost(BaseUnit unitInAction)
+    public virtual List<BaseUnit> SelectTargets(BaseUnit unitInAction, HashSet<int> targetIDs, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)
     {
-        switch (SkillCost.ToProperty)
+        if (Target.TargetType == TargetType.Self)
         {
-            case ApplyToProperty.Life: unitInAction.Life -= SkillCost.Value(); break;
-            case ApplyToProperty.Mana: unitInAction.Mana -= SkillCost.Value(); break;
-            default: throw new ArgumentOutOfRangeException(nameof(SkillCost.ToProperty));
+            return new List<BaseUnit> { unitInAction };
         }
 
-        return true;
-    }
-
-    public virtual List<BaseUnit> SelectTargets(List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)
-    {
         return enemyUnits;
     }
 
