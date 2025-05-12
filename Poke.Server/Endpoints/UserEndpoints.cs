@@ -1,4 +1,3 @@
-using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
@@ -9,7 +8,7 @@ namespace Poke.Server.Endpoints;
 
 public static class UserEndpoints
 {
-    public record UserVM(int UserID, string? Name, string? Email);
+    public record UserVM(string ExternalID, string? Name, string? Email);
     public record CreateUserVM(string Provider, string Token);
     public record GetTeamVM(int TeamID , string Name, List<string> Units);
 
@@ -26,8 +25,8 @@ public static class UserEndpoints
     public static Results<Ok<UserVM>, NotFound> GetUser(ICurrentUser currentUser, PokeContext db)
     {
         var user = db.Users
-            .Select(x => new UserVM(x.UserID, x.Name, x.Email))
             .Where(x => x.UserID == currentUser.UserID)
+            .Select(x => new UserVM(x.UserID, x.Name, x.Email))
             .Single();
         
         return TypedResults.Ok(user);
@@ -52,14 +51,14 @@ public static class UserEndpoints
             return TypedResults.Unauthorized();
         }
 
-        if (await db.Users.AnyAsync(x => x.ExternalID == uuid))
+        if (await db.Users.AnyAsync(x => x.UserID == uuid))
         {
             return TypedResults.Ok();
         }
 
         var user = new User
         {
-            ExternalID = uuid
+            UserID = uuid
         };
 
         await db.Users.AddAsync(user);
@@ -68,13 +67,11 @@ public static class UserEndpoints
         return TypedResults.Ok();
     }
 
-    public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(PokeContext db)
+    public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(ICurrentUser currentUser, PokeContext db)
     {
-        var userID = 1;
-
         var teams = db.Teams
         .Include(x => x.Units)
-        .Where(x => x.UserID == userID)
+        .Where(x => x.UserID == currentUser.UserID)
         .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.Select(p => p.Name).ToList()))
         .ToList();
 

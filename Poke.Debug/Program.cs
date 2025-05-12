@@ -32,8 +32,8 @@ internal class Program
         await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, pokeContext);
         await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, pokeContext);
 
-        var user01 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == 1);
-        var user02 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == 2);
+        var user01 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "0001");
+        var user02 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "0002");
 
         var match = new Poke.Server.Data.Models.Match
         {

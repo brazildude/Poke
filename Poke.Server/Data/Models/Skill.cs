@@ -70,7 +70,7 @@ public abstract class Skill
         }
 
         var selectableUnits = GetUnits(targetDirection).ToList();
-        var targetQuantity = Math.Min(selectableUnits.Count, Target.Quantity);
+        var targetQuantity = Math.Min(selectableUnits.Count, Target.Quantity ?? 0);
 
         return targetType switch
         {
@@ -78,6 +78,7 @@ public abstract class Skill
             TargetType.Select => selectableUnits
                 .Where(unit => targetIDs.Contains(unit.UnitID))
                 .ToList(),
+            TargetType.All => selectableUnits,
             _ => throw new InvalidOperationException("Unsupported target type.")
         };
     }

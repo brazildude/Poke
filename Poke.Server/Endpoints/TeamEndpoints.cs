@@ -22,7 +22,7 @@ public static class TeamEndpoints
         endpoints.MapPost("", CreateTeam);
     }
 
-    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db)
     {
         var team = db
             .Teams
@@ -38,7 +38,7 @@ public static class TeamEndpoints
         return TypedResults.Ok(team);
     }
 
-    public static Ok<List<GetTeamVM>> GetTeams(ICurrentUser currentUser, PokeContext db) 
+    public static Ok<List<GetTeamVM>> GetTeams(ICurrentUser currentUser, PokeContext db)
     {
         var teams = db.Teams
             .Include(x => x.Units)
@@ -49,25 +49,27 @@ public static class TeamEndpoints
         return TypedResults.Ok(teams);
     }
 
-    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
     {
         if (viewModel.BaseUnitIDs.Count != 4)
         {
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        if (db.Teams.Any(x => x.UserID == currentUser.UserID && x.Name == viewModel.Name))
+        var userID = db.Users.Where(x => x.UserID == currentUser.UserID).Select(x => x.UserID).Single();
+
+        if (db.Teams.Any(x => x.UserID == userID && x.Name == viewModel.Name))
         {
             return TypedResults.BadRequest("Team name already exists.");
         }
 
-        var team = new Team 
-        { 
-            UserID = currentUser.UserID,
+        var team = new Team
+        {
+            UserID = userID,
             Name = viewModel.Name,
             Units = viewModel.BaseUnitIDs.Select(Game.GetUnit).ToList()
         };
-        
+
         db.Teams.Add(team);
         db.SaveChanges();
 

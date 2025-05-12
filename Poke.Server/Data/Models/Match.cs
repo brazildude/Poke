@@ -1,5 +1,4 @@
 using Poke.Server.Data.Enums;
-using static Poke.Server.Endpoints.PlayEndpoints;
 
 namespace Poke.Server.Data.Models;
 
@@ -9,7 +8,7 @@ public class Match
     public int Team01ID { get; set; }
     public int Team02ID { get; set; }
 
-    public int CurrentUserID { get; set; }
+    public string CurrentUserID { get; set; } = null!;
     public int Round { get; set; }
     public int RandomSeed { get; set; }
 
@@ -44,7 +43,7 @@ public class Match
         unitInAction.UseSkill(skill, ownUnits, enemyUnits, targetIDs, RandomSeed);
     }
 
-    public Team GetCurrentTeam(int userID)
+    public Team GetCurrentTeam(string userID)
     {
         if (Team01.UserID == userID)
         {
@@ -54,7 +53,7 @@ public class Match
         return Team02;
     }
 
-    public Team GetEnemyTeam(int userID)
+    public Team GetEnemyTeam(string userID)
     {
         if (Team01.UserID == userID)
         {
@@ -70,7 +69,7 @@ public class Match
         var targetDirection = skill.Target.TargetDirection;
 
         // Always valid for Random and Self target types
-        if (targetType == TargetType.Random || targetType == TargetType.Self)
+        if (targetType == TargetType.Random || targetType == TargetType.Self || targetType == TargetType.All)
             return true;
 
         // Cannot be valid if no targets are selected
