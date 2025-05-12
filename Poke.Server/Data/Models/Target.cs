@@ -9,11 +9,11 @@ public class Target
     public TargetDirection TargetDirection { get; set; }
     public int Quantity { get; set; }
 
-    public List<BaseUnit> GetTargets(BaseUnit unitInAction, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits)
+    public List<Unit> GetTargets(Unit unitInAction, List<Unit> ownUnits, List<Unit> enemyUnits)
     {
         if (TargetType == TargetType.Self)
         {
-            return new List<BaseUnit> { unitInAction };
+            return new List<Unit> { unitInAction };
         }
 
         if (TargetType == TargetType.Select)
@@ -24,7 +24,7 @@ public class Target
             }
         }
 
-        return new List<BaseUnit> { unitInAction };
+        return new List<Unit> { unitInAction };
     }
 
     public static Target New(TargetType targetType, TargetDirection targetDirection, int quantity)

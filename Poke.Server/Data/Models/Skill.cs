@@ -4,17 +4,23 @@ using Poke.Server.Data.Enums;
 
 namespace Poke.Server.Data.Models;
 
-public abstract class BaseSkill
+public abstract class Skill
 {
+    public int SkillID { get; set; }
     public int BaseSkillID { get; set; }
+    public int UnitID { get; set; }
     public int SkillCostID { get; set; }
     public int ApplyValueID { get; set; }
     public int TargetID { get; set; }
+
+    public virtual int TotalCooldown { get; set; }
+    public virtual int CurrentCooldown { get; set; }
     public virtual ApplyValue SkillCost { get; set; } = null!;
     public virtual ApplyValue ApplyValue { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
-    public virtual int TotalCooldown { get; set; }
-    public virtual int CurrentCooldown { get; set; }
+    
+    public Unit Unit { get; set; } = null!;
+
 
     [NotMapped]
     public Random random = null!;
@@ -24,7 +30,7 @@ public abstract class BaseSkill
         return CurrentCooldown == 0;
     }
 
-    public virtual void Execute(BaseUnit unitInAction, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits, HashSet<int> targetIDs)
+    public virtual void Execute(Unit unitInAction, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
     {
         var unitTargets = SelectTargets(unitInAction, ownUnits, enemyUnits, targetIDs);
 
@@ -36,10 +42,10 @@ public abstract class BaseSkill
         }
     }
 
-    public virtual List<BaseUnit> SelectTargets(
-        BaseUnit unitInAction,
-        List<BaseUnit> ownUnits,
-        List<BaseUnit> enemyUnits,
+    public virtual List<Unit> SelectTargets(
+        Unit unitInAction,
+        List<Unit> ownUnits,
+        List<Unit> enemyUnits,
         HashSet<int> targetIDs)
     {
         var targetType = Target.TargetType;
@@ -52,7 +58,7 @@ public abstract class BaseSkill
         var aliveOwnUnits = ownUnits.Where(u => u.IsAlive());
         var aliveEnemyUnits = enemyUnits.Where(u => u.IsAlive());
 
-        IEnumerable<BaseUnit> GetUnits(TargetDirection direction)
+        IEnumerable<Unit> GetUnits(TargetDirection direction)
         {
             return direction switch
             {
@@ -70,13 +76,13 @@ public abstract class BaseSkill
         {
             TargetType.Random => SelectRandom(selectableUnits, targetQuantity),
             TargetType.Select => selectableUnits
-                .Where(unit => targetIDs.Contains(unit.BaseUnitID))
+                .Where(unit => targetIDs.Contains(unit.UnitID))
                 .ToList(),
             _ => throw new InvalidOperationException("Unsupported target type.")
         };
     }
 
-    public virtual void ApplyDamage(List<BaseUnit> unitTargets)
+    public virtual void ApplyDamage(List<Unit> unitTargets)
     {
         foreach (var unitTarget in unitTargets)
         {
@@ -84,7 +90,7 @@ public abstract class BaseSkill
         }
     }
 
-    public virtual void ApplyHeal(List<BaseUnit> unitTargets)
+    public virtual void ApplyHeal(List<Unit> unitTargets)
     {
         foreach (var unitTarget in unitTargets)
         {
@@ -92,17 +98,17 @@ public abstract class BaseSkill
         }
     }
 
-    private List<BaseUnit> SelectRandom(List<BaseUnit> units, int quantity)
+    private List<Unit> SelectRandom(List<Unit> units, int quantity)
     {
         var span = CollectionsMarshal.AsSpan(units);
 
         random.Shuffle(span);
-        var baseUnits = new List<BaseUnit>(quantity);
-        foreach (var baseUnit in span.Slice(0, quantity))
+        var shuffledUnits = new List<Unit>(quantity);
+        foreach (var unit in span.Slice(0, quantity))
         {
-            baseUnits.Add(baseUnit);
+            shuffledUnits.Add(unit);
         }
 
-        return baseUnits;
+        return shuffledUnits;
     }
 }

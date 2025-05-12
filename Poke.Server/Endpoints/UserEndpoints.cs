@@ -15,9 +15,10 @@ public static class UserEndpoints
 
     public static void RegisterUserEndpoints(this WebApplication app)
     {
-        var endpoints = app.MapGroup("api/users");
+        var endpoints = app.MapGroup("api/users")
+            .RequireCors("_myAllowSpecificOrigins");
 
-        endpoints.MapGet("{userID}", GetUser).RequireAuthorization();;
+        endpoints.MapGet("{userID}", GetUser).RequireAuthorization();
         endpoints.MapPost("", CreateUser);
         endpoints.MapPost("/teams", GetTeams).RequireAuthorization();
     }
@@ -49,6 +50,11 @@ public static class UserEndpoints
         if (uuid == null)
         {
             return TypedResults.Unauthorized();
+        }
+
+        if (await db.Users.AnyAsync(x => x.ExternalID == uuid))
+        {
+            return TypedResults.Ok();
         }
 
         var user = new User

@@ -11,11 +11,11 @@ public class PokeContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Match> Matches => Set<Match>();
     public DbSet<Team> Teams => Set<Team>();
-    public DbSet<BaseUnit> BaseUnits => Set<BaseUnit>();
-    public DbSet<BaseSkill> BaseSkills => Set<BaseSkill>();
+    public DbSet<Unit> BaseUnits => Set<Unit>();
+    public DbSet<Skill> BaseSkills => Set<Skill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseUnitConfiguration).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UnitConfiguration).Assembly);
     }
 }

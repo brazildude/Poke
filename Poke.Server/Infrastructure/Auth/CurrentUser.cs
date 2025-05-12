@@ -2,6 +2,15 @@ using System.Security.Claims;
 
 namespace Poke.Server.Infrastructure.Auth;
 
+public interface ICurrentUser
+{
+    public int UserID { get; set; }
+    public string ExternalUserID { get; set; }
+    public string? Email { get; set; }
+    public string? Name { get; set; }
+    public string? Role { get; set; }
+}
+
 public class CurrentUser : ICurrentUser
 {
     public int UserID { get; set; }
@@ -23,13 +32,4 @@ public class CurrentUser : ICurrentUser
             Role = principal.FindFirst("role")?.Value;
         }
     }
-}
-
-public interface ICurrentUser
-{
-    public int UserID { get; set; }
-    public string ExternalUserID { get; set; }
-    public string? Email { get; set; }
-    public string? Name { get; set; }
-    public string? Role { get; set; }
 }

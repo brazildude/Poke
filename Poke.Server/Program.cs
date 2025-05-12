@@ -16,7 +16,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<PokeContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<JsonOptions>(options =>
 {
-    options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    //options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     options.SerializerOptions.PropertyNamingPolicy = null;
 });
 builder.Services.AddHttpContextAccessor();

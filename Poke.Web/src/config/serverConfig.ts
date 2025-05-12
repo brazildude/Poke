@@ -4,7 +4,7 @@ export const serverConfig = {
   // Add the authenticateUser method that AuthContext is trying to use
   authenticateUser: async (token: string) => {
     try {
-      const response = await fetch(`${serverConfig.API_BASE_URL}/auth`, {
+      const response = await fetch(`${serverConfig.API_BASE_URL}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

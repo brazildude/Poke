@@ -16,7 +16,7 @@ public class Match
     public Team Team01 { get; set; } = null!;
     public Team Team02 { get; set; } = null!;
 
-    public void Play(BaseUnit unitInAction, BaseSkill skill, HashSet<int> targetIDs)
+    public void Play(Unit unitInAction, Skill skill, HashSet<int> targetIDs)
     {
         if (!unitInAction.IsAlive())
         {
@@ -64,7 +64,7 @@ public class Match
         return Team01;
     }
 
-    public virtual bool AreTargetsValid(BaseSkill skill, List<BaseUnit> ownUnits, List<BaseUnit> enemyUnits, HashSet<int> targetIDs)
+    public virtual bool AreTargetsValid(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
     {
         var targetType = skill.Target.TargetType;
         var targetDirection = skill.Target.TargetDirection;
@@ -77,8 +77,8 @@ public class Match
         if (targetIDs.Count == 0)
             return false;
 
-        var ownUnitIds = ownUnits.Where(u => u.IsAlive()).Select(u => u.BaseUnitID).ToHashSet();
-        var enemyUnitIds = enemyUnits.Where(u => u.IsAlive()).Select(u => u.BaseUnitID).ToHashSet();
+        var ownUnitIds = ownUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
+        var enemyUnitIds = enemyUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
         var allUnitIds = ownUnitIds.Union(enemyUnitIds);
 
         // Ensure all selected targets are valid units

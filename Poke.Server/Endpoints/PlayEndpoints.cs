@@ -48,14 +48,14 @@ public static class PlayEndpoints
             return TypedResults.BadRequest();
         }
 
-        var unitInAction = match.GetCurrentTeam(currentUser.UserID).Units.SingleOrDefault(x => x.BaseUnitID == playVM.UnitID);
+        var unitInAction = match.GetCurrentTeam(currentUser.UserID).Units.SingleOrDefault(x => x.UnitID == playVM.UnitID);
 
         if (unitInAction == null)
         {
             return TypedResults.BadRequest();
         }
 
-        var skill = unitInAction.Skills.SingleOrDefault(x => x.BaseSkillID == playVM.SkillID);
+        var skill = unitInAction.Skills.SingleOrDefault(x => x.SkillID == playVM.SkillID);
 
         if (skill == null)
         {

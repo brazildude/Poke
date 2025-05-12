@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
+using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
@@ -9,13 +10,15 @@ namespace Poke.Server.Endpoints;
 public static class TeamEndpoints
 {
     public record GetTeamVM(int TeamID, string Name, Dictionary<int, string> Units);
-    public record CreateTeamVM(string Name, List<int> UnitIDs);
+    public record CreateTeamVM(string Name, List<int> BaseUnitIDs);
 
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
-        var endpoints = app.MapGroup("api/teams");
+        var endpoints = app.MapGroup("api/teams")
+            .RequireAuthorization()
+            .RequireCors("_myAllowSpecificOrigins");
 
-        endpoints.MapGet("{teamID}", GetTeam).RequireAuthorization();
+        endpoints.MapGet("{teamID}", GetTeam);
         endpoints.MapPost("", CreateTeam);
     }
 
@@ -24,7 +27,7 @@ public static class TeamEndpoints
         var team = db
             .Teams
             .Where(x => x.UserID == currentUser.UserID && x.TeamID == teamID)
-            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.BaseUnitID, u => u.Name)))
+            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.UnitID, u => u.Name)))
             .SingleOrDefault();
 
         if (team == null)
@@ -40,7 +43,7 @@ public static class TeamEndpoints
         var teams = db.Teams
             .Include(x => x.Units)
             .Where(x => x.UserID == currentUser.UserID)
-            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.BaseUnitID, u => u.Name)))
+            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.UnitID, u => u.Name)))
             .ToList();
 
         return TypedResults.Ok(teams);
@@ -48,7 +51,7 @@ public static class TeamEndpoints
 
     public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db) 
     {
-        if (viewModel.UnitIDs.Count != 4)
+        if (viewModel.BaseUnitIDs.Count != 4)
         {
             return TypedResults.BadRequest("You must select 4 units.");
         }
@@ -60,11 +63,13 @@ public static class TeamEndpoints
 
         var team = new Team 
         { 
-            Name = viewModel.Name
+            UserID = currentUser.UserID,
+            Name = viewModel.Name,
+            Units = viewModel.BaseUnitIDs.Select(Game.GetUnit).ToList()
         };
         
         db.Teams.Add(team);
-        db.SaveChangesAsync();
+        db.SaveChanges();
 
         return TypedResults.Ok();
     }
