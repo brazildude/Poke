@@ -9,7 +9,7 @@ namespace Poke.Server.Endpoints;
 
 public static class PlayEndpoints
 {
-    public record PlayDTO(int MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
+    public record class PlayVM(int MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
 
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
@@ -21,12 +21,12 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static async Task<Results<Ok<User>, NotFound>> GetPlay(int userID, PokeContext db) 
+    public static async Task<Results<Ok<User>, NotFound>> GetPlay(ICurrentUser currentUser, PokeContext db) 
     {
         var user = await db.Users
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
-        .SingleOrDefaultAsync(x => x.UserID == userID);
+        .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID);
 
         if (user == null)
         {
@@ -36,15 +36,34 @@ public static class PlayEndpoints
         return TypedResults.Ok(user);
     }
 
-    public static Results<Ok<PlayDTO>, BadRequest> Play(PlayDTO playDTO, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok<PlayVM>, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PokeContext db) 
     {
-        if (!MatchmakingState.Matches.TryGetValue(playDTO.MatchID, out var match))
+        if (!MatchmakingState.Matches.TryGetValue(playVM.MatchID, out var match))
         {
             return TypedResults.BadRequest();
         }
 
-        match.Play(currentUser.UserID, playDTO.UnitID, playDTO.SkillID, playDTO.TargetIDs);
+        if (currentUser.UserID != match.CurrentUserID)
+        {
+            return TypedResults.BadRequest();
+        }
 
-        return TypedResults.Ok(playDTO);
+        var unitInAction = match.GetCurrentTeam(currentUser.UserID).Units.SingleOrDefault(x => x.BaseUnitID == playVM.UnitID);
+
+        if (unitInAction == null)
+        {
+            return TypedResults.BadRequest();
+        }
+
+        var skill = unitInAction.Skills.SingleOrDefault(x => x.BaseSkillID == playVM.SkillID);
+
+        if (skill == null)
+        {
+            return TypedResults.BadRequest();
+        }
+
+        match.Play(unitInAction, skill, playVM.TargetIDs);
+
+        return TypedResults.Ok(playVM);
     }
 }

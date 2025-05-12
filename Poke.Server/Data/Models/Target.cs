@@ -16,7 +16,7 @@ public class Target
             return new List<BaseUnit> { unitInAction };
         }
 
-        if (TargetType == TargetType.Single)
+        if (TargetType == TargetType.Select)
         {
             if (TargetDirection == TargetDirection.Enemy)
             {

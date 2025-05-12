@@ -32,7 +32,7 @@ public static class UserEndpoints
         return TypedResults.Ok(user);
     }
 
-    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserVM viewModel, PokeContext db)
+    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserVM viewModel, IAuthService authService, PokeContext db)
     {
         if (viewModel == null)
         {
@@ -44,16 +44,16 @@ public static class UserEndpoints
             return TypedResults.BadRequest("");
         }
 
-        var payload = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(viewModel.Token);
+        var uuid = await authService.VerifyIdTokenAsync(viewModel.Token);
 
-        if (payload == null)
+        if (uuid == null)
         {
             return TypedResults.Unauthorized();
         }
 
         var user = new User
         {
-            ExternalID = payload.Uid
+            ExternalID = uuid
         };
 
         await db.Users.AddAsync(user);

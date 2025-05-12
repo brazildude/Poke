@@ -1,7 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Poke.Server.Data;
-using Poke.Server.Data.Models;
+using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Endpoints.UserEndpoints;
 
 internal class Program
@@ -23,22 +24,28 @@ internal class Program
         pokeContext.Database.EnsureDeleted();
         pokeContext.Database.EnsureCreated();
 
-        await CreateUser(new CreateUserViewModel("Google", "0001"), pokeContext);
-        await CreateUser(new CreateUserViewModel("Google", "0001"), pokeContext);
+        var authMock = new Mock<IAuthService>();
 
-        var user01 = pokeContext.Users.Single(x => x.UserID == 1);
-        var user02 = pokeContext.Users.Single(x => x.UserID == 2);
+        authMock.Setup(x => x.VerifyIdTokenAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult("")!);
 
-        var match = new Match
+        await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, pokeContext);
+        await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, pokeContext);
+
+        var user01 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == 1);
+        var user02 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == 2);
+
+        var match = new Poke.Server.Data.Models.Match
         {
-            CurrentTeamID = user01.UserID,
-            CurrentTeam = user01.Teams.Single(),
-            NextTeam = user02.Teams.Single(),
-            Round = 1
+            CurrentUserID = user01.UserID,
+            Team01 = user01.Teams.Single(),
+            Team02 = user02.Teams.Single(),
+            Round = 1,
+            RandomSeed = Environment.TickCount
         };
+        
+        var unit = match.GetCurrentTeam(user01.UserID).Units[0];
 
-        var unit = match.CurrentTeam.Units[0];
-
-        unit.UseSkill(unit.Skills.First().BaseSkillID, match.CurrentTeam.Units, match.NextTeam.Units);
+        unit.UseSkill(unit.Skills.First(), match.Team01.Units, match.Team02.Units, new HashSet<int> { 4 }, match.RandomSeed);
     }
 }

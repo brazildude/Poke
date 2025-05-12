@@ -10,9 +10,9 @@ public class ApplyValue
     public ApplyType Type { get; set; }
     public ApplyToProperty ToProperty { get; set; }
 
-    public int Value()
+    public int Value(Random random)
     {
-        return Random.Shared.Next(MinValue, MaxValue + 1);
+        return random.Next(MinValue, MaxValue + 1);
     }
 
     public static ApplyValue New(int minValue, int maxValue, ApplyType type, ApplyToProperty toProperty)

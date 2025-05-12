@@ -21,6 +21,7 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
 
 builder.Services.AddAuthentication("Firebase")

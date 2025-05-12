@@ -4,6 +4,5 @@ public enum TargetType
 {
     Self,
     Random,
-    Single,
-    Multiple
+    Select
 }

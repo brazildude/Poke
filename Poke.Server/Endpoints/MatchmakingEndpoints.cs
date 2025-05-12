@@ -42,8 +42,8 @@ public static class MatchmakingEndpoints
 
         var match = new Match
         {
-            User01ID = opponent.UserID,
-            RandomSeed = Random.Shared.Next()
+            CurrentUserID = Random.Shared.Next(0, 2) == 0 ? currentUser.UserID : opponent.UserID,
+            RandomSeed = Environment.TickCount
         };
 
         db.Matches.Add(match);
