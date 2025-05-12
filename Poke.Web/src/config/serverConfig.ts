@@ -9,14 +9,15 @@ export const serverConfig = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({"Provider": "Google", "Token": token})
       });
       
       if (!response.ok) {
         throw new Error('Failed to authenticate user with server');
       }
       
-      return await response.json();
+      return true;
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;
