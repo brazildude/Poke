@@ -1,10 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
+using Poke.Server.Infrastructure.Matchmaking;
+using static Poke.Server.Endpoints.PlayEndpoints;
 using static Poke.Server.Endpoints.TeamEndpoints;
 using static Poke.Server.Endpoints.UserEndpoints;
 
@@ -48,12 +51,23 @@ internal class Program
             Team01 = SelectTeam(1, pokeContext),
             Team02 = SelectTeam(2, pokeContext),
             Round = 1,
-            RandomSeed = Environment.TickCount
+            RandomSeed = 10000
         };
-        
-        var unit = match.GetCurrentTeam(user01.UserID).Units[0];
+        pokeContext.Matches.Add(match);
+        pokeContext.SaveChanges();
 
-        unit.UseSkill(unit.Skills.First(), match.Team01.Units, match.Team02.Units, new HashSet<int> { 4 }, match.RandomSeed);
+        MatchmakingState.Matches.TryAdd(match.MatchID, match);
+        
+        var result = Play(new PlayVM(match.MatchID, 1, 3, new HashSet<int> { 5 }), new CurrentUser("01", null, null, null), pokeContext);
+        if (result.Result is Ok<PlayVM> ok)
+        {
+            Console.WriteLine(ok.Value);
+        }
+        
+        if (result.Result is BadRequest bad)
+        {
+            Console.WriteLine(bad.StatusCode);
+        }
     }
 
     private static Team SelectTeam(int teamID, PokeContext db)
