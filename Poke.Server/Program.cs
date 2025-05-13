@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.Runtime.CompilerServices;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
+
+[assembly: InternalsVisibleTo("Poke.Debug")]
 
 var builder = WebApplication.CreateBuilder(args);
 

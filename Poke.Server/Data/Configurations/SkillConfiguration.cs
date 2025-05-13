@@ -14,7 +14,5 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
                .HasValue<Fireball>("Fireball")
                .HasValue<Shadowbolt>("Shadowbolt")
                .HasValue<Cleave>("Cleave");
-
-        builder.HasIndex(x => x.BaseSkillID).IsUnique();
     }
 }

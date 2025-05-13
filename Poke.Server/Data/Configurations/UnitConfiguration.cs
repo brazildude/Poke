@@ -14,7 +14,5 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
               .HasValue<Paladin>("Paladin")
               .HasValue<Warlock>("Warlock")
               .HasValue<Warrior>("Warrior");
-
-        builder.HasIndex(x => x.BaseUnitID).IsUnique();
     }
 }

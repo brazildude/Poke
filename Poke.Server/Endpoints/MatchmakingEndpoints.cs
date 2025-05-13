@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
@@ -19,7 +20,7 @@ public static class MatchmakingEndpoints
         endpoints.MapGet("wait", Wait);
     }
 
-    public static Results<Ok<string>, BadRequest<string>> Join(ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PokeContext db)
     {
         // Prevent duplicate join
         if (MatchmakingState.Waiters.ContainsKey(currentUser.UserID))
@@ -27,8 +28,13 @@ public static class MatchmakingEndpoints
             return TypedResults.BadRequest("Already in queue.");
         }
 
+        if (!db.Teams.Any(x => x.TeamID == teamID && x.UserID == currentUser.UserID))
+        {
+            return TypedResults.BadRequest("Team does not exist.");
+        }
+
         var tcs = new TaskCompletionSource<(int, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var player = new MatchmakingState.WaitingPlayer(currentUser.UserID, tcs);
+        var player = new MatchmakingState.WaitingPlayer(currentUser.UserID, teamID, tcs);
 
         // Try to match
         if (!MatchmakingState.Queue.TryDequeue(out var opponent))
@@ -46,9 +52,23 @@ public static class MatchmakingEndpoints
             RandomSeed = Environment.TickCount
         };
 
+        var team01 = SelectTeam(player.TeamID, db);
+        var team02 = SelectTeam(opponent.TeamID, db);
+
+        if (match.CurrentUserID == player.UserID)
+        {
+            match.Team01 = team01;
+            match.Team02 = team02;
+        }
+        else
+        {
+            match.Team01 = team02;
+            match.Team02 = team01;
+        }
+
         db.Matches.Add(match);
         db.SaveChanges();
-        
+
         MatchmakingState.Matches.TryAdd(match.MatchID, match);
 
         opponent.Tcs.TrySetResult((match.MatchID, "player1"));
@@ -63,8 +83,8 @@ public static class MatchmakingEndpoints
 
         var remaining = MatchmakingState.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
         MatchmakingState.Queue.Clear();
-        
-        foreach (var p in remaining) 
+
+        foreach (var p in remaining)
         {
             MatchmakingState.Queue.Enqueue(p);
         }
@@ -96,13 +116,21 @@ public static class MatchmakingEndpoints
 
             var remaining = MatchmakingState.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
             MatchmakingState.Queue.Clear();
-            
-            foreach (var p in remaining) 
+
+            foreach (var p in remaining)
             {
                 MatchmakingState.Queue.Enqueue(p);
             }
 
             return TypedResults.Ok("timeout_or_cancelled");
         }
+    }
+
+    private static Team SelectTeam(int teamID, PokeContext db)
+    {
+        return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
+                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
+                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Target)
+                .Single(x => x.TeamID == teamID);
     }
 }

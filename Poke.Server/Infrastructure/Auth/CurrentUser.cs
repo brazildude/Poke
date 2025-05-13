@@ -4,18 +4,27 @@ namespace Poke.Server.Infrastructure.Auth;
 
 public interface ICurrentUser
 {
-    public string UserID { get; set; }
-    public string? Email { get; set; }
-    public string? Name { get; set; }
-    public string? Role { get; set; }
+    public string UserID { get; }
+    public string? Email { get; }
+    public string? Name { get; }
+    public string? Role { get; }
 }
+
 
 public class CurrentUser : ICurrentUser
 {
-    public string UserID { get; set; }
-    public string? Email { get; set; }
-    public string? Name { get; set; }
-    public string? Role { get; set; }
+    public string UserID { get; private set; }
+    public string? Email { get; private set; }
+    public string? Name { get; private set; }
+    public string? Role { get; private set; }
+
+    internal CurrentUser(string userID, string? email, string? name, string? role)
+    {
+        UserID = userID;
+        Email = email; 
+        Name = name;
+        Role = role;
+    }
 
     public CurrentUser(IHttpContextAccessor accessor)
     {
