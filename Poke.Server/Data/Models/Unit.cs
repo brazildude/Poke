@@ -55,13 +55,7 @@ public abstract class Unit
         return hasResource;
     }
 
-    public virtual void Defend(PropertyName toProperty, int value)
-    {
-        var property = Properties.Single(x => x.PropertyName == toProperty);
-        property.CurrentValue += value;
-    }
-
-    public virtual void Heal(PropertyName toProperty, int value)
+    public virtual void ApplyValue(PropertyName toProperty, int value)
     {
         var property = Properties.Single(x => x.PropertyName == toProperty);
         property.CurrentValue += value;

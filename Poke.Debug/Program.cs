@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
-using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Infrastructure.Matchmaking;
 using static Poke.Server.Endpoints.PlayEndpoints;

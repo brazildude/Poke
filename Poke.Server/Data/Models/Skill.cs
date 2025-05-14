@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models;
 
@@ -12,12 +13,11 @@ public abstract class Skill
     public int ApplyValueID { get; set; }
     public int TargetID { get; set; }
 
-    public virtual int TotalCooldown { get; set; }
-    public virtual int CurrentCooldown { get; set; }
     public virtual ApplyValue ApplyValue { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
 
     public virtual List<Cost> Costs { get; set; } = new List<Cost>();
+    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
     
     public Unit Unit { get; set; } = null!;
 
@@ -26,18 +26,24 @@ public abstract class Skill
 
     public virtual bool IsInCooldown()
     {
-        return CurrentCooldown == 0;
+        return Properties.Single(x => x.PropertyName == PropertyName.Cooldown).CurrentValue > 0;
     }
 
     public virtual void Execute(Unit unitInAction, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
     {
         var unitTargets = SelectTargets(unitInAction, ownUnits, enemyUnits, targetIDs);
 
-        switch (ApplyValue.Type)
+        foreach (var unitTarget in unitTargets)
         {
-            case ApplyType.Damage: ApplyDamage(unitTargets); break;
-            case ApplyType.Heal: ApplyHeal(unitTargets); break;
-            default: throw new ArgumentOutOfRangeException(nameof(ApplyValue.Type));
+            var property = unitTarget.Properties.Single(x => x.PropertyName == ApplyValue.PropertyName);
+            var skillValue = ApplyValue.GetValue(random);
+
+            if (ApplyValue.Type == ApplyType.Damage)
+            {
+                
+            }
+
+            property.CurrentValue += skillValue;
         }
     }
 
@@ -80,22 +86,6 @@ public abstract class Skill
             TargetType.All => selectableUnits,
             _ => throw new InvalidOperationException("Unsupported target type.")
         };
-    }
-
-    public virtual void ApplyDamage(List<Unit> unitTargets)
-    {
-        foreach (var unitTarget in unitTargets)
-        {
-            unitTarget.Defend(ApplyValue.ToProperty, ApplyValue.Value(random));
-        }
-    }
-
-    public virtual void ApplyHeal(List<Unit> unitTargets)
-    {
-        foreach (var unitTarget in unitTargets)
-        {
-            unitTarget.Heal(ApplyValue.ToProperty, ApplyValue.Value(random));
-        }
     }
 
     private List<Unit> SelectRandom(List<Unit> units, int quantity)

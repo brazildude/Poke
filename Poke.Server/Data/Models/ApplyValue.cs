@@ -8,10 +8,10 @@ public class ApplyValue
     public int ApplyValueID { get; set; }
     public int MinMaxPropertyID { get; set; }
     public ApplyType Type { get; set; }
-    public PropertyName ToProperty { get; set; }
+    public PropertyName PropertyName { get; set; }
     public MinMaxProperty MinMaxProperty { get; set; } = null!;
 
-    public int Value(Random random)
+    public int GetValue(Random random)
     {
         return random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
     }
@@ -22,7 +22,7 @@ public class ApplyValue
         {
             MinMaxProperty = MinMaxProperty.New(PropertyName.ApplyValue, minValue, maxValue),
             Type = applyType,
-            ToProperty = propertyName
+            PropertyName = propertyName
         };
     }
 }

@@ -5,5 +5,6 @@ public enum PropertyName
     Life,
     Mana,
     SkillCost,
-    ApplyValue
+    ApplyValue,
+    Cooldown
 }
