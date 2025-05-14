@@ -9,18 +9,17 @@ public abstract class Skill
     public int SkillID { get; set; }
     public int BaseSkillID { get; set; }
     public int UnitID { get; set; }
-    public int SkillCostID { get; set; }
     public int ApplyValueID { get; set; }
     public int TargetID { get; set; }
 
     public virtual int TotalCooldown { get; set; }
     public virtual int CurrentCooldown { get; set; }
-    public virtual Cost Cost { get; set; } = null!;
     public virtual ApplyValue ApplyValue { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
+
+    public virtual List<Cost> Costs { get; set; } = new List<Cost>();
     
     public Unit Unit { get; set; } = null!;
-
 
     [NotMapped]
     public Random random = null!;

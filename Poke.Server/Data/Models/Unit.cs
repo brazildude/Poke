@@ -16,14 +16,41 @@ public abstract class Unit
 
     public virtual void ApplySkillCost(Skill skill)
     {
-        var property = Properties.Single(x => x.PropertyName == skill.Cost.PropertyName);
-        property.CurrentValue += skill.Cost.Value.CurrentValue;
+        foreach (var cost in skill.Costs)
+        {
+            var property = Properties.Single(x => x.PropertyName == cost.PropertyName);
+
+            var valueToApply = cost.CostType switch
+            {
+                CostType.Flat => property.CurrentValue + Math.Abs(cost.FlatProperty.CurrentValue),
+                CostType.Porcentage => property.BaseValue * cost.FlatProperty.CurrentValue / 100,
+                _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
+            };
+
+            property.CurrentValue += valueToApply;
+        }
     }
     
     public virtual bool CheckSkillCost(Skill skill)
     {
-        var property = Properties.Single(x => x.PropertyName == skill.Cost.PropertyName);
-        var hasResource = property.CurrentValue > skill.Cost.Value.CurrentValue;
+        var hasResource = true;
+
+        foreach (var cost in skill.Costs)
+        {
+            var property = Properties.Single(x => x.PropertyName == cost.PropertyName);
+
+            hasResource = cost.CostType switch
+            {
+                CostType.Flat => property.CurrentValue > Math.Abs(cost.FlatProperty.CurrentValue),
+                CostType.Porcentage => property.CurrentValue > property.BaseValue * cost.FlatProperty.CurrentValue / 100,
+                _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
+            };
+
+            if (hasResource == false)
+            {
+                break;
+            }
+        }
 
         return hasResource;
     }

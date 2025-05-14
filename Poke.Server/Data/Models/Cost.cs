@@ -6,16 +6,18 @@ namespace Poke.Server.Data.Models;
 public class Cost
 {
     public int CostID { get; set; }
+    public int SkillID { get; set; }
     public int FlatPropertyID { get; set; }
     public CostType CostType { get; set; }
     public PropertyName PropertyName { get; set; }
-    public FlatProperty Value { get; set; } = null!;
+    public FlatProperty FlatProperty { get; set; } = null!;
+    public Skill Skill { get; set; } = null!;
 
     public static Cost New(int value, CostType costType, PropertyName propertyName)
     {
         return new Cost
         {
-            Value = FlatProperty.New(PropertyName.SkillCost, value),
+            FlatProperty = FlatProperty.New(PropertyName.SkillCost, value),
             CostType = costType,
             PropertyName = propertyName
         };

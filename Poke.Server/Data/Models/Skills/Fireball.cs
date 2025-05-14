@@ -7,8 +7,9 @@ public class Fireball : Skill
     public Fireball()
     {
         BaseSkillID = 2;
-        Cost = Cost.New(10, CostType.Flat, PropertyName.Mana);
         ApplyValue = ApplyValue.New(5, 25, ApplyType.Damage, PropertyName.Life);
         Target = Target.New(TargetType.Select, TargetDirection.Enemy, 2);
+        
+        Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));
     }
 }
