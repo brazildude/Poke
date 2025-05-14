@@ -25,7 +25,8 @@ public static class PlayEndpoints
     {
         var user = await db.Users
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue).ThenInclude(x => x.MinMaxProperty)
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
         .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID);
 
         if (user == null)

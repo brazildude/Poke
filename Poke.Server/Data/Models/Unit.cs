@@ -55,20 +55,11 @@ public abstract class Unit
         return hasResource;
     }
 
-    public virtual void ApplyValue(PropertyName toProperty, int value)
-    {
-        var property = Properties.Single(x => x.PropertyName == toProperty);
-        property.CurrentValue += value;
-    }
-
     public virtual bool IsAlive()
     {
-        if (Properties.Single(x => x.PropertyName == PropertyName.Life).CurrentValue <= 0)
-        {
-            return false;
-        }
+        var isAlive = Properties.Single(x => x.PropertyName == PropertyName.Life).CurrentValue <= 0;
 
-        return true;
+        return isAlive;
     }
 
     public virtual void UseSkill(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs, int randomSeed)

@@ -71,9 +71,9 @@ internal class Program
 
     private static Team SelectTeam(int teamID, PokeContext db)
     {
-        return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue).ThenInclude(x => x.MinMaxProperty)
+        return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
+                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
-                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Target)
                 .Single(x => x.TeamID == teamID);
     }
 }

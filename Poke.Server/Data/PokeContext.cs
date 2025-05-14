@@ -8,7 +8,7 @@ public class PokeContext : DbContext
 {
     public PokeContext(DbContextOptions<PokeContext> options) : base(options) { }
 
-    public DbSet<ApplyValue> ApplyValues => Set<ApplyValue>();
+    public DbSet<Behavior> ApplyValues => Set<Behavior>();
     public DbSet<Cost> Costs => Set<Cost>();
     public DbSet<Match> Matches => Set<Match>();
     public DbSet<Skill> Skills => Set<Skill>();

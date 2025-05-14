@@ -65,35 +65,38 @@ public class Match
 
     public virtual bool AreTargetsValid(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
     {
-        var targetType = skill.Target.TargetType;
-        var targetDirection = skill.Target.TargetDirection;
-
-        // Always valid for Random and Self target types
-        if (targetType == TargetType.Random || targetType == TargetType.Self || targetType == TargetType.All)
-            return true;
-
-        // Cannot be valid if no targets are selected
-        if (targetIDs.Count == 0)
-            return false;
-
-        var ownUnitIds = ownUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
-        var enemyUnitIds = enemyUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
-        var allUnitIds = ownUnitIds.Union(enemyUnitIds);
-
-        // Ensure all selected targets are valid units
-        if (!targetIDs.All(id => allUnitIds.Contains(id)))
-            return false;
-
-        // Check for Select target constraints
-        if (targetType == TargetType.Select)
+        foreach (var behavior in skill.Behaviors)
         {
-            if (targetIDs.Count > skill.Target.Quantity)
+            var targetType = behavior.Target.TargetType;
+            var targetDirection = behavior.Target.TargetDirection;
+
+            // Always valid for Random and Self target types
+            if (targetType == TargetType.Random || targetType == TargetType.Self || targetType == TargetType.All)
+                break;
+
+            // Cannot be valid if no targets are selected
+            if (targetIDs.Count == 0)
                 return false;
 
-            if ((targetDirection == TargetDirection.Own && targetIDs.Any(enemyUnitIds.Contains)) ||
-                (targetDirection == TargetDirection.Enemy && targetIDs.Any(ownUnitIds.Contains)))
-            {
+            var ownUnitIds = ownUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
+            var enemyUnitIds = enemyUnits.Where(u => u.IsAlive()).Select(u => u.UnitID).ToHashSet();
+            var allUnitIds = ownUnitIds.Union(enemyUnitIds);
+
+            // Ensure all selected targets are valid units
+            if (!targetIDs.All(id => allUnitIds.Contains(id)))
                 return false;
+
+            // Check for Select target constraints
+            if (targetType == TargetType.Select)
+            {
+                if (targetIDs.Count > behavior.Target.Quantity)
+                    return false;
+
+                if ((targetDirection == TargetDirection.Own && targetIDs.Any(enemyUnitIds.Contains)) ||
+                    (targetDirection == TargetDirection.Enemy && targetIDs.Any(ownUnitIds.Contains)))
+                {
+                    return false;
+                }
             }
         }
 
