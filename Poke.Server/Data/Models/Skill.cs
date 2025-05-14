@@ -15,7 +15,7 @@ public abstract class Skill
 
     public virtual int TotalCooldown { get; set; }
     public virtual int CurrentCooldown { get; set; }
-    public virtual ApplyValue SkillCost { get; set; } = null!;
+    public virtual Cost Cost { get; set; } = null!;
     public virtual ApplyValue ApplyValue { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
     

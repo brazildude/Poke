@@ -1,11 +1,7 @@
 import { auth } from '../lib/firebase';
 
 class ServerService {
-  private baseUrl: string;
-
-  constructor() {
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL;
-  }
+  private baseUrl: string = 'http://localhost:5245';
 
   private async getHeaders(): Promise<HeadersInit> {
     const token = await auth.currentUser?.getIdToken();

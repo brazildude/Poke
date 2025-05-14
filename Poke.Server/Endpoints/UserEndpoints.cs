@@ -15,7 +15,7 @@ public static class UserEndpoints
     public static void RegisterUserEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/users")
-            .RequireCors("_myAllowSpecificOrigins");
+            .RequireCors("myAllowSpecificOrigins");
 
         endpoints.MapGet("{userID}", GetUser).RequireAuthorization();
         endpoints.MapPost("", CreateUser);

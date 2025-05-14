@@ -4,20 +4,19 @@ export const serverConfig = {
   // Add the authenticateUser method that AuthContext is trying to use
   authenticateUser: async (token: string) => {
     try {
-      const response = await fetch(`${serverConfig.API_BASE_URL}/users`, {
+      const response = await fetch(`${serverConfig.API_BASE_URL}/auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({"Provider": "Google", "Token": token})
+        }
       });
       
       if (!response.ok) {
         throw new Error('Failed to authenticate user with server');
       }
       
-      return true;
+      return await response.json();
     } catch (error) {
       console.error('Authentication error:', error);
       throw error;

@@ -13,7 +13,7 @@ public static class MatchmakingEndpoints
     {
         var endpoints = app.MapGroup("api/matchmaking")
         .RequireAuthorization()
-        .RequireCors("_myAllowSpecificOrigins");
+        .RequireCors("myAllowSpecificOrigins");
 
         endpoints.MapGet("join", Join);
         endpoints.MapGet("cancel", Cancel);
@@ -129,7 +129,7 @@ public static class MatchmakingEndpoints
     private static Team SelectTeam(int teamID, PokeContext db)
     {
         return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
-                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
+                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Cost)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Target)
                 .Single(x => x.TeamID == teamID);
     }

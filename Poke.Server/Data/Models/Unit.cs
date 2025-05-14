@@ -18,11 +18,11 @@ public abstract class Unit
 
     public virtual bool ApplySkillCost(Skill skill)
     {
-        switch (skill.SkillCost.ToProperty)
+        switch (skill.Cost.ToProperty)
         {
-            case ApplyToProperty.Life: Life -= skill.SkillCost.MaxValue; break;
-            case ApplyToProperty.Mana: Mana -= skill.SkillCost.MaxValue; break;
-            default: throw new ArgumentOutOfRangeException(nameof(skill.SkillCost.ToProperty));
+            case ApplyToProperty.Life: Life -= skill.Cost.Value; break;
+            case ApplyToProperty.Mana: Mana -= skill.Cost.Value; break;
+            default: throw new ArgumentOutOfRangeException(nameof(skill.Cost.ToProperty));
         }
 
         return true;
@@ -31,11 +31,11 @@ public abstract class Unit
     public virtual bool CheckSkillCost(Skill skill)
     {
         bool hasResources;
-        switch (skill.SkillCost.ToProperty)
+        switch (skill.Cost.ToProperty)
         {
-            case ApplyToProperty.Life: hasResources = Life >= skill.SkillCost.MaxValue; break;
-            case ApplyToProperty.Mana: hasResources = Mana >= skill.SkillCost.MaxValue; break;
-            default: throw new ArgumentOutOfRangeException(nameof(skill.SkillCost.ToProperty));
+            case ApplyToProperty.Life: hasResources = Life >= skill.Cost.Value; break;
+            case ApplyToProperty.Mana: hasResources = Mana >= skill.Cost.Value; break;
+            default: throw new ArgumentOutOfRangeException(nameof(skill.Cost.ToProperty));
         }
 
         return hasResources;

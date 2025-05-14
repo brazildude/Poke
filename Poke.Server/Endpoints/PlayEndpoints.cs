@@ -15,7 +15,7 @@ public static class PlayEndpoints
     {
         var endpoints = app.MapGroup("api/plays")
         .RequireAuthorization()
-        .RequireCors("_myAllowSpecificOrigins");
+        .RequireCors("myAllowSpecificOrigins");
 
         endpoints.MapGet("", GetPlay);
         endpoints.MapPost("", Play);
@@ -24,7 +24,7 @@ public static class PlayEndpoints
     public static async Task<Results<Ok<User>, NotFound>> GetPlay(ICurrentUser currentUser, PokeContext db) 
     {
         var user = await db.Users
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.SkillCost)
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Cost)
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.ApplyValue)
         .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID);
 

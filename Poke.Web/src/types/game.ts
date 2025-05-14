@@ -1,22 +1,20 @@
+import { CharacterClass } from './game';
+
 export interface Team {
-  id: string;
+  teamID: number;
   name: string;
-  icon: string;
-  characters: {
-    name: string;
-    class: CharacterClass;
-  }[];
+  units: string[];
 }
 
 export type CharacterClass = 'warrior' | 'mage' | 'healer' | 'archer' | 'assassin' | 'tank';
 export type TargetType = 'single' | 'multiple' | 'random' | 'all' | 'self';
 
 export interface Character {
-  id: string;
+  unitID: number;
   name: string;
-  health: number;
-  maxHealth: number;
-  class: CharacterClass;
+  life: number;
+  mana: number;
+  isAbleToAttack: boolean;
   skills: Skill[];
   status: StatusEffect[];
   isActive: boolean;
@@ -24,17 +22,22 @@ export interface Character {
 }
 
 export interface Skill {
-  id: string;
+  skillID: number;
   name: string;
   description: string;
-  damage?: number;
-  healing?: number;
-  cooldown: number;
+  applyValue: {
+    minValue: number;
+    maxValue: number;
+    type: number;
+    toProperty: number;
+  };
+  totalCooldown: number;
   currentCooldown: number;
-  type: 'attack' | 'heal' | 'buff' | 'debuff';
-  targetType: TargetType;
-  targetCount?: number;
-  characterClass: CharacterClass;
+  target: {
+    targetType: number;
+    targetDirection: number;
+    quantity: number | null;
+  };
 }
 
 export interface StatusEffect {
@@ -46,39 +49,37 @@ export interface StatusEffect {
 }
 
 export interface Player {
-  id: string;
-  name: string;
+  userID: string;
+  name: string | null;
+  email: string | null;
   characters: Character[];
   isCurrentTurn: boolean;
 }
 
-export interface Move {
-  id: string;
-  gameId: string;
-  playerId: string;
-  characterId: string;
-  skillId: string;
-  targets: string[];
-  timestamp: number;
+export interface PlayMove {
+  matchID: number;
+  unitID: number;
+  skillID: number;
+  targetIDs: number[];
 }
 
 export interface GameState {
-  id: string;
+  matchID: number;
   players: Player[];
   currentPlayerId: string;
   activeCharacterId: string;
   turnNumber: number;
   gameStatus: 'waiting' | 'in-progress' | 'completed';
   selectedTargets: string[];
-  lastMove?: Move;
+  lastMove?: PlayMove;
 }
 
 export interface GameData {
-  id: string;
+  matchID: number;
   createdAt: number;
   updatedAt: number;
   players: Player[];
   state: GameState;
   winnerId?: string;
-  lastMove?: Move;
+  lastMove?: PlayMove;
 }

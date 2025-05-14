@@ -1,48 +1,42 @@
-import { GameData, Team } from '../types/game';
+import { GameData, GameState, Team, PlayMove } from '../types/game';
 import { serverService } from './serverService';
-
-interface MovePayload {
-  characterId: string;
-  targets: string[];
-  skillId: string;
-}
 
 interface MatchmakingResponse {
   status: 'queued' | 'matched' | 'cancelled';
-  gameId?: string;
+  matchID?: number;
 }
 
 export const gameService = {
   async createGame(userId: string): Promise<GameData> {
     try {
-      return await serverService.post<GameData>('/games', { userId });
+      return await serverService.get<GameData>('/api/plays');
     } catch (error) {
       console.error('Error creating game:', error);
       throw error;
     }
   },
 
-  async getGame(gameId: string): Promise<GameData | null> {
+  async getGame(gameId: number): Promise<GameData | null> {
     try {
-      return await serverService.get<GameData>(`/games/${gameId}`);
+      return await serverService.get<GameData>(`/api/plays/${gameId}`);
     } catch (error) {
       console.error('Error fetching game:', error);
       throw error;
     }
   },
 
-  async makeMove(gameId: string, moveData: MovePayload): Promise<GameData> {
+  async makeMove(matchID: number, moveData: PlayMove): Promise<GameData> {
     try {
-      return await serverService.post<GameData>(`/games/${gameId}/moves`, moveData);
+      return await serverService.post<GameData>('/api/plays', moveData);
     } catch (error) {
       console.error('Error making move:', error);
       throw error;
     }
   },
 
-  async endTurn(gameId: string): Promise<GameData> {
+  async endTurn(gameId: number): Promise<GameData> {
     try {
-      return await serverService.post<GameData>(`/games/${gameId}/end-turn`, {});
+      return await serverService.post<GameData>(`/api/plays/${gameId}/end-turn`, {});
     } catch (error) {
       console.error('Error ending turn:', error);
       throw error;
@@ -51,16 +45,16 @@ export const gameService = {
 
   async getTeams(): Promise<Team[]> {
     try {
-      return await serverService.get<Team[]>('/teams');
+      return await serverService.post<Team[]>('/api/users/teams');
     } catch (error) {
       console.error('Error fetching teams:', error);
       throw error;
     }
   },
 
-  async startMatchmaking(teamId: string): Promise<MatchmakingResponse> {
+  async startMatchmaking(teamID: number): Promise<string> {
     try {
-      return await serverService.post<MatchmakingResponse>('/matchmaking/queue', { teamId });
+      return await serverService.get<string>(`/api/matchmaking/join?teamID=${teamID}`);
     } catch (error) {
       console.error('Error starting matchmaking:', error);
       throw error;
@@ -69,16 +63,16 @@ export const gameService = {
 
   async cancelMatchmaking(): Promise<void> {
     try {
-      await serverService.post('/matchmaking/cancel');
+      await serverService.get('/api/matchmaking/cancel');
     } catch (error) {
       console.error('Error canceling matchmaking:', error);
       throw error;
     }
   },
 
-  async checkMatchmakingStatus(): Promise<MatchmakingResponse> {
+  async checkMatchmakingStatus(): Promise<string> {
     try {
-      return await serverService.get<MatchmakingResponse>('/matchmaking/status');
+      return await serverService.get<string>('/api/matchmaking/wait');
     } catch (error) {
       console.error('Error checking matchmaking status:', error);
       throw error;

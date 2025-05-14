@@ -8,11 +8,14 @@ public class PokeContext : DbContext
 {
     public PokeContext(DbContextOptions<PokeContext> options) : base(options) { }
 
-    public DbSet<User> Users => Set<User>();
+    public DbSet<ApplyValue> ApplyValues => Set<ApplyValue>();
+    public DbSet<Cost> Costs => Set<Cost>();
     public DbSet<Match> Matches => Set<Match>();
+    public DbSet<Skill> Skills => Set<Skill>();
+    public DbSet<Target> Targets => Set<Target>();
     public DbSet<Team> Teams => Set<Team>();
-    public DbSet<Unit> BaseUnits => Set<Unit>();
-    public DbSet<Skill> BaseSkills => Set<Skill>();
+    public DbSet<Unit> Units => Set<Unit>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

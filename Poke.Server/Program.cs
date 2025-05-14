@@ -24,8 +24,6 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
 
-builder.Services.AddAuthentication("Firebase").AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
-builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: builder.Configuration["Cors:Name"]!,
@@ -36,12 +34,14 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     });
 });
+builder.Services.AddAuthentication("Firebase").AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseCors(builder.Configuration["Cors:Name"]!);
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors(builder.Configuration["Cors:Name"]!);
 
 if (app.Environment.IsDevelopment())
 {

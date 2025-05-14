@@ -16,7 +16,7 @@ public static class TeamEndpoints
     {
         var endpoints = app.MapGroup("api/teams")
             .RequireAuthorization()
-            .RequireCors("_myAllowSpecificOrigins");
+            .RequireCors("myAllowSpecificOrigins");
 
         endpoints.MapGet("{teamID}", GetTeam);
         endpoints.MapPost("", CreateTeam);

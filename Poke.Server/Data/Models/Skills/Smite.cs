@@ -7,8 +7,7 @@ public class Smite : Skill
     public Smite()
     {
         BaseSkillID = 4;
-        Target = Target.New(TargetType.Random, TargetDirection.Enemy, 1);
-        SkillCost = ApplyValue.New(10, 10, ApplyType.Cost, ApplyToProperty.Mana);
+        Cost = Cost.New(10, CostType.Flat, ApplyToProperty.Mana);
         ApplyValue = ApplyValue.New(5, 25, ApplyType.Damage, ApplyToProperty.Life);
         Target = Target.New(TargetType.Select, TargetDirection.Enemy, 1);
     }
