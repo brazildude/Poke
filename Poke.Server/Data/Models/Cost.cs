@@ -1,21 +1,23 @@
 using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models;
 
 public class Cost
 {
     public int CostID { get; set; }
-    public int Value { get; set; }
-    public CostType Type { get; set; }
-    public ApplyToProperty ToProperty { get; set; }
+    public int FlatPropertyID { get; set; }
+    public CostType CostType { get; set; }
+    public PropertyName PropertyName { get; set; }
+    public FlatProperty Value { get; set; } = null!;
 
-    public static Cost New(int value, CostType type, ApplyToProperty toProperty)
+    public static Cost New(int value, CostType costType, PropertyName propertyName)
     {
         return new Cost
         {
-            Value = value,
-            Type = type,
-            ToProperty = toProperty
+            Value = FlatProperty.New(PropertyName.SkillCost, value),
+            CostType = costType,
+            PropertyName = propertyName
         };
     }
 }

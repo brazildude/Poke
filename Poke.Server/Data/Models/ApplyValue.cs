@@ -1,28 +1,28 @@
 using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models;
 
 public class ApplyValue
 {
     public int ApplyValueID { get; set; }
-    public int MinValue { get; set; }
-    public int MaxValue { get; set; }
+    public int MinMaxPropertyID { get; set; }
     public ApplyType Type { get; set; }
-    public ApplyToProperty ToProperty { get; set; }
+    public PropertyName ToProperty { get; set; }
+    public MinMaxProperty MinMaxProperty { get; set; } = null!;
 
     public int Value(Random random)
     {
-        return random.Next(MinValue, MaxValue + 1);
+        return random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
     }
 
-    public static ApplyValue New(int minValue, int maxValue, ApplyType type, ApplyToProperty toProperty)
+    public static ApplyValue New(int minValue, int maxValue, ApplyType applyType, PropertyName propertyName)
     {
         return new ApplyValue
         {
-            MinValue = minValue,
-            MaxValue = maxValue,
-            Type = type,
-            ToProperty = toProperty
+            MinMaxProperty = MinMaxProperty.New(PropertyName.ApplyValue, minValue, maxValue),
+            Type = applyType,
+            ToProperty = propertyName
         };
     }
 }

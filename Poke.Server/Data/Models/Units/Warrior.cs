@@ -1,3 +1,5 @@
+using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Properties;
 using Poke.Server.Data.Models.Skills;
 
 namespace Poke.Server.Data.Models.Units;
@@ -8,12 +10,11 @@ public class Warrior : Unit
     {
         BaseUnitID = 4;
         Name = typeof(Warrior).Name;
-        Life = 100;
-        Mana = 100;
 
-        Skills = new List<Skill>
-        {
-            new Cleave()
-        };
+        Skills.Add(new Cleave());
+        Properties.AddRange(
+            FlatProperty.New(PropertyName.Life, 100),
+            FlatProperty.New(PropertyName.Mana, 100)
+        );
     }
 }

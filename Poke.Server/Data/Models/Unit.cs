@@ -1,4 +1,5 @@
 using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models;
 
@@ -8,62 +9,40 @@ public abstract class Unit
     public int BaseUnitID { get; set; }
     public int TeamID { get; set; }
     public string Name { get; set; } = null!;
-    public virtual int Life { get; set; }
-    public virtual int Mana { get; set; }
-    public virtual bool IsAbleToAttack { get; set; }
 
     public Team Team { get; set; } = null!;
-    public virtual IList<Skill> Skills { get; set; } = new List<Skill>();
+    public virtual List<Skill> Skills { get; set; } = new List<Skill>();
+    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
 
-
-    public virtual bool ApplySkillCost(Skill skill)
+    public virtual void ApplySkillCost(Skill skill)
     {
-        switch (skill.Cost.ToProperty)
-        {
-            case ApplyToProperty.Life: Life -= skill.Cost.Value; break;
-            case ApplyToProperty.Mana: Mana -= skill.Cost.Value; break;
-            default: throw new ArgumentOutOfRangeException(nameof(skill.Cost.ToProperty));
-        }
-
-        return true;
+        var property = Properties.Single(x => x.PropertyName == skill.Cost.PropertyName);
+        property.CurrentValue += skill.Cost.Value.CurrentValue;
     }
-
+    
     public virtual bool CheckSkillCost(Skill skill)
     {
-        bool hasResources;
-        switch (skill.Cost.ToProperty)
-        {
-            case ApplyToProperty.Life: hasResources = Life >= skill.Cost.Value; break;
-            case ApplyToProperty.Mana: hasResources = Mana >= skill.Cost.Value; break;
-            default: throw new ArgumentOutOfRangeException(nameof(skill.Cost.ToProperty));
-        }
+        var property = Properties.Single(x => x.PropertyName == skill.Cost.PropertyName);
+        var hasResource = property.CurrentValue > skill.Cost.Value.CurrentValue;
 
-        return hasResources;
+        return hasResource;
     }
 
-    public virtual void Defend(ApplyToProperty toProperty, int value)
+    public virtual void Defend(PropertyName toProperty, int value)
     {
-        switch (toProperty)
-        {
-            case ApplyToProperty.Life: Life -= value; break;
-            case ApplyToProperty.Mana: Mana -= value; break;
-            default: throw new ArgumentOutOfRangeException(nameof(toProperty));
-        }
+        var property = Properties.Single(x => x.PropertyName == toProperty);
+        property.CurrentValue += value;
     }
 
-    public virtual void Heal(ApplyToProperty toProperty, int value)
+    public virtual void Heal(PropertyName toProperty, int value)
     {
-        switch (toProperty)
-        {
-            case ApplyToProperty.Life: Life += value; break;
-            case ApplyToProperty.Mana: Mana += value; break;
-            default: throw new ArgumentOutOfRangeException(nameof(toProperty));
-        }
+        var property = Properties.Single(x => x.PropertyName == toProperty);
+        property.CurrentValue += value;
     }
 
     public virtual bool IsAlive()
     {
-        if (Life <= 0)
+        if (Properties.Single(x => x.PropertyName == PropertyName.Life).CurrentValue <= 0)
         {
             return false;
         }
