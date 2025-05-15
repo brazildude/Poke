@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
@@ -22,6 +23,31 @@ public static class UnitEndpoints
             .RequireCors("myAllowSpecificOrigins");
 
         endpoints.MapGet("", GetUnits);
+        endpoints.MapGet("{unitID}", GetUnit);
+    }
+
+    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PokeContext db)
+    {
+        var unit = db.Units
+            .Include(x => x.Properties)
+            .Include(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
+            .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
+            .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
+            .Where(x => x.Team.UserID == currentUser.UserID && x.UnitID == unitID)
+            .Select(u => new UnitVM(
+                u.BaseUnitID,
+                u.Name,
+                SelectProperties(u.Properties),
+                u.Skills.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
+            ))
+            .SingleOrDefault();
+
+        if (unit == null)
+        {
+            return TypedResults.BadRequest();
+        }
+
+        return TypedResults.Ok(unit);
     }
 
     public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PokeContext db)
@@ -51,12 +77,12 @@ public static class UnitEndpoints
 
     private static IEnumerable<BehaviorVM> SelectBehaviors(List<Behavior> x)
     {
-        return x.Select(b => 
+        return x.Select(b =>
             new BehaviorVM(
-                b.Type.ToString(), 
+                b.Type.ToString(),
                 b.TargetProperty.ToString(),
-                b.MinMaxProperty.MinCurrentValue, 
-                b.MinMaxProperty.MaxCurrentValue, 
+                b.MinMaxProperty.MinCurrentValue,
+                b.MinMaxProperty.MaxCurrentValue,
                 b.Target.TargetType.ToString(),
                 b.Target.TargetDirection.ToString(),
                 b.Target.Quantity

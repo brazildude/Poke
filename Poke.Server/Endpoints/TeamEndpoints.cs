@@ -10,7 +10,7 @@ namespace Poke.Server.Endpoints;
 public static class TeamEndpoints
 {
     public record GetTeamVM(int TeamID, string Name, Dictionary<int, string> Units);
-    public record CreateTeamVM(string Name, List<int> BaseUnitIDs);
+    public record CreateTeamVM(string Name, HashSet<int> BaseUnitIDs);
 
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
@@ -56,16 +56,14 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        var userID = db.Users.Where(x => x.UserID == currentUser.UserID).Select(x => x.UserID).Single();
-
-        if (db.Teams.Any(x => x.UserID == userID && x.Name == viewModel.Name))
+        if (db.Teams.Any(x => x.UserID == currentUser.UserID && x.Name == viewModel.Name))
         {
             return TypedResults.BadRequest("Team name already exists.");
         }
 
         var team = new Team
         {
-            UserID = userID,
+            UserID = currentUser.UserID,
             Name = viewModel.Name,
             Units = viewModel.BaseUnitIDs.Select(Game.GetUnit).ToList()
         };
