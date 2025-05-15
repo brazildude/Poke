@@ -19,6 +19,8 @@ public class Behavior
 
     public virtual void Execute(Unit unitTarget, Random random)
     {
+        this.random = random;
+        
         var property = unitTarget.Properties.Single(x => x.PropertyName == TargetProperty);
         var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
 
