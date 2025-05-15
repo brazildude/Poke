@@ -8,10 +8,13 @@ public class Warlock : Unit
 {
     public Warlock()
     {
-        BaseUnitID = 3;
-        Name = typeof(Warlock).Name;
+        UnitName = UnitName.Warlock;
        
-        Skills.Add(new Shadowbolt());
+        Skills.AddRange(
+            new Shadowbolt(),
+            new Hellfire()
+        );
+
         Properties.AddRange(
             FlatProperty.New(PropertyName.Life, 100),
             FlatProperty.New(PropertyName.Mana, 100)

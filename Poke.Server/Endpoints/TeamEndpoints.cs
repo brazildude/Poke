@@ -27,7 +27,7 @@ public static class TeamEndpoints
         var team = db
             .Teams
             .Where(x => x.UserID == currentUser.UserID && x.TeamID == teamID)
-            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.UnitID, u => u.Name)))
+            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.UnitID, u => u.UnitName.ToString())))
             .SingleOrDefault();
 
         if (team == null)
@@ -43,7 +43,7 @@ public static class TeamEndpoints
         var teams = db.Teams
             .Include(x => x.Units)
             .Where(x => x.UserID == currentUser.UserID)
-            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.UnitID, u => u.Name)))
+            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.UnitID, u => u.UnitName.ToString())))
             .ToList();
 
         return TypedResults.Ok(teams);

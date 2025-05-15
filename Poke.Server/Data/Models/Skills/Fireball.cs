@@ -7,8 +7,7 @@ public class Fireball : Skill
 {
     public Fireball()
     {
-        BaseSkillID = 2;
-        Name = SkillName.Fireball;
+        SkillName = SkillName.Fireball;
         
         Behaviors.Add(Behavior.New(-25, -5, ApplyType.Damage, PropertyName.Life, Target.New(TargetType.Select, TargetDirection.Enemy, 2)));
         Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));

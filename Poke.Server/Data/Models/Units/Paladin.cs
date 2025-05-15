@@ -8,10 +8,13 @@ public class Paladin : Unit
 {
     public Paladin()
     {
-        BaseUnitID = 2;
-        Name = typeof(Paladin).Name;
+        UnitName = UnitName.Paladin;
 
-        Skills.Add(new Smite());
+        Skills.AddRange(
+            new Smite(),
+            new DivineLight()
+        );
+
         Properties.AddRange(
             FlatProperty.New(PropertyName.Life, 100),
             FlatProperty.New(PropertyName.Mana, 100)

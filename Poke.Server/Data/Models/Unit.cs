@@ -6,9 +6,8 @@ namespace Poke.Server.Data.Models;
 public abstract class Unit
 {
     public int UnitID { get; set; }
-    public int BaseUnitID { get; set; }
     public int TeamID { get; set; }
-    public string Name { get; set; } = null!;
+    public UnitName UnitName { get; set; }
 
     public Team Team { get; set; } = null!;
     public virtual List<Skill> Skills { get; set; } = new List<Skill>();

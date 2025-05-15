@@ -8,10 +8,13 @@ public class Warrior : Unit
 {
     public Warrior()
     {
-        BaseUnitID = 4;
-        Name = typeof(Warrior).Name;
+        UnitName = UnitName.Warrior;
 
-        Skills.Add(new Cleave());
+        Skills.AddRange(
+            new Cleave(),
+            new Lacerate()
+        );
+
         Properties.AddRange(
             FlatProperty.New(PropertyName.Life, 100),
             FlatProperty.New(PropertyName.Mana, 100)

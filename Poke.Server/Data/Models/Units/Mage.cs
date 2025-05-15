@@ -8,10 +8,13 @@ public class Mage : Unit
 {
     public Mage()
     {
-        BaseUnitID = 1;
-        Name = typeof(Mage).Name;
+        UnitName = UnitName.Mage;
 
-        Skills.Add(new Fireball());
+        Skills.AddRange(
+            new Fireball(),
+            new Frostbolt()
+        );
+        
         Properties.AddRange(
             FlatProperty.New(PropertyName.Life, 100),
             FlatProperty.New(PropertyName.Mana, 100)

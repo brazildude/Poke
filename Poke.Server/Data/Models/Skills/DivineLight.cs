@@ -3,11 +3,11 @@ using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models.Skills;
 
-public class Smite : Skill
+public class DivineLight : Skill
 {
-    public Smite()
+    public DivineLight()
     {
-        SkillName = SkillName.Smite;
+        SkillName = SkillName.DivineLight;
         
         Behaviors.Add(Behavior.New(-25, -5, ApplyType.Damage, PropertyName.Life, Target.New(TargetType.Select, TargetDirection.Enemy, 1)));
         Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));

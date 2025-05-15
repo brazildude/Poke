@@ -73,7 +73,7 @@ public static class UserEndpoints
         var teams = db.Teams
         .Include(x => x.Units)
         .Where(x => x.UserID == currentUser.UserID)
-        .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.Select(p => p.Name).ToList()))
+        .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.Select(p => p.UnitName.ToString()).ToList()))
         .ToList();
 
         return TypedResults.Ok(teams);

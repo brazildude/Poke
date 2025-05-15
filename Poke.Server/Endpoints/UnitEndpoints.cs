@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
+using Poke.Server.Data.Enums;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
 using Poke.Server.Infrastructure;
@@ -14,7 +15,7 @@ public static class UnitEndpoints
     public record CostVM(string Type, string ToProperty, int Value);
     public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<CostVM> Costs, IEnumerable<BehaviorVM> Behaviors);
     public record FlatPropertyVM(string Name, int Value);
-    public record UnitVM(int BaseUnitID, string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
+    public record UnitVM(int UnitID, string UnitName, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
 
     public static void RegisterUnitEndpoints(this WebApplication app)
     {
@@ -35,10 +36,10 @@ public static class UnitEndpoints
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
             .Where(x => x.Team.UserID == currentUser.UserID && x.UnitID == unitID)
             .Select(u => new UnitVM(
-                u.BaseUnitID,
-                u.Name,
+                u.UnitID,
+                u.UnitName.ToString(),
                 SelectProperties(u.Properties),
-                u.Skills.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
+                u.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
             ))
             .SingleOrDefault();
 
@@ -55,10 +56,10 @@ public static class UnitEndpoints
         var units = Game.GetUnits()
             .Select(x =>
                 new UnitVM(
-                    x.BaseUnitID,
-                    x.Name,
+                    x.UnitID,
+                    x.UnitName.ToString(),
                     SelectProperties(x.Properties),
-                    x.Skills.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
+                    x.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
                 )
             );
 

@@ -3,13 +3,13 @@ using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models.Skills;
 
-public class Smite : Skill
+public class Lacerate : Skill
 {
-    public Smite()
+    public Lacerate()
     {
-        SkillName = SkillName.Smite;
+        SkillName = SkillName.Lacerate;
         
-        Behaviors.Add(Behavior.New(-25, -5, ApplyType.Damage, PropertyName.Life, Target.New(TargetType.Select, TargetDirection.Enemy, 1)));
+        Behaviors.Add(Behavior.New(-25, -5, ApplyType.Damage, PropertyName.Life, Target.New(TargetType.Select, TargetDirection.Enemy, 2)));
         Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));
         Properties.AddRange(FlatProperty.New(PropertyName.Cooldown, 0));
     }
