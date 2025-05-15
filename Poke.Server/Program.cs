@@ -39,6 +39,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.MapOpenApi();
 app.UseCors(builder.Configuration["Cors:Name"]!);
 app.UseAuthentication();
 app.UseAuthorization();
@@ -57,15 +58,15 @@ else
     // app.UseHttpsRedirection();
 }
 
-app.UseFirebase();
-app.MapOpenApi();
 app.UseStaticFiles();
+app.UseFirebase();
 
 app.UseDeveloperExceptionPage();
 
 app.RegisterMatchmakingEndpoints();
 app.RegisterPlayEndpoints();
 app.RegisterTeamEndpoints();
+app.RegisterUnitEndpoints();
 app.RegisterUserEndpoints();
 
 app.Run();

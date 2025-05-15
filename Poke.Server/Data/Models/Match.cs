@@ -100,6 +100,5 @@ public class Match
             }
         }
 
-        return true;
-    }
-}
+            return true;
+    }}

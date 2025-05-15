@@ -5,6 +5,17 @@ namespace Poke.Server.Infrastructure;
 
 public class Game
 {
+    public static List<Unit> GetUnits()
+    {
+        return new List<Unit>
+        {
+           new Mage(),
+           new Paladin(),
+           new Warlock(),
+           new Warrior()
+        };
+    }
+
     public static Unit GetUnit(int baseUnitID)
     {
         return baseUnitID switch

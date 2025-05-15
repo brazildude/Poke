@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
 using Poke.Server.Data.Enums;
 using Poke.Server.Data.Models.Properties;
 
@@ -11,6 +10,7 @@ public abstract class Skill
     public int BaseSkillID { get; set; }
     public int BehaviorID { get; set; }
     public int UnitID { get; set; }
+    public SkillName Name { get; set; }
 
     public virtual List<Behavior> Behaviors { get; set; } = new List<Behavior>();
     public virtual List<Cost> Costs { get; set; } = new List<Cost>();

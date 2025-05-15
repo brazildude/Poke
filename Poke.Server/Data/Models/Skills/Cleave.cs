@@ -8,6 +8,7 @@ public class Cleave : Skill
     public Cleave()
     {
         BaseSkillID = 1;
+        Name = SkillName.Cleave;
         
         Behaviors.Add(Behavior.New(-25, -5, ApplyType.Damage, PropertyName.Life, Target.New(TargetType.All, TargetDirection.Enemy, null)));
         Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));

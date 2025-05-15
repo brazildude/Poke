@@ -17,7 +17,7 @@ public static class PlayEndpoints
         .RequireAuthorization()
         .RequireCors("myAllowSpecificOrigins");
 
-        endpoints.MapGet("", GetPlay);
+        //endpoints.MapGet("", GetPlay);
         endpoints.MapPost("", Play);
     }
 
@@ -64,7 +64,7 @@ public static class PlayEndpoints
         }
 
         match.Play(unitInAction, skill, playVM.TargetIDs);
-
+        
         return TypedResults.Ok(playVM);
     }
 }
