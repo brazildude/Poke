@@ -39,11 +39,6 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.MapOpenApi();
-app.UseCors(builder.Configuration["Cors:Name"]!);
-app.UseAuthentication();
-app.UseAuthorization();
-
 if (app.Environment.IsDevelopment())
 {
     using (var serviceScope = app.Services.CreateScope())
@@ -58,8 +53,12 @@ else
     // app.UseHttpsRedirection();
 }
 
-app.UseStaticFiles();
+app.MapStaticAssets().AllowAnonymous();
+app.MapOpenApi().AllowAnonymous();
 app.UseFirebase();
+app.UseCors(builder.Configuration["Cors:Name"]!);
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseDeveloperExceptionPage();
 

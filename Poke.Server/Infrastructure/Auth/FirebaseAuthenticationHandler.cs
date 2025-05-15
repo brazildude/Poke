@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Poke.Server.Infrastructure.Auth;
@@ -22,6 +23,11 @@ public class FirebaseAuthenticationHandler : AuthenticationHandler<Authenticatio
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        if (Context.GetEndpoint()?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+        {
+            return AuthenticateResult.NoResult();
+        }
+
         if (!Request.Headers.ContainsKey("Authorization"))
         {
             return AuthenticateResult.Fail("Missing Authorization Header");

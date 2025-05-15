@@ -15,11 +15,12 @@ public static class UserEndpoints
     public static void RegisterUserEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/users")
+            .RequireAuthorization()
             .RequireCors("myAllowSpecificOrigins");
 
-        endpoints.MapGet("{userID}", GetUser).RequireAuthorization();
-        endpoints.MapPost("", CreateUser);
-        endpoints.MapPost("/teams", GetTeams).RequireAuthorization();
+        endpoints.MapGet("{userID}", GetUser);
+        endpoints.MapPost("", CreateUser).AllowAnonymous();
+        endpoints.MapPost("/teams", GetTeams);
     }
 
     public static Results<Ok<UserVM>, NotFound> GetUser(ICurrentUser currentUser, PokeContext db)

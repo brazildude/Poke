@@ -18,8 +18,8 @@ public static class UnitEndpoints
     public static void RegisterUnitEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/units")
+            .RequireAuthorization()
             .RequireCors("myAllowSpecificOrigins");
-            //.RequireAuthorization();
 
         endpoints.MapGet("", GetUnits);
     }
