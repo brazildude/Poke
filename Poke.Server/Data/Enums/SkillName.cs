@@ -6,8 +6,12 @@ public enum SkillName
     DivineLight,
     Fireball,
     Frostbolt,
+    GlacialPuncture,
     Hellfire,
     Lacerate,
+    Nullstep,
     Shadowbolt,
-    Smite
+    Slice,
+    Smite,
+    SmokeMirage
 }

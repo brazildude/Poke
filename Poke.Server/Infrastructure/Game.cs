@@ -9,22 +9,26 @@ public class Game
     {
         return new List<Unit>
         {
+           new Lancer(),
            new Mage(),
            new Paladin(),
+           new Rogue(),
            new Warlock(),
            new Warrior()
         };
     }
 
-    public static Unit GetUnit(int baseUnitID)
+    public static Unit GetUnit(string unitName)
     {
-        return baseUnitID switch
+        return unitName switch
         {
-            1 => new Mage(),
-            2 => new Paladin(),
-            3 => new Warlock(),
-            4 => new Warrior(),
-            _ => throw new ArgumentOutOfRangeException(nameof(baseUnitID))
+            nameof(Lancer) => new Lancer(),
+            nameof(Mage) => new Mage(),
+            nameof(Paladin) => new Paladin(),
+            nameof(Rogue) => new Rogue(),
+            nameof(Warlock) => new Warlock(),
+            nameof(Warrior) => new Warrior(),
+            _ => throw new ArgumentOutOfRangeException(nameof(unitName))
         };
     }
 }

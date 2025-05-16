@@ -40,9 +40,11 @@ internal class Program
 
         var user01 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "01");
         var user02 = pokeContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "02");
-        
-        CreateTeam(new CreateTeamVM("My Team 01", new HashSet<int> { 1, 2, 3, 4 }), new CurrentUser("01", null, null, null), pokeContext);
-        CreateTeam(new CreateTeamVM("My Team 02", new HashSet<int> { 1, 2, 3, 4 }), new CurrentUser("02", null, null, null), pokeContext);
+
+        var unitNames = new HashSet<string> { "Mage", "Warrior", "Rogue", "Paladin" };
+
+        CreateTeam(new CreateTeamVM("My Team 01", unitNames), new CurrentUser("01", null, null, null), pokeContext);
+        CreateTeam(new CreateTeamVM("My Team 02", unitNames), new CurrentUser("02", null, null, null), pokeContext);
 
         var match = new Poke.Server.Data.Models.Match
         {

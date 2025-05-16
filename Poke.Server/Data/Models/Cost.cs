@@ -7,7 +7,6 @@ public class Cost
 {
     public int CostID { get; set; }
     public int SkillID { get; set; }
-    public int FlatPropertyID { get; set; }
     public CostType CostType { get; set; }
     public PropertyName PropertyName { get; set; }
     public FlatProperty FlatProperty { get; set; } = null!;

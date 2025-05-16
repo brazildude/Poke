@@ -8,11 +8,13 @@ namespace Poke.Server.Data.Models;
 public class Behavior
 {
     public int BehaviorID { get; set; }
-    public int MinMaxPropertyID { get; set; }
+    public int SkillID { get; set; }
     public ApplyType Type { get; set; }
     public PropertyName TargetProperty { get; set; }
     public MinMaxProperty MinMaxProperty { get; set; } = null!;
     public Target Target { get; set; } = null!;
+
+    public Skill Skill { get; set; } = null!;
 
     [NotMapped]
     public Random random = null!;

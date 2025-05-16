@@ -9,8 +9,9 @@ namespace Poke.Server.Endpoints;
 
 public static class TeamEndpoints
 {
-    public record GetTeamVM(int TeamID, string Name, Dictionary<int, string> Units);
-    public record CreateTeamVM(string Name, HashSet<int> BaseUnitIDs);
+    public record GetTeamVM(int TeamID, string Name, List<KeyValuePair<int, string>> Units);
+    public record CreateTeamVM(string Name, HashSet<string> Units);
+    public record EditTeamVM(int TeamID, string Name, HashSet<string> Units);
 
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
@@ -20,6 +21,7 @@ public static class TeamEndpoints
 
         endpoints.MapGet("{teamID}", GetTeam);
         endpoints.MapPost("", CreateTeam);
+        endpoints.MapPatch("", EditTeam);
     }
 
     public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db)
@@ -27,7 +29,12 @@ public static class TeamEndpoints
         var team = db
             .Teams
             .Where(x => x.UserID == currentUser.UserID && x.TeamID == teamID)
-            .Select(x => new GetTeamVM(x.TeamID, x.Name, x.Units.ToDictionary(u => u.UnitID, u => u.UnitName.ToString())))
+            .Select(x =>
+                new GetTeamVM(
+                    x.TeamID,
+                    x.Name,
+                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
+                )
             .SingleOrDefault();
 
         if (team == null)
@@ -43,7 +50,11 @@ public static class TeamEndpoints
         var teams = db.Teams
             .Include(x => x.Units)
             .Where(x => x.UserID == currentUser.UserID)
-            .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.ToDictionary(u => u.UnitID, u => u.UnitName.ToString())))
+            .Select(x => new GetTeamVM(
+                    x.TeamID,
+                    x.Name,
+                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
+                )
             .ToList();
 
         return TypedResults.Ok(teams);
@@ -51,7 +62,7 @@ public static class TeamEndpoints
 
     public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
     {
-        if (viewModel.BaseUnitIDs.Count != 4)
+        if (viewModel.Units.Count != 4)
         {
             return TypedResults.BadRequest("You must select 4 units.");
         }
@@ -65,10 +76,40 @@ public static class TeamEndpoints
         {
             UserID = currentUser.UserID,
             Name = viewModel.Name,
-            Units = viewModel.BaseUnitIDs.Select(Game.GetUnit).ToList()
+            Units = viewModel.Units.Select(Game.GetUnit).ToList()
         };
 
         db.Teams.Add(team);
+        db.SaveChanges();
+
+        return TypedResults.Ok();
+    }
+
+    public static Results<Ok, BadRequest<string>> EditTeam(EditTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
+    {
+        if (viewModel.Units.Count != 4)
+        {
+            return TypedResults.BadRequest("You must select 4 units.");
+        }
+
+        var team = db.Teams.Where(x => x.UserID == currentUser.UserID && x.TeamID == viewModel.TeamID).SingleOrDefault();
+        if (team == null)
+        {
+            return TypedResults.BadRequest("Team does not exist.");
+        }
+
+        ///# validate all unit names
+        team.Name = viewModel.Name;
+
+        var currentUnits = db.Units.Where(x => x.TeamID == viewModel.TeamID).Select(x => x.UnitName.ToString()).ToList();
+        var unitsToBeAdded = Game.GetUnits()
+            .Where(x => viewModel.Units.Except(currentUnits).Contains(x.UnitName.ToString()))
+            .ToList();
+
+        team.Units.AddRange(unitsToBeAdded);
+
+        db.Units.Where(x => x.TeamID == viewModel.TeamID && !viewModel.Units.Contains(x.UnitName.ToString())).ExecuteDelete();
+
         db.SaveChanges();
 
         return TypedResults.Ok();
