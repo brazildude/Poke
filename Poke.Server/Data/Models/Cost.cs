@@ -8,7 +8,11 @@ public class Cost
     public int CostID { get; set; }
     public int SkillID { get; set; }
     public CostType CostType { get; set; }
+    /// <summary>
+    /// Name of the property that will be targeted.
+    /// </summary>
     public PropertyName PropertyName { get; set; }
+
     public FlatProperty FlatProperty { get; set; } = null!;
     public Skill Skill { get; set; } = null!;
 

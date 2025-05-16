@@ -20,5 +20,13 @@ public class BehaviorConfiguration : IEntityTypeConfiguration<Behavior>
             .WithOne(x => x.Behavior)
             .HasForeignKey<MinMaxProperty>(x => x.BehaviorID)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .Property(x => x.BehaviorType)
+            .HasConversion<string>();
+
+        builder
+            .Property(x => x.PropertyName)
+            .HasConversion<string>();
     }
 }

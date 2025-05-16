@@ -80,8 +80,8 @@ public static class UnitEndpoints
     {
         return x.Select(b =>
             new BehaviorVM(
-                b.Type.ToString(),
-                b.TargetProperty.ToString(),
+                b.BehaviorType.ToString(),
+                b.PropertyName.ToString(),
                 b.MinMaxProperty.MinCurrentValue,
                 b.MinMaxProperty.MaxCurrentValue,
                 b.Target.TargetType.ToString(),

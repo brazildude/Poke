@@ -7,7 +7,6 @@ namespace Poke.Server.Data.Models;
 public abstract class Skill
 {
     public int SkillID { get; set; }
-    public int BehaviorID { get; set; }
     public int UnitID { get; set; }
     public SkillName SkillName { get; set; }
 

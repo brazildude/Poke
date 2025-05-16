@@ -27,6 +27,10 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
             .HasForeignKey(x => x.SkillID)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder
+           .Property(x => x.SkillName)
+           .HasConversion<string>();
+
         builder.HasDiscriminator()
                .HasValue<Cleave>("Cleave")
                .HasValue<DivineLight>("DivineLight")

@@ -14,5 +14,13 @@ public class CostConfiguration : IEntityTypeConfiguration<Cost>
             .WithOne(x => x.Cost)
             .HasForeignKey<FlatProperty>(x => x.CostID)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+           .Property(x => x.CostType)
+           .HasConversion<string>();
+
+        builder
+           .Property(x => x.PropertyName)
+           .HasConversion<string>();
     }
 }

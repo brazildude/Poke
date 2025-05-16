@@ -9,11 +9,14 @@ public class Behavior
 {
     public int BehaviorID { get; set; }
     public int SkillID { get; set; }
-    public ApplyType Type { get; set; }
-    public PropertyName TargetProperty { get; set; }
+    public BehaviorType BehaviorType { get; set; }
+    /// <summary>
+    /// Name of the property that will be targeted.
+    /// </summary>
+    public PropertyName PropertyName { get; set; }
+
     public MinMaxProperty MinMaxProperty { get; set; } = null!;
     public Target Target { get; set; } = null!;
-
     public Skill Skill { get; set; } = null!;
 
     [NotMapped]
@@ -23,10 +26,10 @@ public class Behavior
     {
         this.random = random;
         
-        var property = unitTarget.Properties.Single(x => x.PropertyName == TargetProperty);
+        var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
         var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
 
-        if (Type == ApplyType.Damage)
+        if (BehaviorType == BehaviorType.Damage)
         {
 
         }
@@ -89,14 +92,14 @@ public class Behavior
         return shuffledUnits;
     }
 
-    public static Behavior New(int minValue, int maxValue, ApplyType applyType, PropertyName toPropertyName, Target target)
+    public static Behavior New(int minValue, int maxValue, BehaviorType behaviorType, PropertyName propertyName, Target target)
     {
         return new Behavior
         {
             Target = target,
-            MinMaxProperty = MinMaxProperty.New(PropertyName.ApplyValue, minValue, maxValue),
-            Type = applyType,
-            TargetProperty = toPropertyName
+            MinMaxProperty = MinMaxProperty.New(PropertyName.BehaviorValue, minValue, maxValue),
+            BehaviorType = behaviorType,
+            PropertyName = propertyName
         };
     }
 }
