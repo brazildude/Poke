@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
-using Poke.Server.Data.Enums;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
 using Poke.Server.Infrastructure;

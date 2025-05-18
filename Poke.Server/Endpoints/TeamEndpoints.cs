@@ -92,24 +92,33 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        var team = db.Teams.Where(x => x.UserID == currentUser.UserID && x.TeamID == viewModel.TeamID).SingleOrDefault();
+        var team = db.Teams
+            .Include(x => x.Units)
+            .Where(x => x.UserID == currentUser.UserID && x.TeamID == viewModel.TeamID)
+            .SingleOrDefault();
+
         if (team == null)
         {
             return TypedResults.BadRequest("Team does not exist.");
         }
-
-        ///# validate all unit names
+        
+        if (!viewModel.Units.All(x => Game.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
+        {
+            return TypedResults.BadRequest("Invalid units name.");
+        }
+        
         team.Name = viewModel.Name;
 
-        var currentUnits = db.Units.Where(x => x.TeamID == viewModel.TeamID).Select(x => x.UnitName.ToString()).ToList();
         var unitsToBeAdded = Game.GetUnits()
-            .Where(x => viewModel.Units.Except(currentUnits).Contains(x.UnitName.ToString()))
+            .Where(x =>
+                viewModel.Units
+                .Except(team.Units.Select(x => x.UnitName.ToString()))
+                .Contains(x.UnitName.ToString()))
             .ToList();
 
         team.Units.AddRange(unitsToBeAdded);
 
         db.Units.Where(x => x.TeamID == viewModel.TeamID && !viewModel.Units.Contains(x.UnitName.ToString())).ExecuteDelete();
-
         db.SaveChanges();
 
         return TypedResults.Ok();
