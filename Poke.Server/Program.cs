@@ -6,6 +6,7 @@ using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
 
 [assembly: InternalsVisibleTo("Poke.Debug")]
+[assembly: InternalsVisibleTo("Poke.Tests")]
 
 var builder = WebApplication.CreateBuilder(args);
 

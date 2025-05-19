@@ -18,7 +18,7 @@ public class CurrentUser : ICurrentUser
     public string? Name { get; private set; }
     public string? Role { get; private set; }
 
-    internal CurrentUser(string userID, string? email, string? name, string? role)
+    internal CurrentUser(string userID, string? email = null, string? name = null, string? role = null)
     {
         UserID = userID;
         Email = email; 

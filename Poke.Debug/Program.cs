@@ -43,8 +43,8 @@ internal class Program
 
         var unitNames = new HashSet<string> { "Mage", "Warrior", "Rogue", "Paladin" };
 
-        CreateTeam(new CreateTeamVM("My Team 01", unitNames), new CurrentUser("01", null, null, null), pokeContext);
-        CreateTeam(new CreateTeamVM("My Team 02", unitNames), new CurrentUser("02", null, null, null), pokeContext);
+        CreateTeam(new CreateTeamVM("My Team 01", unitNames), new CurrentUser("01"), pokeContext);
+        CreateTeam(new CreateTeamVM("My Team 02", unitNames), new CurrentUser("02"), pokeContext);
 
         var match = new Poke.Server.Data.Models.Match
         {
