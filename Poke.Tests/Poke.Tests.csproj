@@ -36,4 +36,8 @@
     <ProjectReference Include="..\Poke.Server\Poke.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\DBs\" />
+  </ItemGroup>
+
 </Project>

@@ -67,6 +67,11 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
+        if (!viewModel.Units.All(x => Game.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
+        {
+            return TypedResults.BadRequest("Invalid unit name.");
+        }
+
         if (db.Teams.Any(x => x.UserID == currentUser.UserID && x.Name == viewModel.Name))
         {
             return TypedResults.BadRequest("Team name already exists.");

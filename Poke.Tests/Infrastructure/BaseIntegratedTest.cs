@@ -8,11 +8,14 @@ public abstract class BaseIntegratedTest
 {
     protected PokeContext CreateContext([CallerMemberName] string callerMemberName = "")
     {
-        var connectionstring = $"Data Source={AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net9.0\\", "\\Infrastructure\\DBs\\")}{GetType().Name}.{callerMemberName}.db;";
+        var fileName = $"{AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net9.0\\", "\\Infrastructure\\DBs\\")}{GetType().Name}.{callerMemberName}.db";
+        var connectionstring = $"Data Source={fileName};";
         var optionsBuilder = new DbContextOptionsBuilder<PokeContext>();
         optionsBuilder.UseSqlite(connectionstring);
 
         var pokeContext = new PokeContext(optionsBuilder.Options);
+
+        File.Delete(fileName);
         pokeContext.Database.EnsureCreated();
 
         return pokeContext;
