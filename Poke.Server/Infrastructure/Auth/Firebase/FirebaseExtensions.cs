@@ -2,7 +2,7 @@ using System.Text;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
-namespace Poke.Server.Infrastructure.Auth;
+namespace Poke.Server.Infrastructure.Auth.Firebase;
 
 public static class FirebaseExtensions
 {

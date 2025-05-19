@@ -1,4 +1,4 @@
-namespace Poke.Server.Infrastructure.Auth;
+namespace Poke.Server.Infrastructure.Auth.Firebase;
 
 public class FirebaseSettings
 {

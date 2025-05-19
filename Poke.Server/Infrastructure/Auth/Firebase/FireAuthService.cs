@@ -1,13 +1,8 @@
 using FirebaseAdmin.Auth;
 
-namespace Poke.Server.Infrastructure.Auth;
+namespace Poke.Server.Infrastructure.Auth.Firebase;
 
-public interface IAuthService
-{
-    Task<string?> VerifyIdTokenAsync(string idToken);
-}
-
-public class AuthService : IAuthService
+public class FireAuthService : IAuthService
 {
     public async Task<string?> VerifyIdTokenAsync(string idToken)
     {

@@ -1,24 +1,20 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
-namespace Poke.Server.Infrastructure.Auth;
+namespace Poke.Server.Infrastructure.Auth.Local;
 
-public class FirebaseAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class LocalAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly FirebaseSettings settings;
-
-    public FirebaseAuthenticationHandler(
+    public LocalAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
-        UrlEncoder encoder,
-        IOptions<FirebaseSettings> settings
+        UrlEncoder encoder
     ) : base(options, logger, encoder)
     {
-        this.settings = settings.Value;
+        
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -39,29 +35,20 @@ public class FirebaseAuthenticationHandler : AuthenticationHandler<Authenticatio
             return AuthenticateResult.Fail("Invalid Authorization Header");
         }
 
-        var idToken = authHeader["Bearer ".Length..].Trim();
+        var userID = authHeader["Bearer ".Length..].Trim();
 
         try
         {
-            var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idToken);
-
-            if (settings.ProjectId != decodedToken.Audience)
-            {
-                return AuthenticateResult.Fail("Token audience mismatch");
-            }
-
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, decodedToken.Uid),
-                new Claim(ClaimTypes.Name, decodedToken.Claims.Single(x => x.Key == "name").Value.ToString()!),
-                new Claim(ClaimTypes.Email, decodedToken.Claims.Single(x => x.Key == "email").Value.ToString()!)
+                new Claim(ClaimTypes.NameIdentifier, userID),
             };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-            return AuthenticateResult.Success(ticket);
+            return await Task.FromResult(AuthenticateResult.Success(ticket));
         }
         catch (Exception ex)
         {

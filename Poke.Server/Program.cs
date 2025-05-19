@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
+using Poke.Server.Infrastructure.Auth.Firebase;
+using Poke.Server.Infrastructure.Auth.Local;
 
 [assembly: InternalsVisibleTo("Poke.Debug")]
 [assembly: InternalsVisibleTo("Poke.Tests")]
@@ -21,10 +23,6 @@ builder.Services.AddDbContext<PokeContext>(builder.Configuration["DatabaseProvid
 });
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUser, CurrentUser>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(configuration =>
@@ -34,7 +32,21 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     });
 });
-builder.Services.AddAuthentication("Firebase").AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
+
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+{
+    builder.Services.AddScoped<IAuthService, FireAuthService>();
+    builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("Firebase"));
+    builder.Services.AddAuthentication("Firebase").AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
+}
+else
+{
+    builder.Services.AddScoped<IAuthService, LocalAuthService>();
+    builder.Services.AddAuthentication("Local").AddScheme<AuthenticationSchemeOptions, LocalAuthenticationHandler>("Local", null);
+}
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -64,6 +76,7 @@ app.UseDeveloperExceptionPage();
 
 app.RegisterMatchmakingEndpoints();
 app.RegisterPlayEndpoints();
+app.RegisterSkillEndpoints();
 app.RegisterTeamEndpoints();
 app.RegisterUnitEndpoints();
 app.RegisterUserEndpoints();
