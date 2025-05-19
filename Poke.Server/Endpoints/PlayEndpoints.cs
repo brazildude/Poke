@@ -15,7 +15,7 @@ public static class PlayEndpoints
     {
         var endpoints = app.MapGroup("api/plays")
         .RequireAuthorization()
-        .RequireCors("myAllowSpecificOrigins");
+        .RequireCors();
 
         //endpoints.MapGet("", GetPlay);
         endpoints.MapPost("", Play);

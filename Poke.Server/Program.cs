@@ -27,8 +27,7 @@ builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection("F
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: builder.Configuration["Cors:Name"]!,
-    configuration =>
+    options.AddDefaultPolicy(configuration =>
     {
         configuration.WithOrigins(builder.Configuration["Cors:FrontendOrigin"]!)
         .AllowAnyHeader()
@@ -57,7 +56,7 @@ else
 app.MapStaticAssets().AllowAnonymous();
 app.MapOpenApi().AllowAnonymous();
 app.UseFirebase();
-app.UseCors(builder.Configuration["Cors:Name"]!);
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

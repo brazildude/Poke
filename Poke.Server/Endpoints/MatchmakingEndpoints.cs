@@ -13,7 +13,7 @@ public static class MatchmakingEndpoints
     {
         var endpoints = app.MapGroup("api/matchmaking")
         .RequireAuthorization()
-        .RequireCors("myAllowSpecificOrigins");
+        .RequireCors();
 
         endpoints.MapGet("join", Join);
         endpoints.MapGet("cancel", Cancel);
