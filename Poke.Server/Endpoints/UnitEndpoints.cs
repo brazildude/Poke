@@ -10,9 +10,9 @@ namespace Poke.Server.Endpoints;
 
 public static class UnitEndpoints
 {
-    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity);
+    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<CostVM> Costs);
     public record CostVM(string Type, string ToProperty, int Value);
-    public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<CostVM> Costs, IEnumerable<BehaviorVM> Behaviors);
+    public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<BehaviorVM> Behaviors);
     public record FlatPropertyVM(string Name, int Value);
     public record UnitVM(int UnitID, string UnitName, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
 
@@ -30,15 +30,15 @@ public static class UnitEndpoints
     {
         var unit = db.Units
             .Include(x => x.Properties)
-            .Include(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
+            .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
             .Where(x => x.Team.UserID == currentUser.UserID && x.UnitID == unitID)
             .Select(u => new UnitVM(
                 u.UnitID,
                 u.UnitName.ToString(),
                 SelectProperties(u.Properties),
-                u.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
+                u.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectBehaviors(s.Behaviors)))
             ))
             .SingleOrDefault();
 
@@ -58,7 +58,7 @@ public static class UnitEndpoints
                     x.UnitID,
                     x.UnitName.ToString(),
                     SelectProperties(x.Properties),
-                    x.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectCosts(s.Costs), SelectBehaviors(s.Behaviors)))
+                    x.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectBehaviors(s.Behaviors)))
                 )
             );
 
@@ -85,7 +85,8 @@ public static class UnitEndpoints
                 b.MinMaxProperty.MaxCurrentValue,
                 b.Target.TargetType.ToString(),
                 b.Target.TargetDirection.ToString(),
-                b.Target.Quantity
+                b.Target.Quantity,
+                SelectCosts(b.Costs)
             )
         );
     }

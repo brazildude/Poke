@@ -5,19 +5,24 @@ using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Models;
 
-public class Behavior
+public abstract class Behavior
 {
     public int BehaviorID { get; set; }
     public int SkillID { get; set; }
-    public BehaviorType BehaviorType { get; set; }
+    public BehaviorName BehaviorName { get; set; }
+    public virtual BehaviorType BehaviorType { get; set; }
     /// <summary>
     /// Name of the property that will be targeted.
     /// </summary>
-    public PropertyName PropertyName { get; set; }
+    public virtual PropertyName PropertyName { get; set; }
 
-    public MinMaxProperty MinMaxProperty { get; set; } = null!;
-    public Target Target { get; set; } = null!;
-    public Skill Skill { get; set; } = null!;
+    public virtual MinMaxProperty MinMaxProperty { get; set; } = null!;
+    public virtual Target Target { get; set; } = null!;
+    public virtual Skill Skill { get; set; } = null!;
+
+    public virtual List<Cost> Costs { get; set; } = new List<Cost>();
+    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
+
 
     [NotMapped]
     public Random random = null!;
@@ -25,7 +30,7 @@ public class Behavior
     public virtual void Execute(Unit unitTarget, Random random)
     {
         this.random = random;
-        
+
         var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
         var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
 
@@ -35,6 +40,23 @@ public class Behavior
         }
 
         property.CurrentValue += skillValue;
+
+        TickCooldown();
+    }
+
+    public virtual void TickCooldown()
+    {
+        var cooldown = Properties.Single(x => x.PropertyName == PropertyName.Cooldown);
+        var currentCooldown = Properties.Single(x => x.PropertyName == PropertyName.Cooldown);
+
+        if (currentCooldown.CurrentValue > 1)
+        {
+            currentCooldown.CurrentValue -= 1;
+        }
+        else
+        {
+            currentCooldown.CurrentValue = currentCooldown.BaseValue;
+        }
     }
 
     public virtual List<Unit> SelectTargets(
@@ -90,16 +112,5 @@ public class Behavior
         }
 
         return shuffledUnits;
-    }
-
-    public static Behavior New(int minValue, int maxValue, BehaviorType behaviorType, PropertyName propertyName, Target target)
-    {
-        return new Behavior
-        {
-            Target = target,
-            MinMaxProperty = MinMaxProperty.New(PropertyName.BehaviorValue, minValue, maxValue),
-            BehaviorType = behaviorType,
-            PropertyName = propertyName
-        };
     }
 }

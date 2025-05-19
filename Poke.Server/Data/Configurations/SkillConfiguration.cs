@@ -16,12 +16,6 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .HasMany(x => x.Costs)
-            .WithOne(x => x.Skill)
-            .HasForeignKey(x => x.SkillID)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder
             .HasMany(x => x.Properties)
             .WithOne()
             .HasForeignKey(x => x.SkillID)

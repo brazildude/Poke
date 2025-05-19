@@ -75,7 +75,7 @@ internal class Program
     {
         return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
-                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
+                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
                 .Single(x => x.TeamID == teamID);
     }
 }

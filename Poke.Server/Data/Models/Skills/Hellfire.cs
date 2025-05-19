@@ -1,5 +1,5 @@
 using Poke.Server.Data.Enums;
-using Poke.Server.Data.Models.Properties;
+using Poke.Server.Infrastructure.Builders;
 
 namespace Poke.Server.Data.Models.Skills;
 
@@ -9,8 +9,15 @@ public class Hellfire : Skill
     {
         SkillName = SkillName.Hellfire;
         
-        Behaviors.Add(Behavior.New(-25, -5, BehaviorType.Damage, PropertyName.Life, Target.New(TargetType.Select, TargetDirection.Enemy, 1)));
-        Costs.Add(Cost.New(10, CostType.Flat, PropertyName.Mana));
-        Properties.AddRange(FlatProperty.New(PropertyName.Cooldown, 0));
+        var behavior01 = CommonBehaviorBuilder.Create(BehaviorName.Hellfire01)
+                    .WithTarget(TargetType.All, TargetDirection.Enemy)
+                    .WithMinMax(PropertyName.BehaviorValue, 10, 20)
+                    .WithBehaviorType(BehaviorType.Damage)
+                    .WithPropertyName(PropertyName.Life)
+                    .WithCooldown(0)
+                    .WithCosts(new List<Cost> { Cost.New(10, CostType.Flat, PropertyName.Mana) })
+                    .Build();
+
+        Behaviors.Add(behavior01);
     }
 }

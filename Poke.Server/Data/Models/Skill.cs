@@ -11,7 +11,6 @@ public abstract class Skill
     public SkillName SkillName { get; set; }
 
     public virtual List<Behavior> Behaviors { get; set; } = new List<Behavior>();
-    public virtual List<Cost> Costs { get; set; } = new List<Cost>();
     public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
     
     public Unit Unit { get; set; } = null!;
@@ -21,7 +20,7 @@ public abstract class Skill
 
     public virtual bool IsInCooldown()
     {
-        var isInCooldown = Properties.Single(x => x.PropertyName == PropertyName.Cooldown).CurrentValue > 0;
+        var isInCooldown = Behaviors.SelectMany(x => x.Properties).Any(x => x.PropertyName == PropertyName.Cooldown && x.CurrentValue > 0);
         
         return isInCooldown;
     }

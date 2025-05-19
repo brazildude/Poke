@@ -9,9 +9,9 @@ namespace Poke.Server.Endpoints;
 
 public static class SkillEndpoints
 {
-    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity);
+    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<CostVM> Costs);
     public record CostVM(string Type, string ToProperty, int Value);
-    public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<CostVM> Costs, IEnumerable<BehaviorVM> Behaviors);
+    public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<BehaviorVM> Behaviors);
     public record FlatPropertyVM(string Name, int Value);
 
     public static void RegisterSkillEndpoints(this WebApplication app)
@@ -37,7 +37,6 @@ public static class SkillEndpoints
                 new SkillVM(
                     x.SkillName.ToString(),
                     SelectProperties(x.Properties),
-                    SelectCosts(x.Costs),
                     SelectBehaviors(x.Behaviors)
                 )
             );
@@ -65,7 +64,8 @@ public static class SkillEndpoints
                 b.MinMaxProperty.MaxCurrentValue,
                 b.Target.TargetType.ToString(),
                 b.Target.TargetDirection.ToString(),
-                b.Target.Quantity
+                b.Target.Quantity,
+                SelectCosts(b.Costs)
             )
         );
     }

@@ -15,7 +15,7 @@ public abstract class Unit
 
     public virtual void ApplySkillCost(Skill skill)
     {
-        foreach (var cost in skill.Costs)
+        foreach (var cost in skill.Behaviors.SelectMany(x => x.Costs))
         {
             var property = Properties.Single(x => x.PropertyName == cost.PropertyName);
 
@@ -34,7 +34,7 @@ public abstract class Unit
     {
         var hasResource = true;
 
-        foreach (var cost in skill.Costs)
+        foreach (var cost in skill.Behaviors.SelectMany(x => x.Costs))
         {
             var property = Properties.Single(x => x.PropertyName == cost.PropertyName);
 
@@ -56,7 +56,7 @@ public abstract class Unit
 
     public virtual bool IsAlive()
     {
-        var isAlive = Properties.Single(x => x.PropertyName == PropertyName.Life).CurrentValue <= 0;
+        var isAlive = Properties.Single(x => x.PropertyName == PropertyName.Life).CurrentValue > 0;
 
         return isAlive;
     }

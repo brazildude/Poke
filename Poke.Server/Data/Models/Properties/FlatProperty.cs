@@ -6,6 +6,7 @@ public class FlatProperty
 {
     public int FlatPropertyID { get; set; }
     public int? UnitID { get; set; }
+    public int? BehaviorID { get; set; }
     public int? SkillID { get; set; }
     public int? CostID { get; set; }
     public int BaseValue { get; set; }
@@ -13,6 +14,7 @@ public class FlatProperty
     public PropertyName PropertyName { get; set; }
 
     public Unit? Unit { get; set; }
+    public Behavior? Behavior { get; set; }
     public Skill? Skill { get; set; }
     public Cost? Cost { get; set; }
 

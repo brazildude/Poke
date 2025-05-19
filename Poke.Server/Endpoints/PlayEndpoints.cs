@@ -24,9 +24,9 @@ public static class PlayEndpoints
     public static async Task<Results<Ok<User>, NotFound>> GetPlay(ICurrentUser currentUser, PokeContext db) 
     {
         var user = await db.Users
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
+        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
         .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID);
 
         if (user == null)
