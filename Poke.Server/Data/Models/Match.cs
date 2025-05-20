@@ -15,6 +15,8 @@ public class Match
     public Team Team01 { get; set; } = null!;
     public Team Team02 { get; set; } = null!;
 
+    public List<Play> Plays { get; set; } = new List<Play>();
+
     public void Play(Unit unitInAction, Skill skill, HashSet<int> targetIDs)
     {
         if (!unitInAction.IsAlive())
@@ -39,6 +41,14 @@ public class Match
         {
             return;
         }
+
+        Plays.Add(new Play
+        {
+            TeamID = unitInAction.TeamID,
+            UnitInActionID = unitInAction.UnitID,
+            SkillID = skill.UnitID,
+            TargetIDs = targetIDs
+        });
 
         unitInAction.UseSkill(skill, ownUnits, enemyUnits, targetIDs, RandomSeed);
     }

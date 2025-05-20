@@ -64,7 +64,8 @@ public static class PlayEndpoints
         }
 
         match.Play(unitInAction, skill, playVM.TargetIDs);
-        
+        db.SaveChanges();
+
         return TypedResults.Ok(playVM);
     }
 }

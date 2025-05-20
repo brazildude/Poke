@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Poke.Server.Data.Models;
-using Poke.Server.Data.Models.Properties;
 
 namespace Poke.Server.Data.Configurations;
 

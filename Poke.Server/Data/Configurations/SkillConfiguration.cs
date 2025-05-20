@@ -25,18 +25,17 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
            .Property(x => x.SkillName)
            .HasConversion<string>();
 
-        builder.HasDiscriminator()
-               .HasValue<Cleave>("Cleave")
-               .HasValue<DivineLight>("DivineLight")
-               .HasValue<Fireball>("Fireball")
-               .HasValue<Frostbolt>("Frostbolt")
-               .HasValue<GlacialPuncture>("GlacialPuncture")
-               .HasValue<Hellfire>("Hellfire")
-               .HasValue<Lacerate>("Lacerate")
-               .HasValue<Nullstep>("Nullstep")
-               .HasValue<Shadowbolt>("Shadowbolt")
-               .HasValue<Slice>("Slice")
-               .HasValue<Smite>("Smite")
-               .HasValue<SmokeMirage>("SmokeMirage");
+        // mapping all skills to the database
+        var types = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => type.IsClass && !type.IsAbstract && typeof(Skill).IsAssignableFrom(type))
+            .ToList();
+
+        var discriminator = builder.HasDiscriminator();
+
+        foreach (var type in types)
+        {
+            discriminator.HasValue(type, type.Name);
+        }
     }
 }

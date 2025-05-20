@@ -25,12 +25,17 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
             .Property(x => x.UnitName)
             .HasConversion<string>();
 
-        builder.HasDiscriminator()
-              .HasValue<Lancer>("Lancer")
-              .HasValue<Mage>("Mage")
-              .HasValue<Paladin>("Paladin")
-              .HasValue<Rogue>("Rogue")
-              .HasValue<Warlock>("Warlock")
-              .HasValue<Warrior>("Warrior");
+        // mapping all skills to the database
+        var types = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => type.IsClass && !type.IsAbstract && typeof(Unit).IsAssignableFrom(type))
+            .ToList();
+
+        var discriminator = builder.HasDiscriminator();
+
+        foreach (var type in types)
+        {
+            discriminator.HasValue(type, type.Name);
+        }
     }
 }

@@ -37,7 +37,6 @@ public class BehaviorConfiguration : IEntityTypeConfiguration<Behavior>
             .HasConversion<string>();
 
         builder.HasDiscriminator()
-               .HasValue<CommonBehavior>("CommonBehavior")
-               ;
+               .HasValue<CommonBehavior>("CommonBehavior");
     }
 }
