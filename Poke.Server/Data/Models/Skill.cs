@@ -29,12 +29,7 @@ public abstract class Skill
     {
         foreach (var behavior in Behaviors)
         {
-            var unitTargets = behavior.SelectTargets(unitInAction, ownUnits, enemyUnits, targetIDs);
-
-            foreach (var unitTarget in unitTargets)
-            {
-                behavior.Execute(unitTarget, random);
-            }
+            behavior.Execute(unitInAction, ownUnits, enemyUnits, targetIDs, random);
         }
     }
 }

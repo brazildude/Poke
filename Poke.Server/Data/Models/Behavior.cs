@@ -27,21 +27,45 @@ public abstract class Behavior
     [NotMapped]
     public Random random = null!;
 
-    public virtual void Execute(Unit unitTarget, Random random)
+    public virtual void Execute(Unit unitInAction, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs, Random random)
     {
         this.random = random;
+        ApplyCost(unitInAction);
 
-        var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
-        var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
+        var unitTargets = SelectTargets(unitInAction, ownUnits, enemyUnits, targetIDs);
 
-        if (BehaviorType == BehaviorType.Damage)
+        foreach (var unitTarget in unitTargets)
         {
+            var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
+            var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
+
+            if (BehaviorType == BehaviorType.Damage)
+            {
+
+            }
+
+            property.CurrentValue += skillValue;
 
         }
 
-        property.CurrentValue += skillValue;
-
         TickCooldown();
+    }
+
+    public virtual void ApplyCost(Unit unitInAction)
+    {
+        foreach (var cost in Costs)
+        {
+            var property = unitInAction.Properties.Single(x => x.PropertyName == cost.PropertyName);
+
+            var valueToApply = cost.CostType switch
+            {
+                CostType.Flat => property.CurrentValue + cost.FlatProperty.CurrentValue,
+                CostType.Porcentage => property.BaseValue * cost.FlatProperty.CurrentValue / 100,
+                _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
+            };
+
+            property.CurrentValue = valueToApply;
+        }
     }
 
     public virtual void TickCooldown()
