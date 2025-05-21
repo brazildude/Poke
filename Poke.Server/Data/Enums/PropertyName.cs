@@ -6,5 +6,6 @@ public enum PropertyName
     Mana,
     SkillCost,
     BehaviorValue,
-    Cooldown
+    Cooldown,
+    PlayTimes
 }

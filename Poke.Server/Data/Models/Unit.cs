@@ -13,6 +13,7 @@ public abstract class Unit
     public virtual List<Skill> Skills { get; set; } = new List<Skill>();
     public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
 
+    // TODO: Move to behavior class
     public virtual void ApplySkillCost(Skill skill)
     {
         foreach (var cost in skill.Behaviors.SelectMany(x => x.Costs))
@@ -29,7 +30,7 @@ public abstract class Unit
             property.CurrentValue += valueToApply;
         }
     }
-    
+
     public virtual bool CheckSkillCost(Skill skill)
     {
         var hasResource = true;
@@ -61,11 +62,20 @@ public abstract class Unit
         return isAlive;
     }
 
+    public virtual bool CanPlay()
+    {
+        var playTimes = Properties.Single(x => x.PropertyName == PropertyName.PlayTimes);
+        return playTimes.CurrentValue >= 1;
+    }
+
     public virtual void UseSkill(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs, int randomSeed)
     {
         ApplySkillCost(skill);
 
         skill.random = new Random(randomSeed);
         skill.Execute(this, ownUnits, enemyUnits, targetIDs);
+
+        var playTimes = Properties.Single(x => x.PropertyName == PropertyName.PlayTimes);
+        playTimes.CurrentValue -= 1;
     }
 }

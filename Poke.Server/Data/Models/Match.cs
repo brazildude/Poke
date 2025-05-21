@@ -11,6 +11,8 @@ public class Match
     public string CurrentUserID { get; set; } = null!;
     public int Round { get; set; }
     public int RandomSeed { get; set; }
+    public bool IsMatchOver { get; set; }
+    public string? UserWinnerID { get; set; }
 
     public Team Team01 { get; set; } = null!;
     public Team Team02 { get; set; } = null!;
@@ -20,6 +22,11 @@ public class Match
     public void Play(Unit unitInAction, Skill skill, HashSet<int> targetIDs)
     {
         if (!unitInAction.IsAlive())
+        {
+            return;
+        }
+
+        if (!unitInAction.CanPlay())
         {
             return;
         }
@@ -51,6 +58,72 @@ public class Match
         });
 
         unitInAction.UseSkill(skill, ownUnits, enemyUnits, targetIDs, RandomSeed);
+
+        CheckMatchOver();
+
+        if (!IsMatchOver)
+        {
+            var allUnits = Team01.Units.Concat(Team02.Units);
+            var allAliveUnits = allUnits.Where(x => x.IsAlive());
+            if (IsRoundOver(allAliveUnits))
+            {
+                Round += 1;
+                foreach (var aliveUnit in allAliveUnits)
+                {
+                    TickCooldown(aliveUnit, skill);
+                    aliveUnit.Properties.Single(x => x.PropertyName == PropertyName.PlayTimes).SetCurrentToBase();
+                }
+            }
+            
+            // changing current user
+            CurrentUserID = Team01.UserID == CurrentUserID ? Team02.UserID : Team01.UserID;
+        }
+    }
+
+    public void TickCooldown(Unit aliveUnit, Skill skill)
+    {
+        var cooldowns = aliveUnit.Skills
+            .Where(x => x.SkillID != skill.SkillID)
+            .SelectMany(x => x.Behaviors)
+            .SelectMany(x => x.Properties
+                .Where(p => p.PropertyName == PropertyName.Cooldown && p.CurrentValue > 0)
+            );
+
+        foreach (var cooldown in cooldowns)
+        {
+            cooldown.CurrentValue -= 1;
+        }
+    }
+
+    public bool IsRoundOver(IEnumerable<Unit> allAliveUnits)
+    {
+        if (allAliveUnits.Any(x => x.CanPlay()))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void CheckMatchOver()
+    {
+        if (Team01.Units.Any(x => x.IsAlive()) && Team02.Units.All(x => !x.IsAlive()))
+        {
+            IsMatchOver = true;
+            UserWinnerID = Team01.UserID;
+        }
+
+        if (Team02.Units.Any(x => x.IsAlive()) && Team01.Units.All(x => !x.IsAlive()))
+        {
+            IsMatchOver = true;
+            UserWinnerID = Team02.UserID;
+        }
+
+        if (Team01.Units.All(x => !x.IsAlive()) && Team02.Units.All(x => !x.IsAlive()))
+        {
+            IsMatchOver = true;
+            UserWinnerID = null;
+        }
     }
 
     public Team GetCurrentTeam(string userID)
@@ -73,7 +146,7 @@ public class Match
         return Team01;
     }
 
-    public virtual bool AreTargetsValid(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
+    public bool AreTargetsValid(Skill skill, List<Unit> ownUnits, List<Unit> enemyUnits, HashSet<int> targetIDs)
     {
         foreach (var behavior in skill.Behaviors)
         {
@@ -109,7 +182,7 @@ public class Match
                 }
             }
         }
-        
+
         return true;
     }
 }

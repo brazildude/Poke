@@ -18,9 +18,14 @@ public class FlatProperty
     public Skill? Skill { get; set; }
     public Cost? Cost { get; set; }
 
+    public void SetCurrentToBase()
+    {
+        CurrentValue = BaseValue;
+    }
+
     public static FlatProperty New(PropertyName propertyType, int value)
     {
-        return new FlatProperty 
+        return new FlatProperty
         {
             PropertyName = propertyType,
             BaseValue = value,

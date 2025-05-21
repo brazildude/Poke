@@ -17,7 +17,8 @@ public class Warrior : Unit
 
         Properties.AddRange(
             FlatProperty.New(PropertyName.Life, 100),
-            FlatProperty.New(PropertyName.Mana, 100)
+            FlatProperty.New(PropertyName.Mana, 100),
+            FlatProperty.New(PropertyName.PlayTimes, 1)
         );
     }
 }
