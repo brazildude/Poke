@@ -47,8 +47,6 @@ public abstract class Behavior
             property.CurrentValue += skillValue;
 
         }
-
-        TickCooldown();
     }
 
     public virtual void ApplyCost(Unit unitInAction)
@@ -65,21 +63,6 @@ public abstract class Behavior
             };
 
             property.CurrentValue = valueToApply;
-        }
-    }
-
-    public virtual void TickCooldown()
-    {
-        var cooldown = Properties.Single(x => x.PropertyName == PropertyName.Cooldown);
-        var currentCooldown = Properties.Single(x => x.PropertyName == PropertyName.Cooldown);
-
-        if (currentCooldown.CurrentValue > 1)
-        {
-            currentCooldown.CurrentValue -= 1;
-        }
-        else
-        {
-            currentCooldown.CurrentValue = currentCooldown.BaseValue;
         }
     }
 

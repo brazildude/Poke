@@ -47,6 +47,7 @@ public abstract class Unit
     public virtual bool CanPlay()
     {
         var playTimes = Properties.Single(x => x.PropertyName == PropertyName.PlayTimes);
+
         return playTimes.CurrentValue >= 1;
     }
 
