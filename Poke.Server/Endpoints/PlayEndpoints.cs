@@ -9,7 +9,7 @@ namespace Poke.Server.Endpoints;
 
 public static class PlayEndpoints
 {
-    public record class PlayVM(int MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
+    public record class PlayVM(Guid MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
 
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
@@ -21,7 +21,7 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static async Task<Results<Ok<User>, NotFound>> GetPlay(ICurrentUser currentUser, PokeContext db) 
+    public static async Task<Results<Ok<User>, NotFound>> GetPlay(int matchID, ICurrentUser currentUser, PokeContext db) 
     {
         var user = await db.Users
         .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)

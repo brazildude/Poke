@@ -4,7 +4,7 @@ namespace Poke.Server.Data.Models;
 
 public class Match
 {
-    public int MatchID { get; set; }
+    public Guid MatchID { get; set; }
     public int Team01ID { get; set; }
     public int Team02ID { get; set; }
 

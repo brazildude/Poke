@@ -57,12 +57,12 @@ public abstract class Behavior
 
             var valueToApply = cost.CostType switch
             {
-                CostType.Flat => property.CurrentValue + cost.FlatProperty.CurrentValue,
-                CostType.Porcentage => property.BaseValue * cost.FlatProperty.CurrentValue / 100,
+                CostType.Flat => cost.FlatProperty.CurrentValue,
+                CostType.Percentage => property.BaseValue * cost.FlatProperty.CurrentValue / 100,
                 _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
             };
 
-            property.CurrentValue = valueToApply;
+            property.CurrentValue += valueToApply;
         }
     }
 

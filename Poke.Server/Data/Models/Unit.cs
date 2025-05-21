@@ -24,7 +24,7 @@ public abstract class Unit
             hasResource = cost.CostType switch
             {
                 CostType.Flat => property.CurrentValue > Math.Abs(cost.FlatProperty.CurrentValue),
-                CostType.Porcentage => property.CurrentValue > property.BaseValue * cost.FlatProperty.CurrentValue / 100,
+                CostType.Percentage => property.CurrentValue > property.BaseValue * cost.FlatProperty.CurrentValue / 100,
                 _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
             };
 

@@ -33,7 +33,7 @@ public static class MatchmakingEndpoints
             return TypedResults.BadRequest("Team does not exist.");
         }
 
-        var tcs = new TaskCompletionSource<(int, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var tcs = new TaskCompletionSource<(Guid, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
         var player = new MatchmakingState.WaitingPlayer(currentUser.UserID, teamID, tcs);
 
         // Try to match

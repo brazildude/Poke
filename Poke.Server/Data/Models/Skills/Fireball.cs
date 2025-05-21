@@ -1,4 +1,5 @@
 using Poke.Server.Data.Enums;
+using Poke.Server.Data.Models.Behaviors;
 using Poke.Server.Infrastructure.Builders;
 
 namespace Poke.Server.Data.Models.Skills;
@@ -19,5 +20,6 @@ public class Fireball : Skill
                     .Build();
 
         Behaviors.Add(behavior01);
+        Behaviors.Add(new FireballBehavior02());
     }
 }
