@@ -2,7 +2,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 
-namespace Poke.Server.Infrastructure;
+namespace Poke.Server.Infrastructure.ObjectDiff;
 
 public static class UltraFastObjectDiff
 {
