@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
@@ -39,7 +40,23 @@ public static class SkillEndpoints
 
         return TypedResults.Ok(skills);
     }
-    
+
+    public static Results<Ok, BadRequest<string>> EditSkill(EditSkillVM viewModel, ICurrentUser currentUser, PokeContext db)
+    {
+        var skill = db.Skills
+            .Include(x => x.Unit)
+            .ThenInclude(x => x.Team)
+            .ThenInclude(x => x.User)
+            .SingleOrDefault(x => x.SkillID == viewModel.SkillID && x.Unit.Team.UserID == currentUser.UserID);
+
+        if (skill == null)
+        {
+            return TypedResults.BadRequest("Invalid skill.");
+        }
+
+        return TypedResults.Ok();
+    }
+
     private static IEnumerable<FlatPropertyVM> SelectProperties(List<FlatProperty> x)
     {
         return x.Select(p => new FlatPropertyVM(p.PropertyName.ToString(), p.CurrentValue));
