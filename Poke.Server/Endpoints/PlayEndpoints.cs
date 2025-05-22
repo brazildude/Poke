@@ -1,7 +1,8 @@
+using System.Text.Json;
+using Force.DeepCloner;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
-using Poke.Server.Data.Models;
+using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Infrastructure.Matchmaking;
 
@@ -21,27 +22,11 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static async Task<Results<Ok<User>, NotFound>> GetPlay(int matchID, ICurrentUser currentUser, PokeContext db) 
-    {
-        var user = await db.Users
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
-        .Include(x => x.Teams).ThenInclude(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
-        .SingleOrDefaultAsync(x => x.UserID == currentUser.UserID);
-
-        if (user == null)
-        {
-            return TypedResults.NotFound();
-        }
-            
-        return TypedResults.Ok(user);
-    }
-
-    public static Results<Ok<PlayVM>, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PokeContext db) 
+    public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PokeContext db)
     {
         if (!MatchmakingState.Matches.TryGetValue(playVM.MatchID, out var match))
         {
-            return TypedResults.BadRequest();
+            return TypedResults.NotFound();
         }
 
         if (currentUser.UserID != match.CurrentUserID)
@@ -63,9 +48,15 @@ public static class PlayEndpoints
             return TypedResults.BadRequest();
         }
 
+        var initialState = match.DeepClone();
         match.Play(unitInAction, skill, playVM.TargetIDs);
+
         db.SaveChanges();
+
+        var changes = UltraFastObjectDiff.GetChanges(initialState, match, new HashSet<string> { "Plays" });
+        Console.WriteLine(JsonSerializer.Serialize(changes));
 
         return TypedResults.Ok(playVM);
     }
 }
+
