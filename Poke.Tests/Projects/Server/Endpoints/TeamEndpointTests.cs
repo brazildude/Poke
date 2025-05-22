@@ -3,6 +3,7 @@ using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Tests.Infrastructure;
 using static Poke.Server.Endpoints.TeamEndpoints;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Tests.Projects.Server.Endpoints;
 

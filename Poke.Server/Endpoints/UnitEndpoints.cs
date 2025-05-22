@@ -5,17 +5,12 @@ using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
 using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
 
 public static class UnitEndpoints
 {
-    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<CostVM> Costs);
-    public record CostVM(string Type, string ToProperty, int Value);
-    public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<BehaviorVM> Behaviors);
-    public record FlatPropertyVM(string Name, int Value);
-    public record UnitVM(int UnitID, string UnitName, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
-
     public static void RegisterUnitEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/units")

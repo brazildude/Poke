@@ -9,6 +9,7 @@ using Poke.Server.Infrastructure.Matchmaking;
 using static Poke.Server.Endpoints.PlayEndpoints;
 using static Poke.Server.Endpoints.TeamEndpoints;
 using static Poke.Server.Endpoints.UserEndpoints;
+using static Poke.Server.Infrastructure.ViewModels;
 
 internal class Program
 {

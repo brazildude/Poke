@@ -3,15 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
 
 public static class UserEndpoints
 {
-    public record UserVM(string ExternalID, string? Name, string? Email);
-    public record CreateUserVM(string Provider, string Token);
-    public record GetTeamVM(int TeamID , string Name, List<string> Units);
-
     public static void RegisterUserEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/users")
@@ -70,11 +67,15 @@ public static class UserEndpoints
 
     public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(ICurrentUser currentUser, PokeContext db)
     {
-        var teams = db.Teams
-        .Include(x => x.Units)
-        .Where(x => x.UserID == currentUser.UserID)
-        .Select(t => new GetTeamVM(t.TeamID, t.Name, t.Units.Select(p => p.UnitName.ToString()).ToList()))
-        .ToList();
+       var teams = db.Teams
+            .Include(x => x.Units)
+            .Where(x => x.UserID == currentUser.UserID)
+            .Select(x => new GetTeamVM(
+                    x.TeamID,
+                    x.Name,
+                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
+                )
+            .ToList();
 
         return TypedResults.Ok(teams);
     }

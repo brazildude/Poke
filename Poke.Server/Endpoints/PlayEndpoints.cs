@@ -5,20 +5,18 @@ using Poke.Server.Data;
 using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Infrastructure.Matchmaking;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
 
 public static class PlayEndpoints
 {
-    public record class PlayVM(Guid MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
-
     public static void RegisterPlayEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/plays")
         .RequireAuthorization()
         .RequireCors();
 
-        //endpoints.MapGet("", GetPlay);
         endpoints.MapPost("", Play);
     }
 
@@ -59,4 +57,3 @@ public static class PlayEndpoints
         return TypedResults.Ok(playVM);
     }
 }
-

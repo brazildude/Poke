@@ -4,15 +4,12 @@ using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
 
 public static class TeamEndpoints
 {
-    public record GetTeamVM(int TeamID, string Name, List<KeyValuePair<int, string>> Units);
-    public record CreateTeamVM(string Name, HashSet<string> Units);
-    public record EditTeamVM(int TeamID, string Name, HashSet<string> Units);
-
     public static void RegisterTeamEndpoints(this WebApplication app)
     {
         var endpoints = app.MapGroup("api/teams")
@@ -43,21 +40,6 @@ public static class TeamEndpoints
         }
 
         return TypedResults.Ok(team);
-    }
-
-    public static Ok<List<GetTeamVM>> GetTeams(ICurrentUser currentUser, PokeContext db)
-    {
-        var teams = db.Teams
-            .Include(x => x.Units)
-            .Where(x => x.UserID == currentUser.UserID)
-            .Select(x => new GetTeamVM(
-                    x.TeamID,
-                    x.Name,
-                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
-                )
-            .ToList();
-
-        return TypedResults.Ok(teams);
     }
 
     public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
