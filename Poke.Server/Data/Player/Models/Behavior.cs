@@ -11,17 +11,13 @@ public abstract class Behavior
     public int SkillID { get; set; }
     public BehaviorName BehaviorName { get; set; }
     public virtual BehaviorType BehaviorType { get; set; }
-    /// <summary>
-    /// Name of the property that will be targeted.
-    /// </summary>
-    public virtual PropertyName PropertyName { get; set; }
 
-    public virtual MinMaxProperty MinMaxProperty { get; set; } = null!;
     public virtual Target Target { get; set; } = null!;
     public virtual Skill Skill { get; set; } = null!;
 
-    public virtual List<Cost> Costs { get; set; } = new List<Cost>();
-    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
+    public virtual List<Cost> Costs { get; set; } = [];
+    public virtual List<FlatProperty> Properties { get; set; } = [];
+    public virtual List<MinMaxProperty> MinMaxProperties { get; set; } = [];
 
 
     [NotMapped]
@@ -36,16 +32,19 @@ public abstract class Behavior
 
         foreach (var unitTarget in unitTargets)
         {
-            var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
-            var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
+            var property = unitTarget.Properties.Single(x => x.PropertyName == Target.TargetPropertyName);
 
-            if (BehaviorType == BehaviorType.Damage)
+            foreach (var minMaxProperty in MinMaxProperties)
             {
+                var skillValue = random.Next(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
 
+                if (BehaviorType == BehaviorType.Damage)
+                {
+
+                }
+
+                property.CurrentValue += skillValue;
             }
-
-            property.CurrentValue += skillValue;
-
         }
     }
 

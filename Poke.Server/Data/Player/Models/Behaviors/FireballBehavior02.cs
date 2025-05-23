@@ -7,9 +7,8 @@ public class FireballBehavior02 : Behavior
 {
     public FireballBehavior02()
     {
-        Target = new Target { TargetType = TargetType.All, TargetDirection = TargetDirection.Enemy, Quantity = 1 };
-        MinMaxProperty = MinMaxProperty.New(PropertyName.BehaviorValue, -20, -15);
-        PropertyName = PropertyName.Life;
+        Target = Target.New(TargetType.All, TargetDirection.Enemy, PropertyName.Life, 1);
+        MinMaxProperties.Add(MinMaxProperty.New(PropertyName.BehaviorValue, -20, -15));
         Properties.Add(FlatProperty.New(PropertyName.BehaviorValue, 1));
         Costs.Add(Cost.New(-5, CostType.Percentage, PropertyName.Life));
     }
@@ -25,16 +24,19 @@ public class FireballBehavior02 : Behavior
         {
             foreach (var unitTarget in unitTargets)
             {
-                var property = unitTarget.Properties.Single(x => x.PropertyName == PropertyName);
-                var skillValue = random.Next(MinMaxProperty.MinCurrentValue, MinMaxProperty.MaxCurrentValue + 1);
+                var property = unitTarget.Properties.Single(x => x.PropertyName == Target.TargetPropertyName);
 
-                if (BehaviorType == BehaviorType.Damage)
+                foreach (var minMaxProperty in MinMaxProperties)
                 {
+                    var skillValue = random.Next(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
 
+                    if (BehaviorType == BehaviorType.Damage)
+                    {
+
+                    }
+
+                    property.CurrentValue += skillValue;
                 }
-
-                property.CurrentValue += skillValue;
-
             }
         }
     }

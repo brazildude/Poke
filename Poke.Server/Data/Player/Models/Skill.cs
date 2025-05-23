@@ -10,8 +10,8 @@ public abstract class Skill
     public int UnitID { get; set; }
     public SkillName SkillName { get; set; }
 
-    public virtual List<Behavior> Behaviors { get; set; } = new List<Behavior>();
-    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
+    public virtual List<Behavior> Behaviors { get; set; } = [];
+    public virtual List<FlatProperty> Properties { get; set; } = [];
     
     public Unit Unit { get; set; } = null!;
 

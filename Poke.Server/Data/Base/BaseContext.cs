@@ -7,15 +7,15 @@ public class BaseContext
 {
     public static List<Unit> GetUnits()
     {
-        return new List<Unit>
-        {
+        return
+        [
            new Lancer(),
            new Mage(),
            new Paladin(),
            new Rogue(),
            new Warlock(),
            new Warrior()
-        };
+        ];
     }
 
     public static Unit GetUnit(string unitName)

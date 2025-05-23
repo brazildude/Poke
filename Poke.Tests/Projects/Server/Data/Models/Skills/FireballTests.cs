@@ -27,9 +27,9 @@ public class FireballTests
         // assert
         foreach (var enemyUnit in enemyUnits)
         {
-            var targetProperty = enemyUnit.Properties.Single(x => x.PropertyName == behavior.PropertyName);
-            Assert.True(targetProperty.CurrentValue >= targetProperty.BaseValue + behavior.MinMaxProperty.MinCurrentValue);
-            Assert.True(targetProperty.CurrentValue <= targetProperty.BaseValue + behavior.MinMaxProperty.MaxCurrentValue);
+            var targetProperty = enemyUnit.Properties.Single(x => x.PropertyName == behavior.Target.TargetPropertyName);
+            Assert.True(targetProperty.CurrentValue >= targetProperty.BaseValue + behavior.MinMaxProperties.First().MinCurrentValue);
+            Assert.True(targetProperty.CurrentValue <= targetProperty.BaseValue + behavior.MinMaxProperties.First().MaxCurrentValue);
         }
     }
     

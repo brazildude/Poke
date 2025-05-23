@@ -9,9 +9,9 @@ public class FlatProperty
     public int? BehaviorID { get; set; }
     public int? SkillID { get; set; }
     public int? CostID { get; set; }
+    public PropertyName PropertyName { get; set; }
     public int BaseValue { get; set; }
     public int CurrentValue { get; set; }
-    public PropertyName PropertyName { get; set; }
 
     public Unit? Unit { get; set; }
     public Behavior? Behavior { get; set; }

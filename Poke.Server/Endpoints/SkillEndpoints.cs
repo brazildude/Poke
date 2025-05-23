@@ -67,17 +67,21 @@ public static class SkillEndpoints
         return x.Select(c => new CostVM(c.CostType.ToString(), c.PropertyName.ToString(), c.FlatProperty.CurrentValue));
     }
 
+    private static IEnumerable<MinMaxPropertyVM> SelectMinMaxProperties(List<MinMaxProperty> x)
+    {
+        return x.Select(c => new MinMaxPropertyVM(c.PropertyName.ToString(), c.MinCurrentValue, c.MaxCurrentValue));
+    }
+
     private static IEnumerable<BehaviorVM> SelectBehaviors(List<Behavior> x)
     {
         return x.Select(b =>
             new BehaviorVM(
                 b.BehaviorType.ToString(),
-                b.PropertyName.ToString(),
-                b.MinMaxProperty.MinCurrentValue,
-                b.MinMaxProperty.MaxCurrentValue,
+                b.Target.TargetPropertyName.ToString(),
                 b.Target.TargetType.ToString(),
                 b.Target.TargetDirection.ToString(),
                 b.Target.Quantity,
+                SelectMinMaxProperties(b.MinMaxProperties),
                 SelectCosts(b.Costs)
             )
         );

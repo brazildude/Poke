@@ -16,15 +16,15 @@ public class CommonBehaviorBuilder
         return builder;
     }
 
-    public CommonBehaviorBuilder WithTarget(TargetType targetType, TargetDirection targetDirection, int? quantity = 0)
+    public CommonBehaviorBuilder WithTarget(TargetType targetType, TargetDirection targetDirection, PropertyName targetPropertyName, int? quantity = 0)
     {
-        _behavior.Target = Target.New(targetType, targetDirection, quantity);
+        _behavior.Target = Target.New(targetType, targetDirection, targetPropertyName, quantity);
         return this;
     }
 
     public CommonBehaviorBuilder WithMinMax(PropertyName property, int min, int max)
     {
-        _behavior.MinMaxProperty = MinMaxProperty.New(property, min, max);
+        _behavior.MinMaxProperties = new List<MinMaxProperty> { MinMaxProperty.New(property, min, max) };
         return this;
     }
 
@@ -34,15 +34,9 @@ public class CommonBehaviorBuilder
         return this;
     }
 
-    public CommonBehaviorBuilder WithPropertyName(PropertyName propertyName)
-    {
-        _behavior.PropertyName = propertyName;
-        return this;
-    }
-
     public CommonBehaviorBuilder WithCooldown(int cooldown)
     {
-        _behavior.Properties ??= new List<FlatProperty>();
+        _behavior.Properties ??= [];
         _behavior.Properties.Add(FlatProperty.New(PropertyName.Cooldown, cooldown));
         return this;
     }

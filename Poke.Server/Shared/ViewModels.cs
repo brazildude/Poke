@@ -16,7 +16,8 @@ public static class ViewModels
     public record EditSkillVM(int SkillID, HashSet<int> BehaviorIDs);
     public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<BehaviorVM> Behaviors);
     
-    public record BehaviorVM(string Type, string TargetProperty, int MinValue, int MaxValue, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<CostVM> Costs);
+    public record BehaviorVM(string Type, string TargetProperty, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<MinMaxPropertyVM> MinMaxProperties, IEnumerable<CostVM> Costs);
     public record CostVM(string Type, string ToProperty, int Value);
     public record FlatPropertyVM(string Name, int Value);
+    public record MinMaxPropertyVM(string Name, int MinValue, int MaxValue);
 }

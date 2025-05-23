@@ -8,7 +8,7 @@ public class Play
 
     public int UnitInActionID { get; set; }
     public int SkillID { get; set; }
-    public HashSet<int> TargetIDs { get; set; } = new HashSet<int>();
+    public HashSet<int> TargetIDs { get; set; } = [];
 
     //public Team Team { get; set; } = null!;
     public Match Match { get; set; } = null!;

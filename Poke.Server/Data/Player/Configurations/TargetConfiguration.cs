@@ -15,5 +15,9 @@ public class TargetConfiguration : IEntityTypeConfiguration<Target>
         builder
            .Property(x => x.TargetDirection)
            .HasConversion<string>();
+
+        builder
+            .Property(x => x.TargetPropertyName)
+            .HasConversion<string>();
     }
 }

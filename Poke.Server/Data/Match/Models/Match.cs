@@ -3,6 +3,8 @@ namespace Poke.Server.Data.Match.Models;
 public class Match
 {
     public Guid MatchID { get; set; }
+    public string UserID01 { get; set; } = null!;
+    public string UserID02 { get; set; } = null!;
     public int Team01ID { get; set; }
     public int Team02ID { get; set; }
 
@@ -12,7 +14,7 @@ public class Match
     public bool IsMatchOver { get; set; }
     public string? UserWinnerID { get; set; }
 
-    public List<Play> Plays { get; set; } = new List<Play>();
+    public List<Play> Plays { get; set; } = [];
 
    // public void Play(Unit unitInAction, Skill skill, HashSet<int> targetIDs)
    // {

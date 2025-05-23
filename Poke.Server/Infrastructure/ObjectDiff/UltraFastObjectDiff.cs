@@ -6,14 +6,14 @@ namespace Poke.Server.Infrastructure.ObjectDiff;
 
 public static class UltraFastObjectDiff
 {
-    private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new();
+    private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = [];
 
     public static Dictionary<string, object?> GetChanges(object original, object modified, HashSet<string>? ignoreProperties = null)
     {
         var changes = new Dictionary<string, object?>();
         var visited = new HashSet<object>(ReferenceEqualityComparer.Instance);
         var sb = new StringBuilder(128);
-        Compare(original, modified, sb, changes, visited, ignoreProperties ?? new HashSet<string>());
+        Compare(original, modified, sb, changes, visited, ignoreProperties ?? []);
         return changes;
     }
 

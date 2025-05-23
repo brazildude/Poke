@@ -9,8 +9,8 @@ public static class UltraFastObjectDiffApplier
 {
     private const int MaxPathDepth = 32;
 
-    private static readonly Dictionary<Type, Dictionary<string, PropertyInfo>> _propertyCache = new();
-    private static readonly Dictionary<Type, Func<object>> _constructorCache = new();
+    private static readonly Dictionary<Type, Dictionary<string, PropertyInfo>> _propertyCache = [];
+    private static readonly Dictionary<Type, Func<object>> _constructorCache = [];
 
     public static void ApplyChanges(object target, Dictionary<string, object?> changes)
     {

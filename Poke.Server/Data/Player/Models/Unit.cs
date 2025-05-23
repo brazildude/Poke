@@ -10,8 +10,8 @@ public abstract class Unit
     public UnitName UnitName { get; set; }
 
     public Team Team { get; set; } = null!;
-    public virtual List<Skill> Skills { get; set; } = new List<Skill>();
-    public virtual List<FlatProperty> Properties { get; set; } = new List<FlatProperty>();
+    public virtual List<Skill> Skills { get; set; } = [];
+    public virtual List<FlatProperty> Properties { get; set; } = [];
 
     public virtual bool CheckSkillCost(Skill skill)
     {

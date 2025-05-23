@@ -7,5 +7,5 @@ public class Team
     public required string Name { get; set; }
 
     public User User { get; set; } = null!;
-    public List<Unit> Units { get; set; } = new List<Unit>();
+    public List<Unit> Units { get; set; } = [];
 }
