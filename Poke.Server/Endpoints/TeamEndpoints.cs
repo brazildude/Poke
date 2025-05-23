@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
-using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -21,7 +20,7 @@ public static class TeamEndpoints
         endpoints.MapPatch("", EditTeam);
     }
 
-    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PokeDbContext db)
     {
         var team = db
             .Teams
@@ -42,14 +41,14 @@ public static class TeamEndpoints
         return TypedResults.Ok(team);
     }
 
-    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PokeDbContext db)
     {
         if (viewModel.Units.Count != 4)
         {
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        if (!viewModel.Units.All(x => Game.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
+        if (!viewModel.Units.All(x => PokeBaseContext.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
         {
             return TypedResults.BadRequest("Invalid unit name.");
         }
@@ -63,7 +62,7 @@ public static class TeamEndpoints
         {
             UserID = currentUser.UserID,
             Name = viewModel.Name,
-            Units = viewModel.Units.Select(Game.GetUnit).ToList()
+            Units = viewModel.Units.Select(PokeBaseContext.GetUnit).ToList()
         };
 
         db.Teams.Add(team);
@@ -72,7 +71,7 @@ public static class TeamEndpoints
         return TypedResults.Ok();
     }
 
-    public static Results<Ok, BadRequest<string>> EditTeam(EditTeamVM viewModel, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok, BadRequest<string>> EditTeam(EditTeamVM viewModel, ICurrentUser currentUser, PokeDbContext db)
     {
         if (viewModel.Units.Count != 4)
         {
@@ -89,14 +88,14 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("Team does not exist.");
         }
         
-        if (!viewModel.Units.All(x => Game.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
+        if (!viewModel.Units.All(x => PokeBaseContext.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
         {
             return TypedResults.BadRequest("Invalid units name.");
         }
         
         team.Name = viewModel.Name;
 
-        var unitsToBeAdded = Game.GetUnits()
+        var unitsToBeAdded = PokeBaseContext.GetUnits()
             .Where(x =>
                 viewModel.Units
                 .Except(team.Units.Select(x => x.UnitName.ToString()))

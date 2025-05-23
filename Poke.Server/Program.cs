@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
-builder.Services.AddDbContext<PokeContext>(builder.Configuration["DatabaseProvider"] switch
+builder.Services.AddDbContext<PokeDbContext>(builder.Configuration["DatabaseProvider"] switch
 {
     "sqlite" => opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")),
     "sqlserver" => opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
@@ -63,7 +63,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     using (var serviceScope = app.Services.CreateScope())
-    using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PokeContext>())
+    using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PokeDbContext>())
     {
         dbContext.Database.EnsureDeleted();
         dbContext.Database.EnsureCreated();

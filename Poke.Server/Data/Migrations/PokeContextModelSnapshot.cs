@@ -8,7 +8,7 @@ using Poke.Server.Data;
 
 namespace Poke.Server.Data.Migrations
 {
-    [DbContext(typeof(PokeContext))]
+    [DbContext(typeof(PokeDbContext))]
     partial class PokeContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

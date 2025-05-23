@@ -9,7 +9,7 @@ using Poke.Server.Data;
 
 namespace Poke.Server.Data.Migrations
 {
-    [DbContext(typeof(PokeContext))]
+    [DbContext(typeof(PokeDbContext))]
     [Migration("20250502024905_InitialCreate")]
     partial class InitialCreate
     {

@@ -1,9 +1,9 @@
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Units;
 
-namespace Poke.Server.Infrastructure;
+namespace Poke.Server.Data;
 
-public class Game
+public class PokeBaseContext
 {
     public static List<Unit> GetUnits()
     {

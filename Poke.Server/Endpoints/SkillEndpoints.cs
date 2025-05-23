@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
-using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -20,9 +19,9 @@ public static class SkillEndpoints
         endpoints.MapGet("{unitName}", GetSkills);
     }
 
-    public static Results<Ok<IEnumerable<SkillVM>>, BadRequest<string>> GetSkills(string unitName, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<IEnumerable<SkillVM>>, BadRequest<string>> GetSkills(string unitName, ICurrentUser currentUser, PokeDbContext db)
     {
-        var unit = Game.GetUnits().Where(x => x.UnitName.ToString() == unitName).SingleOrDefault();
+        var unit = PokeBaseContext.GetUnits().Where(x => x.UnitName.ToString() == unitName).SingleOrDefault();
 
         if (unit == null)
         {
@@ -41,7 +40,7 @@ public static class SkillEndpoints
         return TypedResults.Ok(skills);
     }
 
-    public static Results<Ok, BadRequest<string>> EditSkill(EditSkillVM viewModel, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok, BadRequest<string>> EditSkill(EditSkillVM viewModel, ICurrentUser currentUser, PokeDbContext db)
     {
         var skill = db.Skills
             .Include(x => x.Unit)

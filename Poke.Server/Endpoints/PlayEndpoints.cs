@@ -1,10 +1,9 @@
 using System.Text.Json;
 using Force.DeepCloner;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Poke.Server.Cache;
 using Poke.Server.Data;
-using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Infrastructure.Matchmaking;
 using Poke.Server.Infrastructure.ObjectDiff;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -21,9 +20,9 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PokeDbContext db)
     {
-        if (!MatchmakingState.Matches.TryGetValue(playVM.MatchID, out var match))
+        if (!MatchmakingContext.Matches.TryGetValue(playVM.MatchID, out var match))
         {
             return TypedResults.NotFound();
         }

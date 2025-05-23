@@ -4,9 +4,9 @@ using Poke.Server.Data.Models;
 
 namespace Poke.Server.Data;
 
-public class PokeContext : DbContext
+public class PokeDbContext : DbContext
 {
-    public PokeContext(DbContextOptions<PokeContext> options) : base(options) { }
+    public PokeDbContext(DbContextOptions<PokeDbContext> options) : base(options) { }
 
     public DbSet<Behavior> Bahaviors => Set<Behavior>();
     public DbSet<Cost> Costs => Set<Cost>();

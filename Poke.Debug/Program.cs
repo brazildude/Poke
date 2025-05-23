@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Poke.Server.Cache;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Infrastructure.Matchmaking;
 using static Poke.Server.Endpoints.PlayEndpoints;
 using static Poke.Server.Endpoints.TeamEndpoints;
 using static Poke.Server.Endpoints.UserEndpoints;
@@ -23,10 +23,10 @@ internal class Program
     private static async Task SimulateMatch()
     {
         var connectionstring = "Data Source=Poke.db;";
-        var optionsBuilder = new DbContextOptionsBuilder<PokeContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<PokeDbContext>();
         optionsBuilder.UseSqlite(connectionstring);
 
-        var pokeContext = new PokeContext(optionsBuilder.Options);
+        var pokeContext = new PokeDbContext(optionsBuilder.Options);
         pokeContext.Database.EnsureDeleted();
         pokeContext.Database.EnsureCreated();
 
@@ -58,7 +58,7 @@ internal class Program
         pokeContext.Matches.Add(match);
         pokeContext.SaveChanges();
 
-        MatchmakingState.Matches.TryAdd(match.MatchID, match);
+        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
         
         var result = Play(new PlayVM(match.MatchID, 1, 3, new HashSet<int> { 5 }), new CurrentUser("01", null, null, null), pokeContext);
         if (result.Result is Ok<PlayVM> ok)
@@ -72,7 +72,7 @@ internal class Program
         }
     }
 
-    private static Team SelectTeam(int teamID, PokeContext db)
+    private static Team SelectTeam(int teamID, PokeDbContext db)
     {
         return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)

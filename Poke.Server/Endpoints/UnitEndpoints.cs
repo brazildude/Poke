@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Data.Models.Properties;
-using Poke.Server.Infrastructure;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -21,7 +20,7 @@ public static class UnitEndpoints
         endpoints.MapGet("{unitID}", GetUnit);
     }
 
-    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PokeDbContext db)
     {
         var unit = db.Units
             .Include(x => x.Properties)
@@ -45,9 +44,9 @@ public static class UnitEndpoints
         return TypedResults.Ok(unit);
     }
 
-    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PokeContext db)
+    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PokeDbContext db)
     {
-        var units = Game.GetUnits()
+        var units = PokeBaseContext.GetUnits()
             .Select(x =>
                 new UnitVM(
                     x.UnitID,

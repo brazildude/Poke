@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Poke.Server.Cache;
 using Poke.Server.Data;
 using Poke.Server.Data.Models;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Infrastructure.Matchmaking;
 
 namespace Poke.Server.Endpoints;
 
@@ -20,10 +20,10 @@ public static class MatchmakingEndpoints
         endpoints.MapGet("wait", Wait);
     }
 
-    public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PokeContext db)
+    public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PokeDbContext db)
     {
         // Prevent duplicate join
-        if (MatchmakingState.Waiters.ContainsKey(currentUser.UserID))
+        if (MatchmakingContext.Waiters.ContainsKey(currentUser.UserID))
         {
             return TypedResults.BadRequest("Already in queue.");
         }
@@ -34,14 +34,14 @@ public static class MatchmakingEndpoints
         }
 
         var tcs = new TaskCompletionSource<(Guid, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var player = new MatchmakingState.WaitingPlayer(currentUser.UserID, teamID, tcs);
+        var player = new MatchmakingContext.WaitingPlayer(currentUser.UserID, teamID, tcs);
 
         // Try to match
-        if (!MatchmakingState.Queue.TryDequeue(out var opponent))
+        if (!MatchmakingContext.Queue.TryDequeue(out var opponent))
         {
             // Add to queue
-            MatchmakingState.Queue.Enqueue(player);
-            MatchmakingState.Waiters[currentUser.UserID] = tcs;
+            MatchmakingContext.Queue.Enqueue(player);
+            MatchmakingContext.Waiters[currentUser.UserID] = tcs;
 
             return TypedResults.Ok("Waiting for match...");
         }
@@ -69,7 +69,7 @@ public static class MatchmakingEndpoints
         db.Matches.Add(match);
         db.SaveChanges();
 
-        MatchmakingState.Matches.TryAdd(match.MatchID, match);
+        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
 
         opponent.Tcs.TrySetResult((match.MatchID, "player1"));
         tcs.TrySetResult((match.MatchID, "player2"));
@@ -79,14 +79,14 @@ public static class MatchmakingEndpoints
 
     public static Results<Ok<string>, Ok> Cancel(ICurrentUser currentUser)
     {
-        MatchmakingState.Waiters.TryRemove(currentUser.UserID, out _);
+        MatchmakingContext.Waiters.TryRemove(currentUser.UserID, out _);
 
-        var remaining = MatchmakingState.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
-        MatchmakingState.Queue.Clear();
+        var remaining = MatchmakingContext.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
+        MatchmakingContext.Queue.Clear();
 
         foreach (var p in remaining)
         {
-            MatchmakingState.Queue.Enqueue(p);
+            MatchmakingContext.Queue.Enqueue(p);
         }
 
         return TypedResults.Ok();
@@ -94,7 +94,7 @@ public static class MatchmakingEndpoints
 
     public static async Task<Results<Ok<string>, BadRequest<string>>> Wait(ICurrentUser currentUser, HttpContext context)
     {
-        if (!MatchmakingState.Waiters.TryGetValue(currentUser.UserID, out var tcs))
+        if (!MatchmakingContext.Waiters.TryGetValue(currentUser.UserID, out var tcs))
         {
             return TypedResults.BadRequest("Not in matchmaking queue.");
         }
@@ -106,27 +106,27 @@ public static class MatchmakingEndpoints
         try
         {
             var result = await tcs.Task.WaitAsync(linkedCts.Token);
-            MatchmakingState.Waiters.TryRemove(currentUser.UserID, out _);
+            MatchmakingContext.Waiters.TryRemove(currentUser.UserID, out _);
 
             return TypedResults.Ok(result.matchID.ToString());
         }
         catch (OperationCanceledException)
         {
-            MatchmakingState.Waiters.TryRemove(currentUser.UserID, out _);
+            MatchmakingContext.Waiters.TryRemove(currentUser.UserID, out _);
 
-            var remaining = MatchmakingState.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
-            MatchmakingState.Queue.Clear();
+            var remaining = MatchmakingContext.Queue.Where(p => p.UserID != currentUser.UserID).ToList();
+            MatchmakingContext.Queue.Clear();
 
             foreach (var p in remaining)
             {
-                MatchmakingState.Queue.Enqueue(p);
+                MatchmakingContext.Queue.Enqueue(p);
             }
 
             return TypedResults.Ok("timeout_or_cancelled");
         }
     }
 
-    private static Team SelectTeam(int teamID, PokeContext db)
+    private static Team SelectTeam(int teamID, PokeDbContext db)
     {
         return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
