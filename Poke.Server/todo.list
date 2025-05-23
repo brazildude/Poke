@@ -1,3 +1,5 @@
 TODO: FINISH ALL ENDPOINTS SO FRONTEND CAN BE TESTS
 TODO: Create a custom behavior overriding Execute method
 TODO: Evasion based on health
+TODO: Move classes from Match/Models to Cache and create a InitialState to hold serialized state of Match
+TODO: Create Events to hold state changes of match
