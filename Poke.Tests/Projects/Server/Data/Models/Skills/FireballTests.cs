@@ -1,6 +1,6 @@
-using Poke.Server.Data.Enums;
-using Poke.Server.Data.Models;
-using Poke.Server.Data.Models.Units;
+using Poke.Server.Shared.Enums;
+using Poke.Server.Data.Player.Models;
+using Poke.Server.Data.Player.Models.Units;
 
 namespace Poke.Tests.Projects.Server.Data.Models.Skills;
 

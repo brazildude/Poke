@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Cache;
-using Poke.Server.Data;
-using Poke.Server.Data.Models;
+using Poke.Server.Data.Match;
+using Poke.Server.Data.Match.Models;
+using Poke.Server.Data.Player;
+using Poke.Server.Data.Player.Models;
 using Poke.Server.Infrastructure.Auth;
 
 namespace Poke.Server.Endpoints;
@@ -20,59 +22,59 @@ public static class MatchmakingEndpoints
         endpoints.MapGet("wait", Wait);
     }
 
-    public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PokeDbContext db)
+    public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PlayerContext playerContext, MatchContext matchContext)
     {
         // Prevent duplicate join
-        if (MatchmakingContext.Waiters.ContainsKey(currentUser.UserID))
-        {
-            return TypedResults.BadRequest("Already in queue.");
-        }
+       //if (MatchmakingContext.Waiters.ContainsKey(currentUser.UserID))
+       //{
+       //    return TypedResults.BadRequest("Already in queue.");
+       //}
 
-        if (!db.Teams.Any(x => x.TeamID == teamID && x.UserID == currentUser.UserID))
-        {
-            return TypedResults.BadRequest("Team does not exist.");
-        }
+       //if (!playerContext.Teams.Any(x => x.TeamID == teamID && x.UserID == currentUser.UserID))
+       //{
+       //    return TypedResults.BadRequest("Team does not exist.");
+       //}
 
-        var tcs = new TaskCompletionSource<(Guid, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var player = new MatchmakingContext.WaitingPlayer(currentUser.UserID, teamID, tcs);
+       //var tcs = new TaskCompletionSource<(Guid, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
+       //var player = new MatchmakingContext.WaitingPlayer(currentUser.UserID, teamID, tcs);
 
-        // Try to match
-        if (!MatchmakingContext.Queue.TryDequeue(out var opponent))
-        {
-            // Add to queue
-            MatchmakingContext.Queue.Enqueue(player);
-            MatchmakingContext.Waiters[currentUser.UserID] = tcs;
+       //// Try to match
+       //if (!MatchmakingContext.Queue.TryDequeue(out var opponent))
+       //{
+       //    // Add to queue
+       //    MatchmakingContext.Queue.Enqueue(player);
+       //    MatchmakingContext.Waiters[currentUser.UserID] = tcs;
 
-            return TypedResults.Ok("Waiting for match...");
-        }
+       //    return TypedResults.Ok("Waiting for match...");
+       //}
 
-        var match = new Match
-        {
-            CurrentUserID = Random.Shared.Next(0, 2) == 0 ? currentUser.UserID : opponent.UserID,
-            RandomSeed = Environment.TickCount
-        };
+       //var match = new Match
+       //{
+       //    CurrentUserID = Random.Shared.Next(0, 2) == 0 ? currentUser.UserID : opponent.UserID,
+       //    RandomSeed = Environment.TickCount
+       //};
 
-        var team01 = SelectTeam(player.TeamID, db);
-        var team02 = SelectTeam(opponent.TeamID, db);
+       //var team01 = SelectTeam(player.TeamID, playerContext);
+       //var team02 = SelectTeam(opponent.TeamID, playerContext);
 
-        if (match.CurrentUserID == player.UserID)
-        {
-            match.Team01 = team01;
-            match.Team02 = team02;
-        }
-        else
-        {
-            match.Team01 = team02;
-            match.Team02 = team01;
-        }
+       //if (match.CurrentUserID == player.UserID)
+       //{
+       //    match.Team01 = team01;
+       //    match.Team02 = team02;
+       //}
+       //else
+       //{
+       //    match.Team01 = team02;
+       //    match.Team02 = team01;
+       //}
 
-        db.Matches.Add(match);
-        db.SaveChanges();
+       //matchContext.Matches.Add(match);
+       //matchContext.SaveChanges();
 
-        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
+       //MatchmakingContext.Matches.TryAdd(match.MatchID, match);
 
-        opponent.Tcs.TrySetResult((match.MatchID, "player1"));
-        tcs.TrySetResult((match.MatchID, "player2"));
+       //opponent.Tcs.TrySetResult((match.MatchID, "player1"));
+       //tcs.TrySetResult((match.MatchID, "player2"));
 
         return TypedResults.Ok("Match Found");
     }
@@ -126,9 +128,9 @@ public static class MatchmakingEndpoints
         }
     }
 
-    private static Team SelectTeam(int teamID, PokeDbContext db)
+    private static Team SelectTeam(int teamID, PlayerContext playerContext)
     {
-        return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
+        return playerContext.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperty)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
                 .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
                 .Single(x => x.TeamID == teamID);

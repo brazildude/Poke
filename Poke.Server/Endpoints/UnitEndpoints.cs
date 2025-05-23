@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Poke.Server.Data;
-using Poke.Server.Data.Models;
-using Poke.Server.Data.Models.Properties;
+using Poke.Server.Data.Player;
+using Poke.Server.Data.Base;
+using Poke.Server.Data.Player.Models;
+using Poke.Server.Data.Player.Models.Properties;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -20,7 +21,7 @@ public static class UnitEndpoints
         endpoints.MapGet("{unitID}", GetUnit);
     }
 
-    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PokeDbContext db)
+    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PlayerContext db)
     {
         var unit = db.Units
             .Include(x => x.Properties)
@@ -44,9 +45,9 @@ public static class UnitEndpoints
         return TypedResults.Ok(unit);
     }
 
-    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PokeDbContext db)
+    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PlayerContext db)
     {
-        var units = PokeBaseContext.GetUnits()
+        var units = BaseContext.GetUnits()
             .Select(x =>
                 new UnitVM(
                     x.UnitID,

@@ -1,7 +1,7 @@
-using Poke.Server.Data.Enums;
-using Poke.Server.Data.Models;
-using Poke.Server.Data.Models.Behaviors;
-using Poke.Server.Data.Models.Properties;
+using Poke.Server.Shared.Enums;
+using Poke.Server.Data.Player.Models;
+using Poke.Server.Data.Player.Models.Behaviors;
+using Poke.Server.Data.Player.Models.Properties;
 
 namespace Poke.Server.Infrastructure.Builders;
 

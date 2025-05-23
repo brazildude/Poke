@@ -3,7 +3,8 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
-using Poke.Server.Data;
+using Poke.Server.Data.Match;
+using Poke.Server.Data.Player;
 using Poke.Server.Endpoints;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Infrastructure.Auth.Firebase;
@@ -17,7 +18,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
-builder.Services.AddDbContext<PokeDbContext>(builder.Configuration["DatabaseProvider"] switch
+builder.Services.AddDbContext<PlayerContext>(builder.Configuration["DatabaseProvider"] switch
+{
+    "sqlite" => opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")),
+    "sqlserver" => opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    _ => throw new Exception("Invalid DatabaseProvider")
+});
+builder.Services.AddDbContext<MatchContext>(builder.Configuration["DatabaseProvider"] switch
 {
     "sqlite" => opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")),
     "sqlserver" => opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
@@ -63,7 +70,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     using (var serviceScope = app.Services.CreateScope())
-    using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PokeDbContext>())
+    using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PlayerContext>())
     {
         dbContext.Database.EnsureDeleted();
         dbContext.Database.EnsureCreated();

@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Poke.Server.Data.Models;
+using Poke.Server.Data.Match.Models;
 
 namespace Poke.Server.Cache;
 

@@ -1,0 +1,5 @@
+## MIGRATIONS
+
+dotnet ef migrations add MIGRATION_NAME --context CONTEXT_NAME -o Data/CONTEXT_FOLDER_NAME/Migrations
+dotnet ef migrations add InitialCreate --context PlayerContext -o Data/Player/Migrations
+dotnet ef migrations add InitialCreate --context MatchContext -o Data/Match/Migrations

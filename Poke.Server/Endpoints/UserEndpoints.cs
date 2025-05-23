@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Poke.Server.Data;
-using Poke.Server.Data.Models;
+using Poke.Server.Data.Player;
+using Poke.Server.Data.Player.Models;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 
@@ -20,7 +20,7 @@ public static class UserEndpoints
         endpoints.MapPost("/teams", GetTeams);
     }
 
-    public static Results<Ok<UserVM>, NotFound> GetUser(ICurrentUser currentUser, PokeDbContext db)
+    public static Results<Ok<UserVM>, NotFound> GetUser(ICurrentUser currentUser, PlayerContext db)
     {
         var user = db.Users
             .Where(x => x.UserID == currentUser.UserID)
@@ -30,7 +30,7 @@ public static class UserEndpoints
         return TypedResults.Ok(user);
     }
 
-    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserVM viewModel, IAuthService authService, PokeDbContext db)
+    public static async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>> CreateUser(CreateUserVM viewModel, IAuthService authService, PlayerContext db)
     {
         if (viewModel == null)
         {
@@ -65,7 +65,7 @@ public static class UserEndpoints
         return TypedResults.Ok();
     }
 
-    public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(ICurrentUser currentUser, PokeDbContext db)
+    public static Results<Ok<List<GetTeamVM>>, NotFound> GetTeams(ICurrentUser currentUser, PlayerContext db)
     {
        var teams = db.Teams
             .Include(x => x.Units)

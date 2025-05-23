@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Poke.Server.Data.Models;
+using Poke.Server.Data.Player.Models;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Tests.Infrastructure;
 using static Poke.Server.Endpoints.TeamEndpoints;
