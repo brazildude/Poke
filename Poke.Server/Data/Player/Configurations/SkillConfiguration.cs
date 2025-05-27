@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Poke.Server.Data.Player.Models;
-using Poke.Server.Data.Player.Models.Skills;
 
 namespace Poke.Server.Data.Player.Configurations;
 
@@ -24,18 +23,5 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
         builder
            .Property(x => x.SkillName)
            .HasConversion<string>();
-
-        // mapping all skills to the database
-        var types = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => type.IsClass && !type.IsAbstract && typeof(Skill).IsAssignableFrom(type))
-            .ToList();
-
-        var discriminator = builder.HasDiscriminator();
-
-        foreach (var type in types)
-        {
-            discriminator.HasValue(type, type.Name);
-        }
     }
 }

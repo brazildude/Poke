@@ -2,14 +2,9 @@ namespace Poke.Server.Data.Match.Models;
 
 public class Play
 {
-    public int PlayID { get; set; }
-    public int TeamID { get; set; }
-    public int MatchID { get; set; }
-
+    public string UserID { get; set; } = null!;
     public int UnitInActionID { get; set; }
     public int SkillID { get; set; }
     public HashSet<int> TargetIDs { get; set; } = [];
-
-    //public Team Team { get; set; } = null!;
-    public Match Match { get; set; } = null!;
+    public DateTimeOffset PlayedAt { get; set; }
 }

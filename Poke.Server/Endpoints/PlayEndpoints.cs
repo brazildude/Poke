@@ -1,10 +1,8 @@
-using System.Text.Json;
-using Force.DeepCloner;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Poke.Server.Cache;
 using Poke.Server.Data.Player;
+using Poke.Server.GameLogic;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Infrastructure.ObjectDiff;
 using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
@@ -22,39 +20,28 @@ public static class PlayEndpoints
 
     public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PlayerContext db)
     {
-        // if (!MatchmakingContext.Matches.TryGetValue(playVM.MatchID, out var match))
-        // {
-        //     return TypedResults.NotFound();
-        // }
-// 
-        // if (currentUser.UserID != match.CurrentUserID)
-        // {
-        //     return TypedResults.BadRequest();
-        // }
-// 
-        // var unitInAction = match.GetCurrentTeam(currentUser.UserID).Units.SingleOrDefault(x => x.UnitID == playVM.UnitID);
-// 
-        // if (unitInAction == null)
-        // {
-        //     return TypedResults.BadRequest();
-        // }
-// 
-        // var skill = unitInAction.Skills.SingleOrDefault(x => x.SkillID == playVM.SkillID);
-// 
-        // if (skill == null)
-        // {
-        //     return TypedResults.BadRequest();
-        // }
-// 
-        // var initialState = match.DeepClone();
-        // match.Play(unitInAction, skill, playVM.TargetIDs);
-// 
-        // db.SaveChanges();
-// 
-        // var changes = UltraFastObjectDiff.GetChanges(initialState, match, new HashSet<string> { "Plays" });
-        // Console.WriteLine(JsonSerializer.Serialize(changes));
+        if (!MatchmakingContext.Matches.TryGetValue(playVM.MatchID, out var match))
+        {
+            return TypedResults.NotFound();
+        }
 
-        //return TypedResults.Ok(playVM);
-        return TypedResults.BadRequest();
+        if (currentUser.UserID != match.State.CurrentUserID)
+        {
+            return TypedResults.BadRequest();
+        }
+
+        if (!match.State.GetCurrentTeam().TryGetValue(playVM.UnitID, out var unitInAction))
+        {
+            return TypedResults.BadRequest();
+        }
+
+        if (!unitInAction.Skills.TryGetValue(playVM.SkillName, out var skillInAction))
+        {
+            return TypedResults.BadRequest();
+        }
+
+        MatchLogic.HandlePlay(match, unitInAction, skillInAction, playVM.TargetIDs);
+
+        return TypedResults.Ok(playVM);
     }
 }

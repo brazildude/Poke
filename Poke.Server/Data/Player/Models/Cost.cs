@@ -1,5 +1,4 @@
 using Poke.Server.Shared.Enums;
-using Poke.Server.Data.Player.Models.Properties;
 
 namespace Poke.Server.Data.Player.Models;
 

@@ -1,3 +1,5 @@
+using Poke.Server.Shared.Enums;
+
 namespace Poke.Server.Infrastructure;
 
 public static class ViewModels
@@ -6,10 +8,10 @@ public static class ViewModels
     public record CreateUserVM(string Provider, string Token);
 
     public record GetTeamVM(int TeamID, string Name, List<KeyValuePair<int, string>> Units);
-    public record CreateTeamVM(string Name, HashSet<string> Units);
+    public record CreateTeamVM(string Name, HashSet<UnitName> Units);
     public record EditTeamVM(int TeamID, string Name, HashSet<string> Units);
 
-    public record PlayVM(Guid MatchID, int UnitID, int SkillID, HashSet<int> TargetIDs);
+    public record PlayVM(Guid MatchID, int UnitID, SkillName SkillName, HashSet<int> TargetIDs);
 
     public record UnitVM(int UnitID, string UnitName, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
 

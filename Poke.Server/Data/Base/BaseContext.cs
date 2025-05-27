@@ -1,33 +1,46 @@
+using Poke.Server.Data.Base.Models.Units;
 using Poke.Server.Data.Player.Models;
-using Poke.Server.Data.Player.Models.Units;
+using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Base;
 
 public class BaseContext
 {
+    private static Dictionary<UnitName, Unit> map = [];
+
+    static BaseContext()
+    {
+        map.Add(UnitName.Lancer, Lancer.Create());
+        map.Add(UnitName.Mage, Mage.Create());
+        map.Add(UnitName.Paladin, Paladin.Create());
+        map.Add(UnitName.Rogue, Rogue.Create());
+        map.Add(UnitName.Warlock, Warlock.Create());
+        map.Add(UnitName.Warrior, Warrior.Create());
+    }
+
     public static List<Unit> GetUnits()
     {
         return
         [
-           new Lancer(),
-           new Mage(),
-           new Paladin(),
-           new Rogue(),
-           new Warlock(),
-           new Warrior()
+            Lancer.Create(),
+            Mage.Create(),
+            Paladin.Create(),
+            Rogue.Create(),
+            Warlock.Create(),
+            Warrior.Create()
         ];
     }
 
-    public static Unit GetUnit(string unitName)
+    public static Unit GetUnit(UnitName unitName)
     {
         return unitName switch
         {
-            nameof(Lancer) => new Lancer(),
-            nameof(Mage) => new Mage(),
-            nameof(Paladin) => new Paladin(),
-            nameof(Rogue) => new Rogue(),
-            nameof(Warlock) => new Warlock(),
-            nameof(Warrior) => new Warrior(),
+            UnitName.Lancer => Lancer.Create(),
+            UnitName.Mage => Mage.Create(),
+            UnitName.Paladin => Paladin.Create(),
+            UnitName.Rogue => Rogue.Create(),
+            UnitName.Warlock => Warlock.Create(),
+            UnitName.Warrior => Warrior.Create(),
             _ => throw new ArgumentOutOfRangeException(nameof(unitName))
         };
     }

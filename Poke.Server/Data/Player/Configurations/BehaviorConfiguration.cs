@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Poke.Server.Data.Player.Models;
-using Poke.Server.Data.Player.Models.Behaviors;
-using Poke.Server.Data.Player.Models.Properties;
 
 namespace Poke.Server.Data.Player.Configurations;
 
@@ -31,8 +29,5 @@ public class BehaviorConfiguration : IEntityTypeConfiguration<Behavior>
         builder
             .Property(x => x.BehaviorType)
             .HasConversion<string>();
-
-        builder.HasDiscriminator()
-               .HasValue<CommonBehavior>("CommonBehavior");
     }
 }

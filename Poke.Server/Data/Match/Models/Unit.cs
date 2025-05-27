@@ -7,6 +7,6 @@ public class Unit
     public int UnitID { get; set; }
     public UnitName Name { get; set; }
 
-    public List<Skill> Skills { get; set; } = [];
-    public List<FlatProperty> FlatProperties { get; set; } = [];
+    public Dictionary<SkillName, Skill> Skills { get; set; } = [];
+    public Dictionary<PropertyName, FlatProperty> FlatProperties { get; set; } = [];
 }

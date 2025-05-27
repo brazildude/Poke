@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data.Player;
 using Poke.Server.Data.Base;
 using Poke.Server.Data.Player.Models;
-using Poke.Server.Data.Player.Models.Properties;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
 

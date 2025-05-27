@@ -1,6 +1,6 @@
 using Poke.Server.Shared.Enums;
 
-namespace Poke.Server.Data.Player.Models.Properties;
+namespace Poke.Server.Data.Player.Models;
 
 public class MinMaxProperty
 {
