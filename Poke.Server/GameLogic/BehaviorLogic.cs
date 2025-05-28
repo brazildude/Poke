@@ -16,17 +16,18 @@ public class BehaviorLogic
     public static Action<MatchState, Unit, Behavior, HashSet<int>> Execute =
         (MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int> targetUnitIDs) =>
     {
-        var unitTargets = SelectTargets(matchState, unitInAction, behavior, targetUnitIDs);
-
-        if (unitTargets.Count == 0)
+        if (!TrySelectTargets(matchState, unitInAction, behavior, targetUnitIDs, out var unitTargets))
         {
             return;
         }
-        
-        ApplyCost(unitInAction, behavior);
+
+        if (!TryApplyCost(unitInAction, behavior))
+        {
+            return;
+        }
 
         var random = new Random(matchState.RandomSeed);
-        
+
         foreach (var unitTarget in unitTargets)
         {
             var property = unitTarget.FlatProperties[behavior.Target.PropertyName];
@@ -35,71 +36,117 @@ public class BehaviorLogic
             {
                 var skillValue = random.Next(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
 
-                if (behavior.Type == BehaviorType.Damage)
+                switch (behavior.Type)
                 {
+                    case BehaviorType.Damage:
+                        property.CurrentValue -= skillValue;
+                        break;
 
+                    case BehaviorType.Heal:
+                        property.CurrentValue += skillValue;
+                        break;
+
+                    default:
+                        throw new InvalidOperationException($"Unsupported behavior type: {behavior.Type}");
                 }
-
-                property.CurrentValue += skillValue;
             }
         }
     };
 
-    public static void ApplyCost(Unit unitInAction, Behavior behavior)
+    public static bool TryApplyCost(Unit unitInAction, Behavior behavior)
     {
         foreach (var cost in behavior.Costs)
         {
             var property = unitInAction.FlatProperties[cost.CostPropertyName];
 
-            var valueToApply = cost.CostType switch
+            int valueToApply = cost.CostType switch
             {
                 CostType.Flat => cost.CurrentValue,
-                CostType.Percentage => property.BaseValue * cost.CurrentValue / 100,
+                CostType.Percentage => (int)(property.BaseValue * cost.CurrentValue / 100f),
+                _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
+            };
+
+            // Check if the cost can be paid
+            if (property.CurrentValue < valueToApply)
+            {
+                return false;
+            }
+        }
+
+        foreach (var cost in behavior.Costs)
+        {
+            var property = unitInAction.FlatProperties[cost.CostPropertyName];
+
+            int valueToApply = cost.CostType switch
+            {
+                CostType.Flat => cost.CurrentValue,
+                CostType.Percentage => (int)(property.BaseValue * cost.CurrentValue / 100f),
                 _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
             };
 
             property.CurrentValue += valueToApply;
         }
+
+        return true;
     }
 
-    private static List<Unit> SelectTargets(MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int>targetIDs)
+    private static bool TrySelectTargets(
+        MatchState matchState,
+        Unit unitInAction,
+        Behavior behavior,
+        HashSet<int> targetIDs,
+        out List<Unit> targets)
     {
-        // TODO: check for alive units only
-        
+        targets = null!;
+
         var targetType = behavior.Target.Type;
         var targetDirection = behavior.Target.Direction;
 
-        // Self-targeting case
+        // Self-targeting
         if (targetType == TargetType.Self)
-            return [unitInAction];
-
-        var aliveOwnUnits = matchState.GetCurrentTeam().Where(u => UnitLogic.IsAlive(u.Value)).Select(x => x.Value);
-        var aliveEnemyUnits = matchState.GetEnemyTeam().Where(u => UnitLogic.IsAlive(u.Value)).Select(x => x.Value);
-
-        IEnumerable<Unit> GetUnits(TargetDirection direction)
         {
-            return direction switch
-            {
-                TargetDirection.Both => aliveOwnUnits.Concat(aliveEnemyUnits),
-                TargetDirection.Own => aliveOwnUnits,
-                TargetDirection.Enemy => aliveEnemyUnits,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction))
-            };
+            targets = [unitInAction];
+            return true;
         }
 
-        var selectableUnits = GetUnits(targetDirection).ToList();
-        var targetQuantity = Math.Min(selectableUnits.Count, behavior.Target.Quantity ?? 0);
+        // Gather alive units
+        var aliveOwn = matchState.GetCurrentTeam()
+            .Values.Where(UnitLogic.IsAlive);
+        var aliveEnemy = matchState.GetEnemyTeam()
+            .Values.Where(UnitLogic.IsAlive);
 
-        return targetType switch
+        IEnumerable<Unit> GetUnits(TargetDirection dir) => dir switch
         {
-            TargetType.Random => SelectRandom(matchState, selectableUnits, targetQuantity),
-            TargetType.Select => selectableUnits
-                .Where(unit => targetIDs.Contains(unit.UnitID))
+            TargetDirection.Both => aliveOwn.Concat(aliveEnemy),
+            TargetDirection.Own => aliveOwn,
+            TargetDirection.Enemy => aliveEnemy,
+            _ => throw new ArgumentOutOfRangeException(nameof(dir))
+        };
+
+        var candidates = GetUnits(targetDirection).ToList();
+
+        // Early exit if no candidates
+        if (candidates.Count == 0)
+        {
+            targets = [];
+            return false;
+        }
+
+        var quantity = behavior.Target.Quantity ?? 0;
+
+        targets = targetType switch
+        {
+            TargetType.All => candidates,
+            TargetType.Select => candidates
+                .Where(u => targetIDs.Contains(u.UnitID))
                 .ToList(),
-            TargetType.All => selectableUnits,
+            TargetType.Random => SelectRandom(matchState, candidates, Math.Min(candidates.Count, quantity)),
             _ => throw new InvalidOperationException("Unsupported target type.")
         };
+
+        return targets.Count > 0;
     }
+
 
     private static List<Unit> SelectRandom(MatchState matchState, List<Unit> units, int quantity)
     {
