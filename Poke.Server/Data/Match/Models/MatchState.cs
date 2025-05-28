@@ -1,11 +1,16 @@
 using System.Collections.Concurrent;
+using MemoryPack;
 using Poke.Server.GameLogic.Events;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class MatchState
+[MemoryPackable]
+public partial class MatchState
 {
+    [MemoryPackInclude]
     private ConcurrentQueue<GameEvent> _eventQueue = new();
+    
+    [MemoryPackInclude]
     private int _nextEventId = 1;
 
     public string CurrentUserID { get; set; } = null!;

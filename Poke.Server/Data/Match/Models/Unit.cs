@@ -1,8 +1,10 @@
+using MemoryPack;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class Unit
+[MemoryPackable]
+public partial class Unit
 {
     public int UnitID { get; set; }
     public UnitName Name { get; set; }

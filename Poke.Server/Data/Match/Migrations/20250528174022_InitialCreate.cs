@@ -25,7 +25,8 @@ namespace Poke.Server.Data.Match.Migrations
                     Team01ID = table.Column<int>(type: "INTEGER", nullable: false),
                     Team02ID = table.Column<int>(type: "INTEGER", nullable: false),
                     UserWinnerID = table.Column<string>(type: "TEXT", nullable: true),
-                    IsMatchOver = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsMatchOver = table.Column<bool>(type: "INTEGER", nullable: false),
+                    State = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>
                 {

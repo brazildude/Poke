@@ -33,6 +33,12 @@ internal class Program
         var matchContextOptions = new DbContextOptionsBuilder<MatchContext>().UseSqlite(connectionstring).Options;
         var matchContext = new MatchContext(matchContextOptions);
 
+
+        var matchID = Guid.Parse("e64f820e-01a6-488d-96e3-b37f06554589");
+        var nM = matchContext.Matches.Single(x => x.MatchID == matchID);
+        var a = nM;
+
+
         matchContext.Database.EnsureDeleted();
 
         playerContext.Database.Migrate();
@@ -57,18 +63,12 @@ internal class Program
                 Console.WriteLine(e.Type);
             }
         }
-        
+
         if (result.Result is BadRequest bad)
         {
             Console.WriteLine(bad.StatusCode);
         }
-    }
 
-    private static Team SelectTeam(int teamID, PlayerContext db)
-    {
-        return db.Teams.Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperties)
-                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
-                .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
-                .Single(x => x.TeamID == teamID);
+        matchContext.SaveChanges();
     }
 }

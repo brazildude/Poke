@@ -1,8 +1,10 @@
+using MemoryPack;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class MinMaxProperty
+[MemoryPackable]
+public partial class MinMaxProperty
 {
     public PropertyName Name { get; set; }
     public int MinBaseValue { get; set; }

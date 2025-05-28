@@ -1,8 +1,10 @@
+using MemoryPack;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class Behavior
+[MemoryPackable]
+public partial class Behavior
 {
     public BehaviorName Name { get; set; }
     public BehaviorType Type { get; set; }

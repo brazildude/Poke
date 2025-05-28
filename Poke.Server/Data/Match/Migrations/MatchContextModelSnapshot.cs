@@ -28,6 +28,10 @@ namespace Poke.Server.Data.Match.Migrations
                     b.Property<bool>("IsMatchOver")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("State")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
                     b.Property<int>("Team01ID")
                         .HasColumnType("INTEGER");
 

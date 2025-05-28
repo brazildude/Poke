@@ -1,6 +1,9 @@
+using MemoryPack;
+
 namespace Poke.Server.Data.Match.Models;
 
-public class Play
+[MemoryPackable]
+public partial class Play
 {
     public string UserID { get; set; } = null!;
     public int UnitInActionID { get; set; }

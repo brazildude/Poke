@@ -1,8 +1,10 @@
+using MemoryPack;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class Skill
+[MemoryPackable]
+public partial class Skill
 {
     public int SkillID { get; set; }
     public SkillName Name { get; set; }

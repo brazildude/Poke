@@ -1,8 +1,10 @@
+using MemoryPack;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Match.Models;
 
-public class Cost
+[MemoryPackable]
+public partial class Cost
 {
     public CostType CostType { get; set; }
     public PropertyName CostPropertyName { get; set; }
