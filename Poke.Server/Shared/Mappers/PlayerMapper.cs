@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data.Match.Models;
 
-namespace Poke.Server.Shared;
+namespace Poke.Server.Shared.Mappers;
 
-public class Mapper
+public class PlayerMapper
 {
     public static Dictionary<int, Unit> ToMatchTeam(IQueryable<Data.Player.Models.Unit> units)
     {

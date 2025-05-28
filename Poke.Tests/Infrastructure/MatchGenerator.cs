@@ -2,6 +2,7 @@ using Poke.Server.Data.Base;
 using Poke.Server.Data.Match.Models;
 using Poke.Server.Shared;
 using Poke.Server.Shared.Enums;
+using Poke.Server.Shared.Mappers;
 
 namespace Poke.Tests.Infrastructure;
 
@@ -45,7 +46,7 @@ public class MatchGenerator
 
         var data = units.AsQueryable();
 
-        return Mapper.ToMatchTeam(data).ToDictionary(x => x.Key, x => x.Value);
+        return PlayerMapper.ToMatchTeam(data).ToDictionary(x => x.Key, x => x.Value);
     }
 
     private static Dictionary<int, Unit> CreateTeam01(int initialUnitID)

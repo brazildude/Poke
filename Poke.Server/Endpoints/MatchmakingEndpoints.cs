@@ -6,6 +6,7 @@ using Poke.Server.Data.Match.Models;
 using Poke.Server.Data.Player;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Shared;
+using Poke.Server.Shared.Mappers;
 
 namespace Poke.Server.Endpoints;
 
@@ -64,8 +65,8 @@ public static class MatchmakingEndpoints
         var playerTeam01 = GetTeam(player.TeamID, playerContext);
         var playerTeam02 = GetTeam(player.TeamID, playerContext);
 
-        var team01 = Mapper.ToMatchTeam(playerTeam01);
-        var team02 = Mapper.ToMatchTeam(playerTeam02);
+        var team01 = PlayerMapper.ToMatchTeam(playerTeam01);
+        var team02 = PlayerMapper.ToMatchTeam(playerTeam02);
 
         if (match.State.CurrentUserID == player.UserID)
         {
