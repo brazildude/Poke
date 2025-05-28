@@ -10,7 +10,7 @@ public class Mage
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            UnitName = UnitName.Mage,
             Skills =
             [
                 Fireball.Create(),

@@ -17,6 +17,14 @@ public class BehaviorLogic
         (MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int> targetUnitIDs) =>
     {
         var unitTargets = SelectTargets(matchState, unitInAction, behavior, targetUnitIDs);
+
+        if (unitTargets.Count == 0)
+        {
+            return;
+        }
+        
+        ApplyCost(unitInAction, behavior);
+
         var random = new Random(matchState.RandomSeed);
         
         foreach (var unitTarget in unitTargets)
@@ -37,7 +45,7 @@ public class BehaviorLogic
         }
     };
 
-    public static Action<Unit, Behavior> ApplyCost = (unitInAction, behavior) =>
+    public static void ApplyCost(Unit unitInAction, Behavior behavior)
     {
         foreach (var cost in behavior.Costs)
         {
@@ -52,10 +60,12 @@ public class BehaviorLogic
 
             property.CurrentValue += valueToApply;
         }
-    };
+    }
 
     private static List<Unit> SelectTargets(MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int>targetIDs)
     {
+        // TODO: check for alive units only
+        
         var targetType = behavior.Target.Type;
         var targetDirection = behavior.Target.Direction;
 

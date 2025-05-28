@@ -68,7 +68,6 @@ public class TeamEndpointTests : BaseIntegratedTest
     [Fact]
     public void CreatTeam_Ok()
     {
-        var v = MatchGenerator.CreateMatch();
         // arrange
         var userID = "01";
         var teamName = "Team 01";

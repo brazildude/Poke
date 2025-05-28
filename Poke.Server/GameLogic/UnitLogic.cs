@@ -61,7 +61,6 @@ public class UnitLogic
     {
         foreach (var behavior in skillInAction.Behaviors)
         {
-            BehaviorLogic.ApplyCost(unitInAction, behavior);
             BehaviorLogic.Execute(matchState, unitInAction, behavior, targetIDs);
         }
 

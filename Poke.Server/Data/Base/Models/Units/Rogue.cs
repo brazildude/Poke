@@ -10,7 +10,7 @@ public class Rogue
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            UnitName = UnitName.Rogue,
             Skills =
             [
                 Nullstep.Create(),

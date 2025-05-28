@@ -10,7 +10,7 @@ public class Paladin
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            UnitName = UnitName.Paladin,
             Skills = new()
             {
                 Smite.Create(),

@@ -10,7 +10,7 @@ public class Warrior
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            UnitName = UnitName.Warrior,
             Skills =
             [
                 Cleave.Create(),

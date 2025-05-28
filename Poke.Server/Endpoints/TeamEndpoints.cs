@@ -49,7 +49,8 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        if (!viewModel.Units.All(x => BaseContext.GetUnits().Select(p => p.UnitName).Contains(x)))
+        var allUnitNames = BaseContext.GetUnits().Select(p => p.UnitName);
+        if (!viewModel.Units.All(x => allUnitNames.Contains(x)))
         {
             return TypedResults.BadRequest("Invalid unit name.");
         }

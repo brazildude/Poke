@@ -20,6 +20,7 @@ public class MatchGenerator
             State = new MatchState
             {
                 CurrentUserID = userID01,
+                RandomSeed = Environment.TickCount,
                 Round = 1,
                 Plays = new List<Play>(),
                 Teams = new Dictionary<string, Dictionary<int, Unit>> {
@@ -31,49 +32,29 @@ public class MatchGenerator
         };
     }
 
-    private static Dictionary<int, Unit> CreateTeam01(int initialUnitID)
+    private static Dictionary<int, Unit> CreateTeam(int initialUnitID, params UnitName[] unitNames)
     {
-        var unit01 = BaseContext.GetUnit(UnitName.Warrior);
-        var unit02 = BaseContext.GetUnit(UnitName.Mage);
-        var unit03 = BaseContext.GetUnit(UnitName.Paladin);
-        var unit04 = BaseContext.GetUnit(UnitName.Rogue);
+        var units = unitNames
+            .Select(unitName =>
+            {
+                var unit = BaseContext.GetUnit(unitName);
+                unit.UnitID = ++initialUnitID;
+                return unit;
+            })
+            .ToList();
 
-        unit01.UnitID = ++initialUnitID;
-        unit02.UnitID = ++initialUnitID;
-        unit03.UnitID = ++initialUnitID;
-        unit04.UnitID = ++initialUnitID;
-
-        var data = new List<Server.Data.Player.Models.Unit>
-        {
-            unit01,
-            unit02,
-            unit03,
-            unit04
-        }.AsQueryable();
+        var data = units.AsQueryable();
 
         return Mapper.ToMatchTeam(data).ToDictionary(x => x.Key, x => x.Value);
     }
 
+    private static Dictionary<int, Unit> CreateTeam01(int initialUnitID)
+    {
+        return CreateTeam(initialUnitID, UnitName.Warrior, UnitName.Mage, UnitName.Paladin, UnitName.Rogue);
+    }
+
     private static Dictionary<int, Unit> CreateTeam02(int initialUnitID)
     {
-        var unit01 = BaseContext.GetUnit(UnitName.Mage);
-        var unit02 = BaseContext.GetUnit(UnitName.Warlock);
-        var unit03 = BaseContext.GetUnit(UnitName.Paladin);
-        var unit04 = BaseContext.GetUnit(UnitName.Rogue);
-
-        unit01.UnitID = ++initialUnitID;
-        unit02.UnitID = ++initialUnitID;
-        unit03.UnitID = ++initialUnitID;
-        unit04.UnitID = ++initialUnitID;
-
-        var data = new List<Server.Data.Player.Models.Unit>
-        {
-            unit01,
-            unit02,
-            unit03,
-            unit04
-        }.AsQueryable();
-
-        return Mapper.ToMatchTeam(data).ToDictionary(x => x.Key, x => x.Value);
+        return CreateTeam(initialUnitID, UnitName.Mage, UnitName.Warlock, UnitName.Paladin, UnitName.Rogue);
     }
 }

@@ -48,7 +48,7 @@ public class Mapper
                     Costs = b.Costs.Select(c => new Cost
                     {
                         CostType = c.CostType,
-                        CostPropertyName = c.FlatProperty.PropertyName,
+                        CostPropertyName = c.PropertyName,
                         CurrentValue = c.FlatProperty.CurrentValue,
                         BaseValue = c.FlatProperty.BaseValue
                     }).ToList()

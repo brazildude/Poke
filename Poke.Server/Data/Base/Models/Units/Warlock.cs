@@ -10,7 +10,7 @@ public class Warlock
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            UnitName = UnitName.Warlock,
             Skills =
             [
                 Shadowbolt.Create(),
