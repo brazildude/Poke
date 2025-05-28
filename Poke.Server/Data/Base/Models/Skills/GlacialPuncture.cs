@@ -17,7 +17,7 @@ public class GlacialPuncture
 
         return new Skill
         {
-            SkillName = SkillName.GlacialPuncture,
+            Name = SkillName.GlacialPuncture,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

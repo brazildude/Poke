@@ -17,7 +17,7 @@ public class Lacerate
 
         return new Skill
         {
-            SkillName = SkillName.Lacerate,
+            Name = SkillName.Lacerate,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

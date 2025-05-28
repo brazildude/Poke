@@ -30,7 +30,7 @@ public class BehaviorLogic
 
         foreach (var unitTarget in unitTargets)
         {
-            var property = unitTarget.FlatProperties[behavior.Target.PropertyName];
+            var property = unitTarget.FlatProperties[behavior.Target.TargetPropertyName];
 
             foreach (var minMaxProperty in behavior.MinMaxProperties)
             {

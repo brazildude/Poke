@@ -9,7 +9,7 @@ public class FlatProperty
     public int? BehaviorID { get; set; }
     public int? SkillID { get; set; }
     public int? CostID { get; set; }
-    public PropertyName PropertyName { get; set; }
+    public PropertyName Name { get; set; }
     public int BaseValue { get; set; }
     public int CurrentValue { get; set; }
 
@@ -18,26 +18,21 @@ public class FlatProperty
     public Skill? Skill { get; set; }
     public Cost? Cost { get; set; }
 
-    public void SetCurrentToBase()
-    {
-        CurrentValue = BaseValue;
-    }
-
-    public static FlatProperty New(PropertyName propertyType, int value)
+    public static FlatProperty New(PropertyName name, int value)
     {
         return new FlatProperty
         {
-            PropertyName = propertyType,
+            Name = name,
             BaseValue = value,
             CurrentValue = value
         };
     }
 
-    public static FlatProperty New(PropertyName propertyType, int baseValue, int currentValue)
+    public static FlatProperty New(PropertyName name, int baseValue, int currentValue)
     {
         return new FlatProperty 
         {
-            PropertyName = propertyType,
+            Name = name,
             BaseValue = baseValue,
             CurrentValue = currentValue
         };

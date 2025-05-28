@@ -10,45 +10,45 @@ public class Mapper
         return units.Select(x => new Unit
         {
             UnitID = x.UnitID,
-            Name = x.UnitName,
-            FlatProperties = x.Properties.Select(xp => new FlatProperty
+            Name = x.Name,
+            FlatProperties = x.FlatProperties.Select(xp => new FlatProperty
             {
-                Name = xp.PropertyName,
+                Name = xp.Name,
                 CurrentValue = xp.CurrentValue,
                 BaseValue = xp.BaseValue,
             }).ToDictionary(x => x.Name, x => x),
-            Skills = x.Skills.ToDictionary(s => s.SkillName, s => new Skill
+            Skills = x.Skills.ToDictionary(s => s.Name, s => new Skill
             {
                 SkillID = s.SkillID,
-                Name = s.SkillName,
+                Name = s.Name,
                 Behaviors = s.Behaviors.Select(b => new Behavior
                 {
-                    Name = b.BehaviorName,
+                    Name = b.Name,
                     MinMaxProperties = b.MinMaxProperties.Select(mp => new MinMaxProperty
                     {
-                        Name = mp.PropertyName,
+                        Name = mp.Name,
                         MinCurrentValue = mp.MinCurrentValue,
                         MaxCurrentValue = mp.MaxCurrentValue,
                         MinBaseValue = mp.MinBaseValue,
                         MaxBaseValue = mp.MaxBaseValue,
                     }).ToList(),
-                    FlatProperties = b.Properties.Select(mp => new FlatProperty
+                    FlatProperties = b.FlatProperties.Select(mp => new FlatProperty
                     {
-                        Name = mp.PropertyName,
+                        Name = mp.Name,
                         CurrentValue = mp.CurrentValue,
                         BaseValue = mp.BaseValue,
                     }).ToList(),
                     Target = new Target
                     {
-                        PropertyName = b.Target.TargetPropertyName,
-                        Direction = b.Target.TargetDirection,
-                        Type = b.Target.TargetType,
+                        TargetPropertyName = b.Target.TargetPropertyName,
+                        Direction = b.Target.Direction,
+                        Type = b.Target.Type,
                         Quantity = b.Target.Quantity
                     },
                     Costs = b.Costs.Select(c => new Cost
                     {
-                        CostType = c.CostType,
-                        CostPropertyName = c.PropertyName,
+                        CostType = c.Type,
+                        CostPropertyName = c.CostPropertyName,
                         CurrentValue = c.FlatProperty.CurrentValue,
                         BaseValue = c.FlatProperty.BaseValue
                     }).ToList()

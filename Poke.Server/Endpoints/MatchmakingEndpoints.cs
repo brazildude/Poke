@@ -141,7 +141,7 @@ public static class MatchmakingEndpoints
     private static IQueryable<Data.Player.Models.Unit> GetTeam(int teamID, PlayerContext playerContext)
     {
         return playerContext.Teams
-            .Include(x => x.Units).ThenInclude(x => x.Properties)
+            .Include(x => x.Units).ThenInclude(x => x.FlatProperties)
             .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperties)
             .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
             .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)

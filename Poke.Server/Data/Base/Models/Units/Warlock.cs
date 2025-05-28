@@ -10,13 +10,13 @@ public class Warlock
     {
         return new Unit
         {
-            UnitName = UnitName.Warlock,
+            Name = UnitName.Warlock,
             Skills =
             [
                 Shadowbolt.Create(),
                 Hellfire.Create()
             ],
-            Properties =
+            FlatProperties =
             [
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

@@ -17,7 +17,7 @@ public class Slice
 
         return new Skill
         {
-            SkillName = SkillName.Slice,
+            Name = SkillName.Slice,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

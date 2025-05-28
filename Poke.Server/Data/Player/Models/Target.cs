@@ -6,20 +6,19 @@ public class Target
 {
     public int TargetID { get; set; }
     public int BehaviorID { get; set; }
-    public TargetType TargetType { get; set; }
-    public TargetDirection TargetDirection { get; set; }
+    public TargetType Type { get; set; }
+    public TargetDirection Direction { get; set; }
     public PropertyName TargetPropertyName { get; set; }
-
     public int? Quantity { get; set; }
 
     public Behavior Behavior { get; set; } = null!;
 
-    public static Target New(TargetType targetType, TargetDirection targetDirection, PropertyName targetPropertyName, int? quantity)
+    public static Target New(TargetType type, TargetDirection direction, PropertyName targetPropertyName, int? quantity)
     {
         return new Target
         {
-            TargetType = targetType,
-            TargetDirection = targetDirection,
+            Type = type,
+            Direction = direction,
             TargetPropertyName = targetPropertyName,
             Quantity = quantity
         };

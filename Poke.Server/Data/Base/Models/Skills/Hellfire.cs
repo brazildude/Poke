@@ -17,7 +17,7 @@ public class Hellfire
 
         return new Skill
         {
-            SkillName = SkillName.Hellfire,
+            Name = SkillName.Hellfire,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

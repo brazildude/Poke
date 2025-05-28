@@ -9,11 +9,11 @@ public class TargetConfiguration : IEntityTypeConfiguration<Target>
     public void Configure(EntityTypeBuilder<Target> builder)
     {
         builder
-           .Property(x => x.TargetType)
+           .Property(x => x.Type)
            .HasConversion<string>();
 
         builder
-           .Property(x => x.TargetDirection)
+           .Property(x => x.Direction)
            .HasConversion<string>();
 
         builder

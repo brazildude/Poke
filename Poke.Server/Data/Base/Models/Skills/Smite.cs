@@ -17,7 +17,7 @@ public class Smite
 
         return new Skill
         {
-            SkillName = SkillName.Smite,
+            Name = SkillName.Smite,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

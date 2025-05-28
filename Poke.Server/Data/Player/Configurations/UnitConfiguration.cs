@@ -15,13 +15,13 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-           .HasMany(x => x.Properties)
+           .HasMany(x => x.FlatProperties)
            .WithOne()
            .HasForeignKey(x => x.UnitID)
            .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .Property(x => x.UnitName)
+            .Property(x => x.Name)
             .HasConversion<string>();
     }
 }

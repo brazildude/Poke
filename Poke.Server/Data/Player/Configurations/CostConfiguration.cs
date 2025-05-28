@@ -15,11 +15,11 @@ public class CostConfiguration : IEntityTypeConfiguration<Cost>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-           .Property(x => x.CostType)
+           .Property(x => x.Type)
            .HasConversion<string>();
 
         builder
-           .Property(x => x.PropertyName)
+           .Property(x => x.CostPropertyName)
            .HasConversion<string>();
     }
 }

@@ -15,13 +15,13 @@ public class SkillConfiguration : IEntityTypeConfiguration<Skill>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .HasMany(x => x.Properties)
+            .HasMany(x => x.FlatProperties)
             .WithOne()
             .HasForeignKey(x => x.SkillID)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-           .Property(x => x.SkillName)
+           .Property(x => x.Name)
            .HasConversion<string>();
     }
 }

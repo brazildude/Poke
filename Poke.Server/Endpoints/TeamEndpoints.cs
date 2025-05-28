@@ -30,7 +30,7 @@ public static class TeamEndpoints
                 new GetTeamVM(
                     x.TeamID,
                     x.Name,
-                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
+                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.Name.ToString())).ToList())
                 )
             .SingleOrDefault();
 
@@ -49,7 +49,7 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        var allUnitNames = BaseContext.GetUnits().Select(p => p.UnitName);
+        var allUnitNames = BaseContext.GetUnits().Select(p => p.Name);
         if (!viewModel.Units.All(x => allUnitNames.Contains(x)))
         {
             return TypedResults.BadRequest("Invalid unit name.");
@@ -90,7 +90,7 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("Team does not exist.");
         }
         
-        if (!viewModel.Units.All(x => BaseContext.GetUnits().Select(p => p.UnitName.ToString()).Contains(x)))
+        if (!viewModel.Units.All(x => BaseContext.GetUnits().Select(p => p.Name.ToString()).Contains(x)))
         {
             return TypedResults.BadRequest("Invalid units name.");
         }
@@ -100,13 +100,13 @@ public static class TeamEndpoints
         var unitsToBeAdded = BaseContext.GetUnits()
             .Where(x =>
                 viewModel.Units
-                .Except(team.Units.Select(x => x.UnitName.ToString()))
-                .Contains(x.UnitName.ToString()))
+                .Except(team.Units.Select(x => x.Name.ToString()))
+                .Contains(x.Name.ToString()))
             .ToList();
 
         team.Units.AddRange(unitsToBeAdded);
 
-        db.Units.Where(x => x.TeamID == viewModel.TeamID && !viewModel.Units.Contains(x.UnitName.ToString())).ExecuteDelete();
+        db.Units.Where(x => x.TeamID == viewModel.TeamID && !viewModel.Units.Contains(x.Name.ToString())).ExecuteDelete();
         db.SaveChanges();
 
         return TypedResults.Ok();

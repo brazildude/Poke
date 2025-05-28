@@ -27,7 +27,7 @@ public class BehaviorConfiguration : IEntityTypeConfiguration<Behavior>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .Property(x => x.BehaviorType)
+            .Property(x => x.Type)
             .HasConversion<string>();
     }
 }

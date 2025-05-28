@@ -21,7 +21,7 @@ public static class SkillEndpoints
 
     public static Results<Ok<IEnumerable<SkillVM>>, BadRequest<string>> GetSkills(string unitName, ICurrentUser currentUser, PlayerContext db)
     {
-        var unit = BaseContext.GetUnits().Where(x => x.UnitName.ToString() == unitName).SingleOrDefault();
+        var unit = BaseContext.GetUnits().Where(x => x.Name.ToString() == unitName).SingleOrDefault();
 
         if (unit == null)
         {
@@ -31,8 +31,8 @@ public static class SkillEndpoints
         var skills =
             unit.Skills.Select(x =>
                 new SkillVM(
-                    x.SkillName.ToString(),
-                    SelectProperties(x.Properties),
+                    x.Name.ToString(),
+                    SelectProperties(x.FlatProperties),
                     SelectBehaviors(x.Behaviors)
                 )
             );
@@ -58,27 +58,27 @@ public static class SkillEndpoints
 
     private static IEnumerable<FlatPropertyVM> SelectProperties(List<FlatProperty> x)
     {
-        return x.Select(p => new FlatPropertyVM(p.PropertyName.ToString(), p.CurrentValue));
+        return x.Select(p => new FlatPropertyVM(p.Name.ToString(), p.CurrentValue));
     }
 
     private static IEnumerable<CostVM> SelectCosts(List<Cost> x)
     {
-        return x.Select(c => new CostVM(c.CostType.ToString(), c.PropertyName.ToString(), c.FlatProperty.CurrentValue));
+        return x.Select(c => new CostVM(c.Type.ToString(), c.CostPropertyName.ToString(), c.FlatProperty.CurrentValue));
     }
 
     private static IEnumerable<MinMaxPropertyVM> SelectMinMaxProperties(List<MinMaxProperty> x)
     {
-        return x.Select(c => new MinMaxPropertyVM(c.PropertyName.ToString(), c.MinCurrentValue, c.MaxCurrentValue));
+        return x.Select(c => new MinMaxPropertyVM(c.Name.ToString(), c.MinCurrentValue, c.MaxCurrentValue));
     }
 
     private static IEnumerable<BehaviorVM> SelectBehaviors(List<Behavior> x)
     {
         return x.Select(b =>
             new BehaviorVM(
-                b.BehaviorType.ToString(),
+                b.Type.ToString(),
                 b.Target.TargetPropertyName.ToString(),
-                b.Target.TargetType.ToString(),
-                b.Target.TargetDirection.ToString(),
+                b.Target.Type.ToString(),
+                b.Target.Direction.ToString(),
                 b.Target.Quantity,
                 SelectMinMaxProperties(b.MinMaxProperties),
                 SelectCosts(b.Costs)

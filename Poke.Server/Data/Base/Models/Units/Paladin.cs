@@ -10,13 +10,13 @@ public class Paladin
     {
         return new Unit
         {
-            UnitName = UnitName.Paladin,
+            Name = UnitName.Paladin,
             Skills = new()
             {
                 Smite.Create(),
                 DivineLight.Create()
             },
-            Properties = new()
+            FlatProperties = new()
             {
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

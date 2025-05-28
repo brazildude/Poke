@@ -17,7 +17,7 @@ public class Nullstep
 
         return new Skill
         {
-            SkillName = SkillName.Nullstep,
+            Name = SkillName.Nullstep,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

@@ -10,15 +10,15 @@ public class MinMaxProperty
     public int MaxBaseValue { get; set; }
     public int MinCurrentValue { get; set; }
     public int MaxCurrentValue { get; set; }
-    public PropertyName PropertyName { get; set; }
+    public PropertyName Name { get; set; }
 
     public Behavior? Behavior { get; set; }
 
-    public static MinMaxProperty New(PropertyName propertyType, int minValue, int maxValue)
+    public static MinMaxProperty New(PropertyName name, int minValue, int maxValue)
     {
         return new MinMaxProperty
         {
-            PropertyName = propertyType,
+            Name = name,
             MinBaseValue = minValue,
             MaxBaseValue = maxValue,
             MinCurrentValue = minValue,
@@ -30,7 +30,7 @@ public class MinMaxProperty
     {
         return new MinMaxProperty 
         {
-            PropertyName = propertyType,
+            Name = propertyType,
             MinBaseValue = minBase,
             MaxBaseValue = maxBase,
             MinCurrentValue = minCurrent,

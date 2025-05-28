@@ -23,16 +23,16 @@ public static class UnitEndpoints
     public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PlayerContext db)
     {
         var unit = db.Units
-            .Include(x => x.Properties)
+            .Include(x => x.FlatProperties)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperties)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
             .Where(x => x.Team.UserID == currentUser.UserID && x.UnitID == unitID)
             .Select(u => new UnitVM(
                 u.UnitID,
-                u.UnitName.ToString(),
-                SelectProperties(u.Properties),
-                u.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectBehaviors(s.Behaviors)))
+                u.Name.ToString(),
+                SelectProperties(u.FlatProperties),
+                u.Skills.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.FlatProperties), SelectBehaviors(s.Behaviors)))
             ))
             .SingleOrDefault();
 
@@ -50,9 +50,9 @@ public static class UnitEndpoints
             .Select(x =>
                 new UnitVM(
                     x.UnitID,
-                    x.UnitName.ToString(),
-                    SelectProperties(x.Properties),
-                    x.Skills.Select(s => new SkillVM(s.SkillName.ToString(), SelectProperties(s.Properties), SelectBehaviors(s.Behaviors)))
+                    x.Name.ToString(),
+                    SelectProperties(x.FlatProperties),
+                    x.Skills.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.FlatProperties), SelectBehaviors(s.Behaviors)))
                 )
             );
 
@@ -61,27 +61,27 @@ public static class UnitEndpoints
 
     private static IEnumerable<FlatPropertyVM> SelectProperties(List<FlatProperty> x)
     {
-        return x.Select(p => new FlatPropertyVM(p.PropertyName.ToString(), p.CurrentValue));
+        return x.Select(p => new FlatPropertyVM(p.Name.ToString(), p.CurrentValue));
     }
 
     private static IEnumerable<CostVM> SelectCosts(List<Cost> x)
     {
-        return x.Select(c => new CostVM(c.CostType.ToString(), c.PropertyName.ToString(), c.FlatProperty.CurrentValue));
+        return x.Select(c => new CostVM(c.Type.ToString(), c.CostPropertyName.ToString(), c.FlatProperty.CurrentValue));
     }
 
     private static IEnumerable<MinMaxPropertyVM> SelectMinMaxProperties(List<MinMaxProperty> x)
     {
-        return x.Select(c => new MinMaxPropertyVM(c.PropertyName.ToString(), c.MinCurrentValue, c.MaxCurrentValue));
+        return x.Select(c => new MinMaxPropertyVM(c.Name.ToString(), c.MinCurrentValue, c.MaxCurrentValue));
     }
 
     private static IEnumerable<BehaviorVM> SelectBehaviors(List<Behavior> x)
     {
         return x.Select(b =>
             new BehaviorVM(
-                b.BehaviorType.ToString(),
+                b.Type.ToString(),
                 b.Target.TargetPropertyName.ToString(),
-                b.Target.TargetType.ToString(),
-                b.Target.TargetDirection.ToString(),
+                b.Target.Type.ToString(),
+                b.Target.Direction.ToString(),
                 b.Target.Quantity,
                 SelectMinMaxProperties(b.MinMaxProperties),
                 SelectCosts(b.Costs)

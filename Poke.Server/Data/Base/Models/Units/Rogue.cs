@@ -10,13 +10,13 @@ public class Rogue
     {
         return new Unit
         {
-            UnitName = UnitName.Rogue,
+            Name = UnitName.Rogue,
             Skills =
             [
                 Nullstep.Create(),
                 SmokeMirage.Create()
             ],
-            Properties =
+            FlatProperties =
             [
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

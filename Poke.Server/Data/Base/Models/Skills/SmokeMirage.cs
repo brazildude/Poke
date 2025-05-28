@@ -17,7 +17,7 @@ public class SmokeMirage
 
         return new Skill
         {
-            SkillName = SkillName.SmokeMirage,
+            Name = SkillName.SmokeMirage,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

@@ -10,7 +10,7 @@ public class BehaviorBuilder
     public static BehaviorBuilder Create(BehaviorName name)
     {
         var builder = new BehaviorBuilder();
-        builder.behavior.BehaviorName = name;
+        builder.behavior.Name = name;
         return builder;
     }
 
@@ -28,14 +28,14 @@ public class BehaviorBuilder
 
     public BehaviorBuilder WithBehaviorType(BehaviorType behaviorType)
     {
-        behavior.BehaviorType = behaviorType;
+        behavior.Type = behaviorType;
         return this;
     }
 
     public BehaviorBuilder WithCooldown(int cooldown)
     {
-        behavior.Properties ??= [];
-        behavior.Properties.Add(FlatProperty.New(PropertyName.Cooldown, cooldown));
+        behavior.FlatProperties ??= [];
+        behavior.FlatProperties.Add(FlatProperty.New(PropertyName.Cooldown, cooldown));
         return this;
     }
 

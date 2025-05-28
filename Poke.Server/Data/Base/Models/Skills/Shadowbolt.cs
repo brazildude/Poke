@@ -17,7 +17,7 @@ public class Shadowbolt
 
         return new Skill
         {
-            SkillName = SkillName.Shadowbolt,
+            Name = SkillName.Shadowbolt,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

@@ -17,7 +17,7 @@ public class Frostbolt
 
         return new Skill
         {
-            SkillName = SkillName.Frostbolt,
+            Name = SkillName.Frostbolt,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

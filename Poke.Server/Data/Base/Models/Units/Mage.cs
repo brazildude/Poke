@@ -10,13 +10,13 @@ public class Mage
     {
         return new Unit
         {
-            UnitName = UnitName.Mage,
+            Name = UnitName.Mage,
             Skills =
             [
                 Fireball.Create(),
                 Frostbolt.Create()
             ],
-            Properties =
+            FlatProperties =
             [
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

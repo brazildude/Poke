@@ -17,7 +17,7 @@ public class Cleave
 
         return new Skill
         {
-            SkillName = SkillName.Cleave,
+            Name = SkillName.Cleave,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

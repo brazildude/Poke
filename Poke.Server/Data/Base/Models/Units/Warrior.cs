@@ -10,13 +10,13 @@ public class Warrior
     {
         return new Unit
         {
-            UnitName = UnitName.Warrior,
+            Name = UnitName.Warrior,
             Skills =
             [
                 Cleave.Create(),
                 Lacerate.Create()
             ],
-            Properties =
+            FlatProperties =
             [
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

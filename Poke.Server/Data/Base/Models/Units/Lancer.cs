@@ -10,13 +10,13 @@ public class Lancer
     {
         return new Unit
         {
-            UnitName = UnitName.Lancer,
+            Name = UnitName.Lancer,
             Skills =
             [
                 Slice.Create(),
                 GlacialPuncture.Create()
             ],
-            Properties =
+            FlatProperties =
             [
                 FlatProperty.New(PropertyName.Life, 100),
                 FlatProperty.New(PropertyName.Mana, 100),

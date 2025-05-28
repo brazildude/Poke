@@ -73,7 +73,7 @@ public static class UserEndpoints
             .Select(x => new GetTeamVM(
                     x.TeamID,
                     x.Name,
-                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.UnitName.ToString())).ToList())
+                    x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.Name.ToString())).ToList())
                 )
             .ToList();
 

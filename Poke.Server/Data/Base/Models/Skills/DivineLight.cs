@@ -17,7 +17,7 @@ public class DivineLight
 
         return new Skill
         {
-            SkillName = SkillName.DivineLight,
+            Name = SkillName.DivineLight,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }

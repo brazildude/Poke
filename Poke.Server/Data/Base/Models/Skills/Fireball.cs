@@ -17,7 +17,7 @@ public class Fireball
 
         return new Skill
         {
-            SkillName = SkillName.Fireball,
+            Name = SkillName.Fireball,
             Behaviors = new List<Behavior> { behavior01 },
         };
     }
