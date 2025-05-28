@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Poke.Server.Data.Match.Models;
+using Poke.Server.GameLogic.Events;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.GameLogic;
@@ -21,7 +22,7 @@ public class BehaviorLogic
             return;
         }
 
-        if (!TryApplyCost(unitInAction, behavior))
+        if (!TryApplyCost(matchState, unitInAction, behavior))
         {
             return;
         }
@@ -53,7 +54,7 @@ public class BehaviorLogic
         }
     };
 
-    public static bool TryApplyCost(Unit unitInAction, Behavior behavior)
+    public static bool TryApplyCost(MatchState matchState, Unit unitInAction, Behavior behavior)
     {
         foreach (var cost in behavior.Costs)
         {
@@ -85,6 +86,14 @@ public class BehaviorLogic
             };
 
             property.CurrentValue += valueToApply;
+
+            matchState.AddEvent(new CostEvent
+            {
+                Type = "Cost",
+                UnitID = unitInAction.UnitID,
+                CostPropertyName = cost.CostPropertyName.ToString(),
+                CostValue = cost.CurrentValue,
+            });
         }
 
         return true;

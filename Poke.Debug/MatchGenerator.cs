@@ -3,7 +3,7 @@ using Poke.Server.Data.Match.Models;
 using Poke.Server.Shared.Enums;
 using Poke.Server.Shared.Mappers;
 
-namespace Poke.Tests.Infrastructure;
+namespace Poke.Debug;
 
 public class MatchGenerator
 {

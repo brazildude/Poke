@@ -72,8 +72,7 @@ namespace Poke.Server.Data.Player.Migrations
                     UnitID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     TeamID = table.Column<int>(type: "INTEGER", nullable: false),
-                    UnitName = table.Column<string>(type: "TEXT", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 8, nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,8 +94,7 @@ namespace Poke.Server.Data.Player.Migrations
                     SkillID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     UnitID = table.Column<int>(type: "INTEGER", nullable: false),
-                    SkillName = table.Column<string>(type: "TEXT", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -118,10 +116,8 @@ namespace Poke.Server.Data.Player.Migrations
                     BehaviorID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SkillID = table.Column<int>(type: "INTEGER", nullable: false),
-                    BehaviorName = table.Column<int>(type: "INTEGER", nullable: false),
-                    BehaviorType = table.Column<string>(type: "TEXT", nullable: false),
-                    PropertyName = table.Column<string>(type: "TEXT", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false)
+                    Name = table.Column<int>(type: "INTEGER", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,8 +139,8 @@ namespace Poke.Server.Data.Player.Migrations
                     CostID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     BehaviorID = table.Column<int>(type: "INTEGER", nullable: false),
-                    CostType = table.Column<string>(type: "TEXT", nullable: false),
-                    PropertyName = table.Column<string>(type: "TEXT", nullable: false)
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    CostPropertyName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -170,7 +166,7 @@ namespace Poke.Server.Data.Player.Migrations
                     MaxBaseValue = table.Column<int>(type: "INTEGER", nullable: false),
                     MinCurrentValue = table.Column<int>(type: "INTEGER", nullable: false),
                     MaxCurrentValue = table.Column<int>(type: "INTEGER", nullable: false),
-                    PropertyName = table.Column<int>(type: "INTEGER", nullable: false)
+                    Name = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -192,8 +188,9 @@ namespace Poke.Server.Data.Player.Migrations
                     TargetID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     BehaviorID = table.Column<int>(type: "INTEGER", nullable: false),
-                    TargetType = table.Column<string>(type: "TEXT", nullable: false),
-                    TargetDirection = table.Column<string>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Direction = table.Column<string>(type: "TEXT", nullable: false),
+                    TargetPropertyName = table.Column<string>(type: "TEXT", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -219,9 +216,9 @@ namespace Poke.Server.Data.Player.Migrations
                     BehaviorID = table.Column<int>(type: "INTEGER", nullable: true),
                     SkillID = table.Column<int>(type: "INTEGER", nullable: true),
                     CostID = table.Column<int>(type: "INTEGER", nullable: true),
+                    Name = table.Column<int>(type: "INTEGER", nullable: false),
                     BaseValue = table.Column<int>(type: "INTEGER", nullable: false),
                     CurrentValue = table.Column<int>(type: "INTEGER", nullable: false),
-                    PropertyName = table.Column<int>(type: "INTEGER", nullable: false),
                     UnitID1 = table.Column<int>(type: "INTEGER", nullable: true),
                     SkillID1 = table.Column<int>(type: "INTEGER", nullable: true)
                 },
@@ -322,8 +319,7 @@ namespace Poke.Server.Data.Player.Migrations
                 name: "IX_player_minmax_properties_BehaviorID",
                 schema: "player",
                 table: "player_minmax_properties",
-                column: "BehaviorID",
-                unique: true);
+                column: "BehaviorID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_player_skills_UnitID",

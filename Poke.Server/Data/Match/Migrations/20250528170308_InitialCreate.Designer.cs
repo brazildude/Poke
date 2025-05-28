@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Poke.Server.Data.Match;
 
@@ -10,9 +11,11 @@ using Poke.Server.Data.Match;
 namespace Poke.Server.Data.Match.Migrations
 {
     [DbContext(typeof(MatchContext))]
-    partial class MatchContextModelSnapshot : ModelSnapshot
+    [Migration("20250528170308_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -7,6 +7,8 @@ using Poke.Server.Data.Match;
 using Poke.Server.Data.Player;
 using Poke.Server.Data.Player.Models;
 using Poke.Server.Infrastructure.Auth;
+using Poke.Server.Shared.Enums;
+using Poke.Debug;
 using static Poke.Server.Endpoints.PlayEndpoints;
 using static Poke.Server.Endpoints.TeamEndpoints;
 using static Poke.Server.Endpoints.UserEndpoints;
@@ -14,14 +16,14 @@ using static Poke.Server.Infrastructure.ViewModels;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         Console.WriteLine("Starting Match context");
 
-        await SimulateMatch();
+        SimulateMatch();
     }
 
-    private static async Task SimulateMatch()
+    private static void SimulateMatch()
     {
         var connectionstring = "Data Source=Poke.db;";
 
@@ -36,48 +38,30 @@ internal class Program
         playerContext.Database.Migrate();
         matchContext.Database.Migrate();
 
-        await Task.CompletedTask;
+        var match = MatchGenerator.CreateMatch();
+        matchContext.Matches.Add(match);
+        matchContext.SaveChanges();
 
-        // var authMock = new Mock<IAuthService>();
-        // 
-        // authMock.SetupSequence(x => x.VerifyIdTokenAsync(It.IsAny<string>()))
-        //         .Returns(Task.FromResult("01")!)
-        //         .Returns(Task.FromResult("02")!);
-        // 
-        // await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, playerContext);
-        // await CreateUser(new CreateUserVM("Google", "0001"), authMock.Object, playerContext);
-        // 
-        // var user01 = playerContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "01");
-        // var user02 = playerContext.Users.Include(x => x.Teams).ThenInclude(x => x.Units).Single(x => x.UserID == "02");
-        // 
-        // var unitNames = new HashSet<string> { "Mage", "Warrior", "Rogue", "Paladin" };
-        // 
-        // CreateTeam(new CreateTeamVM("My Team 01", unitNames), new CurrentUser("01"), playerContext);
-        // CreateTeam(new CreateTeamVM("My Team 02", unitNames), new CurrentUser("02"), playerContext);
-        // 
-        // var match = new Poke.Server.Data.Match.Models.Match
-        // {
-        //     CurrentUserID = user01.UserID,
-        //     Team01 = SelectTeam(1, playerContext),
-        //     Team02 = SelectTeam(2, playerContext),
-        //     Round = 1,
-        //     RandomSeed = 10000
-        // };
-        // matchContext.Matches.Add(match);
-        // matchContext.SaveChanges();
-        // 
-        // MatchmakingContext.Matches.TryAdd(match.MatchID, match);
-        // 
-        // var result = Play(new PlayVM(match.MatchID, 1, 3, new HashSet<int> { 5 }), new CurrentUser("01", null, null, null), playerContext);
-        // if (result.Result is Ok<PlayVM> ok)
-        // {
-        //     Console.WriteLine(ok.Value);
-        // }
-        // 
-        // if (result.Result is BadRequest bad)
-        // {
-        //     Console.WriteLine(bad.StatusCode);
-        // }
+        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
+        var playVM = new PlayVM(match.MatchID, 1, SkillName.Cleave, new HashSet<int> { 5 });
+        var currentUser = new CurrentUser("UserID01", null, null, null);
+
+        var result = Play(playVM, currentUser, playerContext);
+        if (result.Result is Ok<PlayVM> ok)
+        {
+            Console.WriteLine(ok.Value);
+
+            Console.WriteLine("Match State Events:");
+            foreach (var e in match.State.GetEventsSince(0))
+            {
+                Console.WriteLine(e.Type);
+            }
+        }
+        
+        if (result.Result is BadRequest bad)
+        {
+            Console.WriteLine(bad.StatusCode);
+        }
     }
 
     private static Team SelectTeam(int teamID, PlayerContext db)

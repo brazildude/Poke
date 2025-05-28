@@ -24,34 +24,21 @@ namespace Poke.Server.Data.Player.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BehaviorName")
+                    b.Property<int>("Name")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("BehaviorType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("SkillID")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("BehaviorID");
 
                     b.HasIndex("SkillID");
 
                     b.ToTable("player_behaviors", "player");
-
-                    b.HasDiscriminator().HasValue("Behavior");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.Cost", b =>
@@ -63,11 +50,11 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Property<int>("BehaviorID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("CostType")
+                    b.Property<string>("CostPropertyName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PropertyName")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -78,7 +65,7 @@ namespace Poke.Server.Data.Player.Migrations
                     b.ToTable("player_costs", "player");
                 });
 
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Properties.FlagProperty", b =>
+            modelBuilder.Entity("Poke.Server.Data.Player.Models.FlagProperty", b =>
                 {
                     b.Property<int>("FlagPropertyID")
                         .ValueGeneratedOnAdd()
@@ -95,7 +82,7 @@ namespace Poke.Server.Data.Player.Migrations
                     b.ToTable("player_flag_properties", "player");
                 });
 
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Properties.FlatProperty", b =>
+            modelBuilder.Entity("Poke.Server.Data.Player.Models.FlatProperty", b =>
                 {
                     b.Property<int>("FlatPropertyID")
                         .ValueGeneratedOnAdd()
@@ -113,7 +100,7 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Property<int>("CurrentValue")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PropertyName")
+                    b.Property<int>("Name")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("SkillID")
@@ -146,7 +133,7 @@ namespace Poke.Server.Data.Player.Migrations
                     b.ToTable("player_flat_properties", "player");
                 });
 
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Properties.MinMaxProperty", b =>
+            modelBuilder.Entity("Poke.Server.Data.Player.Models.MinMaxProperty", b =>
                 {
                     b.Property<int>("MinMaxPropertyID")
                         .ValueGeneratedOnAdd()
@@ -167,13 +154,12 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Property<int>("MinCurrentValue")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PropertyName")
+                    b.Property<int>("Name")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("MinMaxPropertyID");
 
-                    b.HasIndex("BehaviorID")
-                        .IsUnique();
+                    b.HasIndex("BehaviorID");
 
                     b.ToTable("player_minmax_properties", "player");
                 });
@@ -184,12 +170,7 @@ namespace Poke.Server.Data.Player.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SkillName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -201,10 +182,6 @@ namespace Poke.Server.Data.Player.Migrations
                     b.HasIndex("UnitID");
 
                     b.ToTable("player_skills", "player");
-
-                    b.HasDiscriminator().HasValue("Skill");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.Target", b =>
@@ -216,14 +193,18 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Property<int>("BehaviorID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TargetDirection")
+                    b.Property<string>("Direction")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TargetType")
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TargetPropertyName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -262,27 +243,18 @@ namespace Poke.Server.Data.Player.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(8)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TeamID")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("UnitName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("UnitID");
 
                     b.HasIndex("TeamID");
 
                     b.ToTable("player_units", "player");
-
-                    b.HasDiscriminator().HasValue("Unit");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.User", b =>
@@ -302,139 +274,6 @@ namespace Poke.Server.Data.Player.Migrations
                         .IsUnique();
 
                     b.ToTable("player_users", "player");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Behaviors.CommonBehavior", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Behavior");
-
-                    b.HasDiscriminator().HasValue("CommonBehavior");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Cleave", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Cleave");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.DivineLight", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("DivineLight");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Fireball", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Fireball");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Frostbolt", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Frostbolt");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.GlacialPuncture", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("GlacialPuncture");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Hellfire", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Hellfire");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Lacerate", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Lacerate");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Nullstep", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Nullstep");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Shadowbolt", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Shadowbolt");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Slice", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Slice");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.Smite", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("Smite");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Skills.SmokeMirage", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Skill");
-
-                    b.HasDiscriminator().HasValue("SmokeMirage");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Lancer", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Lancer");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Mage", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Mage");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Paladin", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Paladin");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Rogue", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Rogue");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Warlock", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Warlock");
-                });
-
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Units.Warrior", b =>
-                {
-                    b.HasBaseType("Poke.Server.Data.Player.Models.Unit");
-
-                    b.HasDiscriminator().HasValue("Warrior");
                 });
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.Behavior", b =>
@@ -459,19 +298,19 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Navigation("Behavior");
                 });
 
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Properties.FlatProperty", b =>
+            modelBuilder.Entity("Poke.Server.Data.Player.Models.FlatProperty", b =>
                 {
                     b.HasOne("Poke.Server.Data.Player.Models.Behavior", "Behavior")
-                        .WithMany("Properties")
+                        .WithMany("FlatProperties")
                         .HasForeignKey("BehaviorID");
 
                     b.HasOne("Poke.Server.Data.Player.Models.Cost", "Cost")
                         .WithOne("FlatProperty")
-                        .HasForeignKey("Poke.Server.Data.Player.Models.Properties.FlatProperty", "CostID")
+                        .HasForeignKey("Poke.Server.Data.Player.Models.FlatProperty", "CostID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Poke.Server.Data.Player.Models.Skill", null)
-                        .WithMany("Properties")
+                        .WithMany("FlatProperties")
                         .HasForeignKey("SkillID")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -480,7 +319,7 @@ namespace Poke.Server.Data.Player.Migrations
                         .HasForeignKey("SkillID1");
 
                     b.HasOne("Poke.Server.Data.Player.Models.Unit", null)
-                        .WithMany("Properties")
+                        .WithMany("FlatProperties")
                         .HasForeignKey("UnitID")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -497,11 +336,11 @@ namespace Poke.Server.Data.Player.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("Poke.Server.Data.Player.Models.Properties.MinMaxProperty", b =>
+            modelBuilder.Entity("Poke.Server.Data.Player.Models.MinMaxProperty", b =>
                 {
                     b.HasOne("Poke.Server.Data.Player.Models.Behavior", "Behavior")
-                        .WithOne("MinMaxProperty")
-                        .HasForeignKey("Poke.Server.Data.Player.Models.Properties.MinMaxProperty", "BehaviorID")
+                        .WithMany("MinMaxProperties")
+                        .HasForeignKey("BehaviorID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Behavior");
@@ -555,10 +394,9 @@ namespace Poke.Server.Data.Player.Migrations
                 {
                     b.Navigation("Costs");
 
-                    b.Navigation("MinMaxProperty")
-                        .IsRequired();
+                    b.Navigation("FlatProperties");
 
-                    b.Navigation("Properties");
+                    b.Navigation("MinMaxProperties");
 
                     b.Navigation("Target")
                         .IsRequired();
@@ -574,7 +412,7 @@ namespace Poke.Server.Data.Player.Migrations
                 {
                     b.Navigation("Behaviors");
 
-                    b.Navigation("Properties");
+                    b.Navigation("FlatProperties");
                 });
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.Team", b =>
@@ -584,7 +422,7 @@ namespace Poke.Server.Data.Player.Migrations
 
             modelBuilder.Entity("Poke.Server.Data.Player.Models.Unit", b =>
                 {
-                    b.Navigation("Properties");
+                    b.Navigation("FlatProperties");
 
                     b.Navigation("Skills");
                 });

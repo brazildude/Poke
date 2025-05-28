@@ -41,7 +41,7 @@ public class UnitLogic
             return custom(unit, skill);
         }
 
-        var hasResources = false;
+        var hasResources = true;
         var behavior = skill.Behaviors.First();
 
         foreach (var cost in behavior.Costs)
