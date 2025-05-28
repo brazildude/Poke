@@ -38,7 +38,7 @@ public class MatchLogic
             UnitInActionID = unitInAction.UnitID,
             SkillID = skillInAction.SkillID,
             TargetIDs = targetIDs,
-            PlayedAt = DateTimeOffset.UtcNow
+            PlayedAt = DateTime.UtcNow
         });
 
         UnitLogic.UseSkill(match.State, unitInAction, skillInAction, targetIDs);
@@ -62,6 +62,11 @@ public class MatchLogic
 
             // changing current user
             match.State.CurrentUserID = match.UserID01 == match.State.CurrentUserID ? match.UserID02 : match.UserID01;
+        }
+        else
+        {
+            //matchContext.Matches.Update(match);
+            //matchContext.SaveChanges();
         }
     }
 

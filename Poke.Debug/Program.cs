@@ -1,17 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Poke.Server.Cache;
 using Poke.Server.Data.Match;
 using Poke.Server.Data.Player;
-using Poke.Server.Data.Player.Models;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Shared.Enums;
 using Poke.Debug;
 using static Poke.Server.Endpoints.PlayEndpoints;
-using static Poke.Server.Endpoints.TeamEndpoints;
-using static Poke.Server.Endpoints.UserEndpoints;
 using static Poke.Server.Infrastructure.ViewModels;
 
 internal class Program
@@ -33,11 +29,9 @@ internal class Program
         var matchContextOptions = new DbContextOptionsBuilder<MatchContext>().UseSqlite(connectionstring).Options;
         var matchContext = new MatchContext(matchContextOptions);
 
-
-        var matchID = Guid.Parse("e64f820e-01a6-488d-96e3-b37f06554589");
+        var matchID = Guid.Parse("f314d9d5-ee75-41bb-b4cc-c558bb2a5a32");
         var nM = matchContext.Matches.Single(x => x.MatchID == matchID);
         var a = nM;
-
 
         matchContext.Database.EnsureDeleted();
 
@@ -52,7 +46,7 @@ internal class Program
         var playVM = new PlayVM(match.MatchID, 1, SkillName.Cleave, new HashSet<int> { 5 });
         var currentUser = new CurrentUser("UserID01", null, null, null);
 
-        var result = Play(playVM, currentUser, playerContext);
+        var result = Play(playVM, currentUser);
         if (result.Result is Ok<PlayVM> ok)
         {
             Console.WriteLine(ok.Value);
@@ -68,7 +62,5 @@ internal class Program
         {
             Console.WriteLine(bad.StatusCode);
         }
-
-        matchContext.SaveChanges();
     }
 }

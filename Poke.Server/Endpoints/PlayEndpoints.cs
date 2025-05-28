@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Poke.Server.Cache;
-using Poke.Server.Data.Player;
+using Poke.Server.Data.Match;
 using Poke.Server.GameLogic;
 using Poke.Server.Infrastructure.Auth;
 using static Poke.Server.Infrastructure.ViewModels;
@@ -18,7 +18,7 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser, PlayerContext db)
+    public static Results<Ok<PlayVM>, NotFound, BadRequest> Play(PlayVM playVM, ICurrentUser currentUser)
     {
         if (!MatchmakingContext.Matches.TryGetValue(playVM.MatchID, out var match))
         {
@@ -40,7 +40,7 @@ public static class PlayEndpoints
             return TypedResults.BadRequest();
         }
 
-        MatchLogic.HandlePlay(match, unitInAction, skillInAction, playVM.TargetIDs);
+        MatchLogic.HandlePlay(match, unitInAction, skillInAction, playVM.TargetIDs);        
 
         return TypedResults.Ok(playVM);
     }

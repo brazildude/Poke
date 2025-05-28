@@ -9,5 +9,5 @@ public partial class Play
     public int UnitInActionID { get; set; }
     public int SkillID { get; set; }
     public HashSet<int> TargetIDs { get; set; } = [];
-    public DateTimeOffset PlayedAt { get; set; }
+    public DateTime PlayedAt { get; set; }
 }

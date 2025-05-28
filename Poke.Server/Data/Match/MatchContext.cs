@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Poke.Server.Data.Match.Configurations;
-using Poke.Server.Data.Match.Models;
 
 namespace Poke.Server.Data.Match;
 

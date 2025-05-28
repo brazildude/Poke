@@ -11,7 +11,7 @@ using Poke.Server.Data.Match;
 namespace Poke.Server.Data.Match.Migrations
 {
     [DbContext(typeof(MatchContext))]
-    [Migration("20250528174022_InitialCreate")]
+    [Migration("20250528190628_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
