@@ -21,7 +21,8 @@ public class MatchGenerator
             {
                 CurrentUserID = userID01,
                 EnemyUserID = userID02,
-                RandomSeed = Environment.TickCount,
+                RandomSeed = 1,
+                Random = new Random(1),
                 Round = 1,
                 Plays = new List<Play>(),
                 Teams = new Dictionary<string, Dictionary<int, Unit>> {

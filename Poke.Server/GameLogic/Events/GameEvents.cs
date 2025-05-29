@@ -7,10 +7,12 @@ namespace Poke.Server.GameLogic.Events;
 [MemoryPackUnion(1, typeof(DamageEvent))]
 [MemoryPackUnion(2, typeof(DodgeEvent))]
 [MemoryPackUnion(3, typeof(HealEvent))]
+[MemoryPackUnion(4, typeof(UnitSelectedEvent))]
+[MemoryPackUnion(5, typeof(SkillSelectedEvent))]
 public abstract partial class GameEvent
 {
     public long EventId { get; init; } = DateTime.UtcNow.Ticks;
-    public string Type { get; init; } = null!;  // e.g. "Damage", "Dodge", "Crit"
+    public string Type { get; init; } = null!;
 }
 
 [MemoryPackable]

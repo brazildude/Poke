@@ -16,7 +16,7 @@ public class BehaviorLogic
 
     public static Action<MatchState, Unit, Behavior, HashSet<int>> Execute =
         (MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int> targetUnitIDs) =>
-    { 
+    {
         if (!TrySelectTargets(matchState, unitInAction, behavior, targetUnitIDs, out var unitTargets))
         {
             return;
@@ -27,15 +27,13 @@ public class BehaviorLogic
             return;
         }
 
-        var random = new Random(matchState.RandomSeed);
-
         foreach (var unitTarget in unitTargets)
         {
             var property = unitTarget.FlatProperties[behavior.Target.TargetPropertyName];
 
             foreach (var minMaxProperty in behavior.MinMaxProperties)
             {
-                var skillValue = random.Next(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
+                var skillValue = matchState.RandomNextInt(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
 
                 switch (behavior.Type)
                 {
@@ -107,67 +105,67 @@ public class BehaviorLogic
         out List<Unit> targets)
     {
         targets = null!;
+        bool success;
 
         var targetType = behavior.Target.Type;
         var targetDirection = behavior.Target.Direction;
 
-        // Self-targeting
         if (targetType == TargetType.Self)
         {
             targets = [unitInAction];
-            return true;
+            success = true;
+        }
+        else
+        {
+            var aliveOwn = matchState.GetCurrentTeam().Values.Where(UnitLogic.IsAlive).ToList();
+            var aliveEnemy = matchState.GetEnemyTeam().Values.Where(UnitLogic.IsAlive).ToList();
+
+            IEnumerable<Unit> GetUnits(TargetDirection dir) => dir switch
+            {
+                TargetDirection.Both => aliveOwn.Concat(aliveEnemy),
+                TargetDirection.Own => aliveOwn,
+                TargetDirection.Enemy => aliveEnemy,
+                _ => throw new ArgumentOutOfRangeException(nameof(dir))
+            };
+
+            var candidates = GetUnits(targetDirection).ToList();
+            if (candidates.Count == 0)
+            {
+                targets = [];
+                success = false;
+            }
+            else
+            {
+                var quantity = behavior.Target.Quantity ?? 0;
+                targets = targetType switch
+                {
+                    TargetType.All => candidates,
+                    TargetType.Select when targetIDs.Count > 0 =>
+                        candidates.Where(u => targetIDs.Contains(u.UnitID)).ToList(),
+                    TargetType.Select => [],
+                    TargetType.Random =>
+                        SelectRandom(matchState, candidates, Math.Min(candidates.Count, quantity)),
+                    _ => throw new InvalidOperationException("Unsupported target type.")
+                };
+
+                success = targets.Count > 0;
+            }
         }
 
-        // Gather alive units
-        var aliveOwn = matchState.GetCurrentTeam()
-            .Values.Where(UnitLogic.IsAlive);
-        var aliveEnemy = matchState.GetEnemyTeam()
-            .Values.Where(UnitLogic.IsAlive);
-
-        IEnumerable<Unit> GetUnits(TargetDirection dir) => dir switch
-        {
-            TargetDirection.Both => aliveOwn.Concat(aliveEnemy),
-            TargetDirection.Own => aliveOwn,
-            TargetDirection.Enemy => aliveEnemy,
-            _ => throw new ArgumentOutOfRangeException(nameof(dir))
-        };
-
-        var candidates = GetUnits(targetDirection).ToList();
-
-        // Early exit if no candidates
-        if (candidates.Count == 0)
-        {
-            targets = [];
-            return false;
-        }
-
-        var quantity = behavior.Target.Quantity ?? 0;
-
-        targets = targetType switch
-        {
-            TargetType.All => candidates,
-            TargetType.Select => candidates
-                .Where(u => targetIDs.Contains(u.UnitID))
-                .ToList(),
-            TargetType.Random => SelectRandom(matchState, candidates, Math.Min(candidates.Count, quantity)),
-            _ => throw new InvalidOperationException("Unsupported target type.")
-        };
-
-        return targets.Count > 0;
+        return success;
     }
-
 
     private static List<Unit> SelectRandom(MatchState matchState, List<Unit> units, int quantity)
     {
         var span = CollectionsMarshal.AsSpan(units);
+        matchState.RandomShuffle(span);
 
-        new Random(matchState.RandomSeed).Shuffle(span);
-        var shuffledUnits = new List<Unit>(quantity);
-        foreach (var unit in span.Slice(0, quantity))
+        var result = new List<Unit>(quantity);
+        for (int i = 0; i < quantity; i++)
         {
-            shuffledUnits.Add(unit);
+            result.Add(span[i]);
         }
 
-        return shuffledUnits;
+        return result;
     }
 }

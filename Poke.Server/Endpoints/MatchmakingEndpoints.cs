@@ -61,7 +61,7 @@ public static class MatchmakingEndpoints
                 MatchID = matchID,
                 CurrentUserID = randomUser == 0 ? currentUser.UserID : opponent.UserID,
                 EnemyUserID = randomUser == 0 ? opponent.UserID : currentUser.UserID,
-                RandomSeed = Environment.TickCount,
+                Random = new Random(Environment.TickCount),
                 Round = 1,
             },
         };

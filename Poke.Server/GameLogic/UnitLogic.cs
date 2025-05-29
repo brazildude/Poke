@@ -1,6 +1,6 @@
 using Poke.Server.Data.Match.Models;
-using Poke.Server.GameLogic.Events;
 using Poke.Server.Shared.Enums;
+using Poke.Server.Shared.Extensions;
 
 namespace Poke.Server.GameLogic;
 
@@ -60,8 +60,8 @@ public class UnitLogic
     public static Action<MatchState, Unit, Skill, HashSet<int>> UseSkill =
         (MatchState matchState, Unit unitInAction, Skill skillInAction, HashSet<int> targetIDs) =>
     {
-        matchState.AddEvent(new UnitSelectedEvent { Type = nameof(UnitSelectedEvent), UnitID = unitInAction.UnitID  });
-        matchState.AddEvent(new SkillSelectedEvent { Type = nameof(SkillSelectedEvent), SkillID = skillInAction.SkillID  });
+        matchState.AddUnitSelectedEvent(unitInAction.UnitID);
+        matchState.AddSkillSelectedEvent(skillInAction.SkillID);
 
         foreach (var behavior in skillInAction.Behaviors)
         {

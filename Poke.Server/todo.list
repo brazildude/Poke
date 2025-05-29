@@ -1,4 +1,4 @@
 TODO: FINISH ALL ENDPOINTS SO FRONTEND CAN BE TESTS
 TODO: Create a custom behavior overriding Execute method
 TODO: Evasion based on health
-TODO: Improve Events organization (add enum to types and crete static new Methods (maybe add AddEventX to matchStateClass))
+TODO: Improve Events organization (add enum to types and create static new Methods (maybe add AddEventX to matchStateClass))
