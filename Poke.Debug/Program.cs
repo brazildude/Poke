@@ -52,19 +52,20 @@ internal class Program
         ConsolePlay(result);
     }
 
-    private static void ConsolePlay(Results<Ok<List<GameEvent>>, BadRequest<string>, NotFound> result)
+    private static void ConsolePlay(Results<Ok<PlayOutputVM>, BadRequest<string>, NotFound> response)
     {
-        if (result.Result is Ok<List<GameEvent>> events)
+        Console.WriteLine(" ");
+        if (response.Result is Ok<PlayOutputVM> result)
         {
-
-            foreach (var _event in events.Value!)
+            Console.WriteLine($"Played by: {result.Value!.PlayedByID}, Unit: {result.Value.UnitName}, Skill: {result.Value.SkillName}, Targets: {string.Join(", ", result.Value.TargetIDs)}");
+            foreach (var _event in result.Value!.Events)
             {
                 if (_event is UnitStateChangedEvent e)
                 {
                     Console.WriteLine($"{e.EventId}: {e.Type} - UnitID: {e.UnitID}, Property: {e.PropertyName}, AppliedValue: {e.AppliedValue}, CurrentValue: {e.CurrentValue}, HitType: {e.HitType}");
                     continue;
                 }
-                
+
                 if (_event is NoResourcesEvent ee)
                 {
                     Console.WriteLine($"{ee.EventId}: {ee.Type} - Behavior: {ee.BehaviorName}, Property: {ee.PropertyName}, RequiredValue: {ee.RequiredValue}, CurrentValue: {ee.CurrentValue}");
@@ -73,7 +74,7 @@ internal class Program
             }
         }
 
-        if (result.Result is BadRequest<string> bad)
+        if (response.Result is BadRequest<string> bad)
         {
             Console.WriteLine(bad.Value);
         }

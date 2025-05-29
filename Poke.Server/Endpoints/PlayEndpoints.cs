@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Poke.Server.Cache;
 using Poke.Server.Data.Match;
 using Poke.Server.GameLogic;
-using Poke.Server.GameLogic.Events;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Infrastructure.GameLogic;
 using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
@@ -20,7 +18,7 @@ public static class PlayEndpoints
         endpoints.MapPost("", Play);
     }
 
-    public static Results<Ok<List<GameEvent>>, BadRequest<string>, NotFound> Play(PlayVM playVM, ICurrentUser currentUser, MatchContext matchContext)
+    public static Results<Ok<PlayOutputVM>, BadRequest<string>, NotFound> Play(PlayVM playVM, ICurrentUser currentUser, MatchContext matchContext)
     {
         // TODO: this code need a lock on matchState
         if (CacheContext.Matches.TryGetValue(playVM.MatchID, out var matchState))
@@ -41,11 +39,12 @@ public static class PlayEndpoints
             }
 
             return MatchLogic.HandlePlay(matchState, unitInAction, skillInAction, playVM.TargetIDs)
-                .Match<Results<Ok<List<GameEvent>>, BadRequest<string>, NotFound>>(
+                .Match<Results<Ok<PlayOutputVM>, BadRequest<string>, NotFound>>(
                 _continue =>
                 {
                     var turnEvents = matchState.GetTurnEvents();
-                    return TypedResults.Ok(turnEvents);
+                    var playOutputVM = new PlayOutputVM(currentUser.UserID, unitInAction.Name.ToString(), skillInAction.Name.ToString(), playVM.TargetIDs, turnEvents);
+                    return TypedResults.Ok(playOutputVM);
                 },
                 matchFinished =>
                 {
@@ -54,13 +53,14 @@ public static class PlayEndpoints
                     match.UserWinnerID = matchFinished.WinnerPlayerID;
                     match.State = matchState;
 
-                    var turnEvents = matchState.GetTurnEvents();
-
                     matchContext.Matches.Update(match);
                     matchContext.SaveChanges();
 
                     CacheContext.Matches.TryRemove(playVM.MatchID, out _);
-                    return TypedResults.Ok(turnEvents);
+
+                    var turnEvents = matchState.GetTurnEvents();
+                    var playOutputVM = new PlayOutputVM(currentUser.UserID, unitInAction.Name.ToString(), skillInAction.Name.ToString(), playVM.TargetIDs, turnEvents);
+                    return TypedResults.Ok(playOutputVM);
                 },
                 error => TypedResults.BadRequest(error.Message)
             );
