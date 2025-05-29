@@ -5,7 +5,6 @@ using Poke.Server.Data.Match;
 using Poke.Server.Data.Match.Models;
 using Poke.Server.Data.Player;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Shared;
 using Poke.Server.Shared.Mappers;
 
 namespace Poke.Server.Endpoints;
@@ -49,40 +48,40 @@ public static class MatchmakingEndpoints
             return TypedResults.Ok("Waiting for match...");
         }
 
+        var randomUser = Random.Shared.Next(0, 2);
+        var matchID = Guid.NewGuid();
         var match = new Match
         {
+            MatchID = matchID,
             IsMatchOver = false,
             UserID01 = player.UserID,
             UserID02 = opponent.UserID,
             State = new MatchState
             {
-                CurrentUserID = Random.Shared.Next(0, 2) == 0 ? currentUser.UserID : opponent.UserID,
+                MatchID = matchID,
+                CurrentUserID = randomUser == 0 ? currentUser.UserID : opponent.UserID,
+                EnemyUserID = randomUser == 0 ? opponent.UserID : currentUser.UserID,
                 RandomSeed = Environment.TickCount,
                 Round = 1,
             },
         };
 
         var playerTeam01 = GetTeam(player.TeamID, playerContext);
-        var playerTeam02 = GetTeam(player.TeamID, playerContext);
+        var playerTeam02 = GetTeam(opponent.TeamID, playerContext);
 
         var team01 = PlayerMapper.ToMatchTeam(playerTeam01);
         var team02 = PlayerMapper.ToMatchTeam(playerTeam02);
 
-        if (match.State.CurrentUserID == player.UserID)
+        match.State.Teams.Add(player.UserID, team01);
+        match.State.Teams.Add(opponent.UserID, team02);
+
+        if (!CacheContext.Matches.TryAdd(match.MatchID, match.State))
         {
-            match.State.Teams.Add(player.UserID, team01);
-            match.State.Teams.Add(opponent.UserID, team02);
-        }
-        else
-        {
-            match.State.Teams.Add(opponent.UserID, team01);
-            match.State.Teams.Add(player.UserID, team02);
+            return TypedResults.BadRequest("Failed to create match.");
         }
 
         matchContext.Matches.Add(match);
         matchContext.SaveChanges();
-
-        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
 
         opponent.Tcs.TrySetResult((match.MatchID, "player1"));
         tcs.TrySetResult((match.MatchID, "player2"));

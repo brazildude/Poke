@@ -9,6 +9,9 @@ public class MatchConfiguration : IEntityTypeConfiguration<Models.Match>
 {
     public void Configure(EntityTypeBuilder<Models.Match> builder)
     {
+         builder.Property(m => m.MatchID)
+            .ValueGeneratedNever();
+
         builder
            .Property(x => x.State)
            .HasConversion(

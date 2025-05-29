@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Poke.Server.Cache;
 using Poke.Server.Data.Match;
 using Poke.Server.Data.Player;
+using Poke.Server.GameLogic.Events;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Shared.Enums;
 using Poke.Debug;
@@ -29,10 +30,6 @@ internal class Program
         var matchContextOptions = new DbContextOptionsBuilder<MatchContext>().UseSqlite(connectionstring).Options;
         var matchContext = new MatchContext(matchContextOptions);
 
-        var matchID = Guid.Parse("f314d9d5-ee75-41bb-b4cc-c558bb2a5a32");
-        var nM = matchContext.Matches.Single(x => x.MatchID == matchID);
-        var a = nM;
-
         matchContext.Database.EnsureDeleted();
 
         playerContext.Database.Migrate();
@@ -42,25 +39,34 @@ internal class Program
         matchContext.Matches.Add(match);
         matchContext.SaveChanges();
 
-        MatchmakingContext.Matches.TryAdd(match.MatchID, match);
+        CacheContext.Matches.TryAdd(match.MatchID, match.State);
+
         var playVM = new PlayVM(match.MatchID, 1, SkillName.Cleave, new HashSet<int> { 5 });
         var currentUser = new CurrentUser("UserID01", null, null, null);
+        var result = Play(playVM, currentUser, matchContext);
 
-        var result = Play(playVM, currentUser);
-        if (result.Result is Ok<PlayVM> ok)
+        ConsolePlay(result);
+
+        playVM = new PlayVM(match.MatchID, 5, SkillName.Shadowbolt, new HashSet<int> { 1 });
+        currentUser = new CurrentUser("UserID02", null, null, null);
+        result = Play(playVM, currentUser, matchContext);
+
+        ConsolePlay(result);
+    }
+
+    private static void ConsolePlay(Results<Ok<List<GameEvent>>, BadRequest<string>, NotFound> result)
+    {
+        if (result.Result is Ok<List<GameEvent>> events)
         {
-            Console.WriteLine(ok.Value);
-
-            Console.WriteLine("Match State Events:");
-            foreach (var e in match.State.GetEventsSince(0))
+            foreach (var e in events.Value!)
             {
-                Console.WriteLine(e.Type);
+                Console.WriteLine($"{e.EventId}: {e.Type}");
             }
         }
 
-        if (result.Result is BadRequest bad)
+        if (result.Result is BadRequest<string> bad)
         {
-            Console.WriteLine(bad.StatusCode);
+            Console.WriteLine(bad.Value);
         }
     }
 }

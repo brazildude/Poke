@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DeepCloner" Version="0.10.4" />
     <PackageReference Include="FirebaseAdmin" Version="3.2.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
     <PackageReference Include="MemoryPack" Version="1.21.4" />
@@ -24,6 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
 </Project>

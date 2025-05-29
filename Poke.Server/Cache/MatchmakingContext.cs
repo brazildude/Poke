@@ -9,5 +9,4 @@ public static class MatchmakingContext
 
     public static ConcurrentQueue<WaitingPlayer> Queue = new();
     public static ConcurrentDictionary<string, TaskCompletionSource<(Guid matchID, string role)>> Waiters = new();
-    public static ConcurrentDictionary<Guid, Match> Matches = new();
 }

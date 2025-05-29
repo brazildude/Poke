@@ -20,6 +20,7 @@ public class MatchGenerator
             State = new MatchState
             {
                 CurrentUserID = userID01,
+                EnemyUserID = userID02,
                 RandomSeed = Environment.TickCount,
                 Round = 1,
                 Plays = new List<Play>(),

@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using MemoryPack;
 using Poke.Server.GameLogic.Events;
 
@@ -7,18 +6,19 @@ namespace Poke.Server.Data.Match.Models;
 [MemoryPackable]
 public partial class MatchState
 {
-    [MemoryPackInclude]
-    private ConcurrentQueue<GameEvent> _eventQueue = new();
-    
-    [MemoryPackInclude]
-    private int _nextEventId = 1;
-
+    public Guid MatchID { get; set; }
     public string CurrentUserID { get; set; } = null!;
+    public string EnemyUserID { get; set; } = null!;
     public int RandomSeed { get; set; }
     public int Round { get; set; }
+    public int LastEventID { get; set; } = 0;
 
     public List<Play> Plays { get; set; } = [];
     public Dictionary<string, Dictionary<int, Unit>> Teams { get; set; } = [];
+    public List<GameEvent> Events { get; set; } = new();
+
+    [MemoryPackIgnore]
+    public List<GameEvent> TurnEvents { get; set; } = [];
 
     public Dictionary<int, Unit> GetCurrentTeam()
     {
@@ -33,12 +33,18 @@ public partial class MatchState
 
     public void AddEvent(GameEvent evt)
     {
-        evt.EventId = Interlocked.Increment(ref _nextEventId);
-        _eventQueue.Enqueue(evt);
+        evt.EventId = ++LastEventID;
+        TurnEvents.Add(evt);
     }
 
     public List<GameEvent> GetEventsSince(int lastSeenId)
     {
-        return _eventQueue.Where(e => e.EventId > lastSeenId).ToList();
+        return Events.Where(e => e.EventId > lastSeenId).ToList();
+    }
+
+    public List<GameEvent> GetTurnEvents()
+    {
+        Events.AddRange(TurnEvents);
+        return TurnEvents;
     }
 }

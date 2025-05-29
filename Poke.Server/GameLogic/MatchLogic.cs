@@ -1,73 +1,75 @@
+using OneOf;
 using Poke.Server.Data.Match.Models;
+using Poke.Server.Infrastructure.GameLogic;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.GameLogic;
 
 public class MatchLogic
 {
-    public static void HandlePlay(Match match, Unit unitInAction, Skill skillInAction, HashSet<int> targetIDs)
+    public static OneOf<bool, MatchFinishedDTO, ErrorDTO> HandlePlay(MatchState matchState, Unit unitInAction, Skill skillInAction, HashSet<int> targetIDs)
     {
         if (!UnitLogic.IsAlive(unitInAction))
         {
-            return;
+            return ErrorDTO.New("Unit is not alive.");
         }
 
         if (!UnitLogic.CanPlay(unitInAction))
         {
-            return;
+            return ErrorDTO.New("Unit cannot play at this time.");
         }
 
         if (!UnitLogic.HasInitialSkillResources(unitInAction, skillInAction))
         {
-            return;
+            return ErrorDTO.New("Unit does not have enough resources to play this skill.");
         }
 
         if (SkillLogic.IsInCooldown(skillInAction))
         {
-            return;
+            return ErrorDTO.New("Skill is in cooldown.");
         }
 
-        if (!SkillLogic.AreTargetsValid(skillInAction, match.State.GetCurrentTeam(), match.State.GetEnemyTeam(), targetIDs))
+        if (!SkillLogic.AreTargetsValid(skillInAction, matchState.GetCurrentTeam(), matchState.GetEnemyTeam(), targetIDs))
         {
-            return;
+            return ErrorDTO.New("Invalid targets for the skill.");
         }
 
-        match.State.Plays.Add(new Play
+        matchState.TurnEvents.Clear();
+        matchState.Plays.Add(new Play
         {
-            UserID = match.State.CurrentUserID,
+            UserID = matchState.CurrentUserID,
             UnitInActionID = unitInAction.UnitID,
             SkillID = skillInAction.SkillID,
             TargetIDs = targetIDs,
             PlayedAt = DateTime.UtcNow
         });
 
-        UnitLogic.UseSkill(match.State, unitInAction, skillInAction, targetIDs);
+        UnitLogic.UseSkill(matchState, unitInAction, skillInAction, targetIDs);
 
-        CheckMatchOver(match);
-
-        if (!match.IsMatchOver)
+        if (CheckMatchOver(matchState, out var userWinnerID))
         {
-            var allUnits = match.State.GetCurrentTeam().Values.Concat(match.State.GetEnemyTeam().Values);
-            var allAliveUnits = allUnits.Where(x => UnitLogic.IsAlive(x));
+            return MatchFinishedDTO.New(userWinnerID);
+        }
 
-            if (IsRoundOver(allAliveUnits))
+        var allUnits = matchState.GetCurrentTeam().Values.Concat(matchState.GetEnemyTeam().Values);
+        var allAliveUnits = allUnits.Where(x => UnitLogic.IsAlive(x));
+
+        if (IsRoundOver(allAliveUnits))
+        {
+            matchState.Round += 1;
+            foreach (var aliveUnit in allAliveUnits)
             {
-                match.State.Round += 1;
-                foreach (var aliveUnit in allAliveUnits)
-                {
-                    SkillLogic.TickCooldown(aliveUnit, skillInAction.Name);
-                    aliveUnit.FlatProperties[PropertyName.PlayTimes].Reset();
-                }
+                SkillLogic.TickCooldown(aliveUnit, skillInAction.Name);
+                aliveUnit.FlatProperties[PropertyName.PlayTimes].Reset();
             }
+        }
 
-            // changing current user
-            match.State.CurrentUserID = match.UserID01 == match.State.CurrentUserID ? match.UserID02 : match.UserID01;
-        }
-        else
-        {
-            //matchContext.Matches.Update(match);
-            //matchContext.SaveChanges();
-        }
+        // changing current user
+        var temp = matchState.CurrentUserID;
+        matchState.CurrentUserID = matchState.EnemyUserID;
+        matchState.EnemyUserID = temp;
+
+        return true;
     }
 
     public static bool IsRoundOver(IEnumerable<Unit> allAliveUnits)
@@ -80,27 +82,32 @@ public class MatchLogic
         return true;
     }
 
-    public static void CheckMatchOver(Match match)
+    public static bool CheckMatchOver(MatchState matchState, out string? userWinnerID)
     {
-        var team01 = match.State.GetCurrentTeam();
-        var team02 = match.State.GetEnemyTeam();
+        var team01 = matchState.GetCurrentTeam();
+        var team02 = matchState.GetEnemyTeam();
+
+        var isMatchOver = false;
+        userWinnerID = null;
 
         if (team01.Any(x => UnitLogic.IsAlive(x.Value)) && team02.All(x => !UnitLogic.IsAlive(x.Value)))
         {
-            match.IsMatchOver = true;
-            match.UserWinnerID = match.UserID01;
+            isMatchOver = true;
+            userWinnerID = matchState.CurrentUserID;
         }
 
         if (team02.Any(x => UnitLogic.IsAlive(x.Value)) && team01.All(x => !UnitLogic.IsAlive(x.Value)))
         {
-            match.IsMatchOver = true;
-            match.UserWinnerID = match.UserID02;
+            isMatchOver = true;
+            userWinnerID = matchState.EnemyUserID;
         }
 
         if (team01.All(x => !UnitLogic.IsAlive(x.Value)) && team02.All(x => !UnitLogic.IsAlive(x.Value)))
         {
-            match.IsMatchOver = true;
-            match.UserWinnerID = null;
+            isMatchOver = true;
+            userWinnerID = null;
         }
+
+        return isMatchOver;
     }
 }
