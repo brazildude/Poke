@@ -16,7 +16,7 @@ public class BehaviorLogic
 
     public static Action<MatchState, Unit, Behavior, HashSet<int>> Execute =
         (MatchState matchState, Unit unitInAction, Behavior behavior, HashSet<int> targetUnitIDs) =>
-    {
+    { 
         if (!TrySelectTargets(matchState, unitInAction, behavior, targetUnitIDs, out var unitTargets))
         {
             return;

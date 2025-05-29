@@ -34,14 +34,12 @@ public class MatchLogic
             return ErrorDTO.New("Invalid targets for the skill.");
         }
 
-        matchState.TurnEvents.Clear();
-        matchState.Plays.Add(new Play
+        matchState.AddPlay(new Play
         {
             UserID = matchState.CurrentUserID,
             UnitInActionID = unitInAction.UnitID,
             SkillID = skillInAction.SkillID,
             TargetIDs = targetIDs,
-            PlayedAt = DateTime.UtcNow
         });
 
         UnitLogic.UseSkill(matchState, unitInAction, skillInAction, targetIDs);

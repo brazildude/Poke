@@ -11,14 +11,12 @@ public partial class MatchState
     public string EnemyUserID { get; set; } = null!;
     public int RandomSeed { get; set; }
     public int Round { get; set; }
-    public int LastEventID { get; set; } = 0;
 
-    public List<Play> Plays { get; set; } = [];
+    public List<Play> Plays { private get; set; } = [];
     public Dictionary<string, Dictionary<int, Unit>> Teams { get; set; } = [];
-    public List<GameEvent> Events { get; set; } = new();
 
     [MemoryPackIgnore]
-    public List<GameEvent> TurnEvents { get; set; } = [];
+    public Play CurrentPlay { private get; set; } = null!;
 
     public Dictionary<int, Unit> GetCurrentTeam()
     {
@@ -31,20 +29,29 @@ public partial class MatchState
         return Teams[enemyUserID];
     }
 
-    public void AddEvent(GameEvent evt)
+    public void AddPlay(Play play)
     {
-        evt.EventId = ++LastEventID;
-        TurnEvents.Add(evt);
+        CurrentPlay = play;
+        Plays.Add(play);
     }
 
-    public List<GameEvent> GetEventsSince(int lastSeenId)
+    public void AddEvent(GameEvent gameEvent)
     {
-        return Events.Where(e => e.EventId > lastSeenId).ToList();
+        if (CurrentPlay == null)
+        {
+            throw new InvalidOperationException("Current play is not set. Cannot add event.");
+        }
+
+        CurrentPlay.Events.Add(gameEvent);
     }
 
     public List<GameEvent> GetTurnEvents()
     {
-        Events.AddRange(TurnEvents);
-        return TurnEvents;
+        if (CurrentPlay == null)
+        {
+            throw new InvalidOperationException("Current play is not set. Cannot get turn events.");
+        }
+
+        return CurrentPlay.Events;
     }
 }
