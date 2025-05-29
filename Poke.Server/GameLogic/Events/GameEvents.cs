@@ -1,14 +1,11 @@
 using MemoryPack;
+using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.GameLogic.Events;
 
 [MemoryPackable]
-[MemoryPackUnion(0, typeof(CostEvent))]
-[MemoryPackUnion(1, typeof(DamageEvent))]
-[MemoryPackUnion(2, typeof(DodgeEvent))]
-[MemoryPackUnion(3, typeof(HealEvent))]
-[MemoryPackUnion(4, typeof(UnitSelectedEvent))]
-[MemoryPackUnion(5, typeof(SkillSelectedEvent))]
+[MemoryPackUnion(0, typeof(UnitStateChangedEvent))]
+[MemoryPackUnion(1, typeof(NoResourcesEvent))]
 public abstract partial class GameEvent
 {
     public long EventId { get; init; } = DateTime.UtcNow.Ticks;
@@ -16,46 +13,20 @@ public abstract partial class GameEvent
 }
 
 [MemoryPackable]
-public partial class UnitSelectedEvent : GameEvent
+public partial class UnitStateChangedEvent : GameEvent
 {
-    public int UnitID { get; init; }
+    public int UnitID { get; set; }
+    public string PropertyName { get; set; } = null!;
+    public int AppliedValue { get; init; }
+    public int CurrentValue { get; init; }
+    public HitType HitType { get; set; }
 }
 
 [MemoryPackable]
-public partial class SkillSelectedEvent : GameEvent
+public partial class NoResourcesEvent : GameEvent
 {
-    public int SkillID { get; init; }
-}
-
-[MemoryPackable]
-public partial class CostEvent : GameEvent
-{
-    public int UnitID { get; init; }
-    public string CostPropertyName { get; init; } = null!;
-    public int CostValue { get; init; }
-}
-
-[MemoryPackable]
-public partial class DamageEvent : GameEvent
-{
-    public int SourceUnitId { get; init; }
-    public int TargetUnitId { get; init; }
-    public string PropertyName { get; init; } = null!;
-    public int Amount { get; init; }
-    public bool IsCritical { get; init; }
-}
-
-[MemoryPackable]
-public partial class DodgeEvent : GameEvent
-{
-    public int AttackerUnitId { get; init; }
-    public int DefenderUnitId { get; init; }
-}
-
-[MemoryPackable]
-public partial class HealEvent : GameEvent
-{
-    public int HealerUnitId { get; init; }
-    public int TargetUnitId { get; init; }
-    public int Amount { get; init; }
+    public string BehaviorName { get; set; } = null!;
+    public string PropertyName { get; set; } = null!;
+    public int RequiredValue { get; init; }
+    public int CurrentValue { get; init; }
 }

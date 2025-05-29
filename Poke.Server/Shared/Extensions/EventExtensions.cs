@@ -1,19 +1,29 @@
 using Poke.Server.Data.Match.Models;
 using Poke.Server.GameLogic.Events;
+using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Shared.Extensions;
 
 public static class EventExtensions
 {
-    public static void AddUnitSelectedEvent(this MatchState matchState, int unitID)
+    public static void AddUnitStateChangedEvent(
+        this MatchState matchState,
+        string type,
+        int unitID,
+        string propertyName,
+        int appliedValud,
+        int currentValue,
+        HitType hitType)
     {
-        var e = new UnitSelectedEvent { Type = nameof(UnitSelectedEvent), UnitID = unitID };
-        matchState.AddEvent(e);
-    }
-
-    public static void AddSkillSelectedEvent(this MatchState matchState, int skillID)
-    {
-        var e = new SkillSelectedEvent { Type = nameof(SkillSelectedEvent), SkillID = skillID };
+        var e = new UnitStateChangedEvent
+        {
+            Type = type,
+            UnitID = unitID,
+            PropertyName = propertyName,
+            AppliedValue = appliedValud,
+            CurrentValue = currentValue,
+            HitType = hitType
+        };
         matchState.AddEvent(e);
     }
 }

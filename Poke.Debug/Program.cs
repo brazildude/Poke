@@ -56,9 +56,20 @@ internal class Program
     {
         if (result.Result is Ok<List<GameEvent>> events)
         {
-            foreach (var e in events.Value!)
+
+            foreach (var _event in events.Value!)
             {
-                Console.WriteLine($"{e.EventId}: {e.Type}");
+                if (_event is UnitStateChangedEvent e)
+                {
+                    Console.WriteLine($"{e.EventId}: {e.Type} - UnitID: {e.UnitID}, Property: {e.PropertyName}, AppliedValue: {e.AppliedValue}, CurrentValue: {e.CurrentValue}, HitType: {e.HitType}");
+                    continue;
+                }
+                
+                if (_event is NoResourcesEvent ee)
+                {
+                    Console.WriteLine($"{ee.EventId}: {ee.Type} - Behavior: {ee.BehaviorName}, Property: {ee.PropertyName}, RequiredValue: {ee.RequiredValue}, CurrentValue: {ee.CurrentValue}");
+                    continue;
+                }
             }
         }
 

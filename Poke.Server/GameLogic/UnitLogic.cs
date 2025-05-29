@@ -60,14 +60,12 @@ public class UnitLogic
     public static Action<MatchState, Unit, Skill, HashSet<int>> UseSkill =
         (MatchState matchState, Unit unitInAction, Skill skillInAction, HashSet<int> targetIDs) =>
     {
-        matchState.AddUnitSelectedEvent(unitInAction.UnitID);
-        matchState.AddSkillSelectedEvent(skillInAction.SkillID);
-
         foreach (var behavior in skillInAction.Behaviors)
         {
             BehaviorLogic.Execute(matchState, unitInAction, behavior, targetIDs);
         }
 
-        unitInAction.FlatProperties[PropertyName.PlayTimes].CurrentValue -= 1;
+        var e = unitInAction.ChangeFlatProperty("TurnFinished", PropertyName.PlayTimes, -1, HitType.Normal);
+        matchState.AddEvent(e);
     };
 }

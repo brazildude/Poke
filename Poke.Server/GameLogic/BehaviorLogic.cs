@@ -29,25 +29,19 @@ public class BehaviorLogic
 
         foreach (var unitTarget in unitTargets)
         {
-            var property = unitTarget.FlatProperties[behavior.Target.TargetPropertyName];
-
             foreach (var minMaxProperty in behavior.MinMaxProperties)
             {
                 var skillValue = matchState.RandomNextInt(minMaxProperty.MinCurrentValue, minMaxProperty.MaxCurrentValue + 1);
 
-                switch (behavior.Type)
+                var applyValue = behavior.Type switch
                 {
-                    case BehaviorType.Damage:
-                        property.CurrentValue -= skillValue;
-                        break;
+                    BehaviorType.Damage => -skillValue,
+                    BehaviorType.Heal => skillValue,
+                    _ => throw new InvalidOperationException($"Unsupported behavior type: {behavior.Type}")
+                };
 
-                    case BehaviorType.Heal:
-                        property.CurrentValue += skillValue;
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Unsupported behavior type: {behavior.Type}");
-                }
+                var e = unitTarget.ChangeFlatProperty("Hit", behavior.Target.TargetPropertyName, applyValue, HitType.Normal);
+                matchState.AddEvent(e);
             }
         }
     };
@@ -68,6 +62,15 @@ public class BehaviorLogic
             // Check if the cost can be paid
             if (property.CurrentValue < valueToApply)
             {
+                matchState.AddEvent(new NoResourcesEvent
+                {
+                    Type = "NoResourcesEvent",
+                    BehaviorName = behavior.Name.ToString(),
+                    PropertyName = cost.CostPropertyName.ToString(),
+                    RequiredValue = valueToApply,
+                    CurrentValue = property.CurrentValue
+                });
+                
                 return false;
             }
         }
@@ -83,15 +86,8 @@ public class BehaviorLogic
                 _ => throw new InvalidOperationException($"{nameof(cost.CostType)}")
             };
 
-            property.CurrentValue += valueToApply;
-
-            matchState.AddEvent(new CostEvent
-            {
-                Type = "Cost",
-                UnitID = unitInAction.UnitID,
-                CostPropertyName = cost.CostPropertyName.ToString(),
-                CostValue = cost.CurrentValue,
-            });
+            var e = unitInAction.ChangeFlatProperty("ApplyCost", cost.CostPropertyName, -valueToApply, HitType.Normal);
+            matchState.AddEvent(e);
         }
 
         return true;
