@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using Poke.Server.Cache;
 using Poke.Server.Data.Match;
-using Poke.Server.Data.Match.Models;
 using Poke.Server.Data.Player;
 using Poke.Server.Infrastructure.Auth;
-using Poke.Server.Shared.Mappers;
+using static Poke.Server.Infrastructure.ViewModels;
 
 namespace Poke.Server.Endpoints;
 
@@ -24,12 +22,6 @@ public static class MatchmakingEndpoints
 
     public static Results<Ok<string>, BadRequest<string>> Join(int teamID, ICurrentUser currentUser, PlayerContext playerContext, MatchContext matchContext)
     {
-        // Prevent duplicate join
-        if (MatchmakingContext.Waiters.ContainsKey(currentUser.UserID))
-        {
-            return TypedResults.BadRequest("Already in queue.");
-        }
-
         if (!playerContext.Teams.Any(x => x.TeamID == teamID && x.UserID == currentUser.UserID))
         {
             return TypedResults.BadRequest("Team does not exist.");
@@ -38,55 +30,41 @@ public static class MatchmakingEndpoints
         var tcs = new TaskCompletionSource<(Guid, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
         var player = new MatchmakingContext.WaitingPlayer(currentUser.UserID, teamID, tcs);
 
+        // Atomically try to register the player
+        if (!MatchmakingContext.Waiters.TryAdd(currentUser.UserID, tcs))
+        {
+            return TypedResults.BadRequest("Already in queue.");
+        }
+
         // Try to match
         if (!MatchmakingContext.Queue.TryDequeue(out var opponent))
         {
-            // Add to queue
+            // No match found, enqueue the current player
             MatchmakingContext.Queue.Enqueue(player);
-            MatchmakingContext.Waiters[currentUser.UserID] = tcs;
-
             return TypedResults.Ok("Waiting for match...");
         }
 
-        var randomUser = Random.Shared.Next(0, 2);
-        var matchID = Guid.NewGuid();
-        var match = new Match
+        var createMatchVM = new CreateMatchVM(
+            player.UserID, opponent.UserID,
+            player.TeamID, opponent.TeamID);
+
+        // In the future this will be a http call instead of a direct call
+        var response = MatchEndpoints.CreateMatch(createMatchVM, matchContext, playerContext);
+
+        if (response.Result is BadRequest<string> result)
         {
-            MatchID = matchID,
-            IsMatchOver = false,
-            UserID01 = player.UserID,
-            UserID02 = opponent.UserID,
-            State = new MatchState
-            {
-                MatchID = matchID,
-                CurrentUserID = randomUser == 0 ? currentUser.UserID : opponent.UserID,
-                EnemyUserID = randomUser == 0 ? opponent.UserID : currentUser.UserID,
-                Random = new Random(Environment.TickCount),
-                Round = 1,
-            },
-        };
+            MatchmakingContext.Waiters.TryRemove(currentUser.UserID, out _);
+            MatchmakingContext.Waiters.TryRemove(opponent.UserID, out _);
 
-        var playerTeam01 = GetTeam(player.TeamID, playerContext);
-        var playerTeam02 = GetTeam(opponent.TeamID, playerContext);
-
-        var team01 = PlayerMapper.ToMatchTeam(playerTeam01);
-        var team02 = PlayerMapper.ToMatchTeam(playerTeam02);
-
-        match.State.Teams.Add(player.UserID, team01);
-        match.State.Teams.Add(opponent.UserID, team02);
-
-        if (!CacheContext.Matches.TryAdd(match.MatchID, match.State))
-        {
-            return TypedResults.BadRequest("Failed to create match.");
+            return TypedResults.BadRequest(result.Value);
         }
 
-        matchContext.Matches.Add(match);
-        matchContext.SaveChanges();
+        var matchID = ((Ok<Guid>)response.Result).Value;
 
-        opponent.Tcs.TrySetResult((match.MatchID, "player1"));
-        tcs.TrySetResult((match.MatchID, "player2"));
+        opponent.Tcs.TrySetResult((matchID, "player1"));
+        tcs.TrySetResult((matchID, "player2"));
 
-        return TypedResults.Ok("Match Found");
+        return TypedResults.Ok("Match found!");
     }
 
     public static Results<Ok<string>, Ok> Cancel(ICurrentUser currentUser)
@@ -118,6 +96,9 @@ public static class MatchmakingEndpoints
         try
         {
             var result = await tcs.Task.WaitAsync(linkedCts.Token);
+
+            // Both users will hit this endpoint
+            // So currentUser will be user01 and user02
             MatchmakingContext.Waiters.TryRemove(currentUser.UserID, out _);
 
             return TypedResults.Ok(result.matchID.ToString());
@@ -136,16 +117,5 @@ public static class MatchmakingEndpoints
 
             return TypedResults.Ok("timeout_or_cancelled");
         }
-    }
-
-    private static IQueryable<Data.Player.Models.Unit> GetTeam(int teamID, PlayerContext playerContext)
-    {
-        return playerContext.Teams
-            .Include(x => x.Units).ThenInclude(x => x.FlatProperties)
-            .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperties)
-            .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
-            .Include(x => x.Units).ThenInclude(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Costs).ThenInclude(x => x.FlatProperty)
-            .Where(x => x.TeamID == teamID)
-            .SelectMany(x => x.Units);
     }
 }

@@ -8,7 +8,7 @@ using Poke.Server.GameLogic.Events;
 using Poke.Server.Infrastructure.Auth;
 using Poke.Server.Shared.Enums;
 using Poke.Debug;
-using static Poke.Server.Endpoints.PlayEndpoints;
+using static Poke.Server.Endpoints.MatchEndpoints;
 using static Poke.Server.Infrastructure.ViewModels;
 
 internal class Program

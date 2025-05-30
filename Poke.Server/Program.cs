@@ -83,7 +83,7 @@ app.UseAuthorization();
 app.UseDeveloperExceptionPage();
 
 app.RegisterMatchmakingEndpoints();
-app.RegisterPlayEndpoints();
+app.RegisterMatchEndpoints();
 app.RegisterSkillEndpoints();
 app.RegisterTeamEndpoints();
 app.RegisterUnitEndpoints();
