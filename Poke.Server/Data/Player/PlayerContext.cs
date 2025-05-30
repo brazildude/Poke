@@ -8,7 +8,7 @@ public class PlayerContext : DbContext
 {
     public PlayerContext(DbContextOptions<PlayerContext> options) : base(options) { }
 
-    public DbSet<Behavior> Bahaviors => Set<Behavior>();
+    public DbSet<Behavior> Behaviors => Set<Behavior>();
     public DbSet<Cost> Costs => Set<Cost>();
     public DbSet<FlagProperty> FlagProperties => Set<FlagProperty>();
     public DbSet<FlatProperty> FlatProperties => Set<FlatProperty>();

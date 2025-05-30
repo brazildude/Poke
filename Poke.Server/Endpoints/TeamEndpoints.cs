@@ -21,9 +21,9 @@ public static class TeamEndpoints
         endpoints.MapPatch("", EditTeam);
     }
 
-    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PlayerContext db)
+    public static Results<Ok<GetTeamVM>, NotFound> GetTeam(int teamID, ICurrentUser currentUser, PlayerContext playerContext)
     {
-        var team = db
+        var team = playerContext
             .Teams
             .Where(x => x.UserID == currentUser.UserID && x.TeamID == teamID)
             .Select(x =>
@@ -32,6 +32,7 @@ public static class TeamEndpoints
                     x.Name,
                     x.Units.Select(u => new KeyValuePair<int, string>(u.UnitID, u.Name.ToString())).ToList())
                 )
+            .AsNoTracking()
             .SingleOrDefault();
 
         if (team == null)
@@ -42,7 +43,7 @@ public static class TeamEndpoints
         return TypedResults.Ok(team);
     }
 
-    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PlayerContext db)
+    public static Results<Ok, BadRequest<string>> CreateTeam(CreateTeamVM viewModel, ICurrentUser currentUser, PlayerContext playerContext)
     {
         if (viewModel.Units.Count != 4)
         {
@@ -55,7 +56,7 @@ public static class TeamEndpoints
             return TypedResults.BadRequest("Invalid unit name.");
         }
 
-        if (db.Teams.Any(x => x.UserID == currentUser.UserID && x.Name == viewModel.Name))
+        if (playerContext.Teams.Any(x => x.UserID == currentUser.UserID && x.Name == viewModel.Name))
         {
             return TypedResults.BadRequest("Team name already exists.");
         }
@@ -67,48 +68,72 @@ public static class TeamEndpoints
             Units = viewModel.Units.Select(BaseContext.GetUnit).ToList()
         };
 
-        db.Teams.Add(team);
-        db.SaveChanges();
+        playerContext.Teams.Add(team);
+        playerContext.SaveChanges();
 
         return TypedResults.Ok();
     }
 
-    public static Results<Ok, BadRequest<string>> EditTeam(EditTeamVM viewModel, ICurrentUser currentUser, PlayerContext db)
+    public static Results<Ok, BadRequest<string>> EditTeam(EditTeamVM viewModel, ICurrentUser currentUser, PlayerContext playerContext)
     {
         if (viewModel.Units.Count != 4)
         {
             return TypedResults.BadRequest("You must select 4 units.");
         }
 
-        var team = db.Teams
-            .Include(x => x.Units)
-            .Where(x => x.UserID == currentUser.UserID && x.TeamID == viewModel.TeamID)
-            .SingleOrDefault();
+        // Load team with units and validate ownership
+        var team = playerContext.Teams
+            .Include(t => t.Units)
+            .SingleOrDefault(t => t.UserID == currentUser.UserID && t.TeamID == viewModel.TeamID);
 
         if (team == null)
         {
             return TypedResults.BadRequest("Team does not exist.");
         }
-        
-        if (!viewModel.Units.All(x => BaseContext.GetUnits().Select(p => p.Name.ToString()).Contains(x)))
+
+        // Validate all provided unit names exist
+        var allValidUnitNames = BaseContext.GetUnits().Select(u => u.Name).ToHashSet();
+        if (!viewModel.Units.All(name => allValidUnitNames.Contains(name)))
         {
-            return TypedResults.BadRequest("Invalid units name.");
+            return TypedResults.BadRequest("One or more unit names are invalid.");
         }
-        
+
+        // Update team name
         team.Name = viewModel.Name;
 
-        var unitsToBeAdded = BaseContext.GetUnits()
-            .Where(x =>
-                viewModel.Units
-                .Except(team.Units.Select(x => x.Name.ToString()))
-                .Contains(x.Name.ToString()))
-            .ToList();
+        // Determine current vs. desired unit names
+        var currentUnitNames = team.Units.Select(u => u.Name).ToHashSet();
+        var targetUnitNames = viewModel.Units;
 
-        team.Units.AddRange(unitsToBeAdded);
+        var toAddNames = targetUnitNames.Except(currentUnitNames).ToHashSet();
+        var toRemoveNames = currentUnitNames.Except(targetUnitNames).ToHashSet();
 
-        db.Units.Where(x => x.TeamID == viewModel.TeamID && !viewModel.Units.Contains(x.Name.ToString())).ExecuteDelete();
-        db.SaveChanges();
+        // Add new units
+        if (toAddNames.Count > 0)
+        {
+            var unitsToAdd = BaseContext.GetUnits()
+                .Where(u => toAddNames.Contains(u.Name))
+                .ToList();
 
+            team.Units.AddRange(unitsToAdd);
+        }
+
+        // Remove old units from DB
+        if (toRemoveNames.Count > 0)
+        {
+            var unitsToRemove = team.Units
+                .Where(u => toRemoveNames.Contains(u.Name))
+                .ToList(); // Avoid modifying collection while iterating
+
+            foreach (var unit in unitsToRemove)
+            {
+                team.Units.Remove(unit);
+                playerContext.Units.Remove(unit); // Remove from DB explicitly
+            }
+        }
+
+        // Save changes
+        playerContext.SaveChanges();
         return TypedResults.Ok();
     }
 }

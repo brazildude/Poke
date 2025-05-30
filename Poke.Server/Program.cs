@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
 builder.Services.AddDbContext<PlayerContext>(builder.Configuration["DatabaseProvider"] switch
 {
     "sqlite" => opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")),
@@ -35,7 +34,7 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     //options.SerializerOptions.Converters.Add(new TimeSpanConverter());
     //options.SerializerOptions.Converters.Add(new JsonDateTimeConverter());
-    options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    //options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -72,8 +71,8 @@ if (app.Environment.IsDevelopment())
     using (var serviceScope = app.Services.CreateScope())
     using (var dbContext = serviceScope.ServiceProvider.GetRequiredService<PlayerContext>())
     {
-        dbContext.Database.EnsureDeleted();
-        dbContext.Database.EnsureCreated();
+        //dbContext.Database.EnsureDeleted();
+        //dbContext.Database.EnsureCreated();
     }
 }
 else
@@ -81,7 +80,7 @@ else
     // app.UseHttpsRedirection();
 }
 
-//app.MapStaticAssets().AllowAnonymous();
+app.MapStaticAssets().AllowAnonymous();
 app.MapOpenApi().AllowAnonymous();
 app.UseFirebase();
 app.UseCors();

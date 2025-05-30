@@ -20,7 +20,7 @@ public static class UnitEndpoints
         endpoints.MapGet("{unitID}", GetUnit);
     }
 
-    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser, PlayerContext db)
+    public static Ok<IEnumerable<UnitVM>> GetUnits(ICurrentUser currentUser)
     {
         var units = BaseContext.GetUnits()
             .Select(x =>
@@ -28,16 +28,16 @@ public static class UnitEndpoints
                     x.UnitID,
                     x.Name.ToString(),
                     VMMapper.SelectProperties(x.FlatProperties),
-                    x.Skills.Select(s => new SkillVM(s.Name.ToString(), VMMapper.SelectProperties(s.FlatProperties), VMMapper.SelectBehaviors(s.Behaviors)))
+                    VMMapper.SelectSkills(x.Skills)
                 )
             );
 
         return TypedResults.Ok(units);
     }
 
-    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PlayerContext db)
+    public static Results<Ok<UnitVM>, BadRequest> GetUnit(int unitID, ICurrentUser currentUser, PlayerContext playerContext)
     {
-        var unit = db.Units
+        var unit = playerContext.Units
             .Include(x => x.FlatProperties)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.MinMaxProperties)
             .Include(x => x.Skills).ThenInclude(x => x.Behaviors).ThenInclude(x => x.Target)
@@ -47,8 +47,10 @@ public static class UnitEndpoints
                 u.UnitID,
                 u.Name.ToString(),
                 VMMapper.SelectProperties(u.FlatProperties),
-                u.Skills.Select(s => new SkillVM(s.Name.ToString(), VMMapper.SelectProperties(s.FlatProperties), VMMapper.SelectBehaviors(s.Behaviors)))
+                VMMapper.SelectSkills(u.Skills)
             ))
+            .AsSplitQuery()
+            .AsNoTracking()
             .SingleOrDefault();
 
         if (unit == null)

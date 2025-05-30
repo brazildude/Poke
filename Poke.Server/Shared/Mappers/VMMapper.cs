@@ -15,6 +15,11 @@ public class VMMapper
         return x.Select(c => new CostVM(c.Type.ToString(), c.CostPropertyName.ToString(), c.FlatProperty.CurrentValue));
     }
 
+    public static IEnumerable<SkillVM> SelectSkills(List<Skill> x)
+    {
+        return x.Select(s => new SkillVM(s.Name.ToString(), SelectProperties(s.FlatProperties), SelectBehaviors(s.Behaviors)));
+    }
+
     public static IEnumerable<MinMaxPropertyVM> SelectMinMaxProperties(List<MinMaxProperty> x)
     {
         return x.Select(c => new MinMaxPropertyVM(c.Name.ToString(), c.MinCurrentValue, c.MaxCurrentValue));

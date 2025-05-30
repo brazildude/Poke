@@ -12,6 +12,7 @@ public enum BehaviorName
     Nullstep01,
     Shadowbolt01,
     Slice01,
+    Slice02,
     Smite01,
     SmokeMirage01,
 }

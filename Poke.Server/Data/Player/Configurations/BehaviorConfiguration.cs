@@ -21,6 +21,12 @@ public class BehaviorConfiguration : IEntityTypeConfiguration<Behavior>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
+            .HasMany(x => x.FlatProperties)
+            .WithOne(x => x.Behavior)
+            .HasForeignKey(x => x.BehaviorID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder
             .HasMany(x => x.MinMaxProperties)
             .WithOne(x => x.Behavior)
             .HasForeignKey(x => x.BehaviorID)

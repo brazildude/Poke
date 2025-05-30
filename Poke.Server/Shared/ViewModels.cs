@@ -10,14 +10,14 @@ public static class ViewModels
 
     public record GetTeamVM(int TeamID, string Name, List<KeyValuePair<int, string>> Units);
     public record CreateTeamVM(string Name, HashSet<UnitName> Units);
-    public record EditTeamVM(int TeamID, string Name, HashSet<string> Units);
+    public record EditTeamVM(int TeamID, string Name, HashSet<UnitName> Units);
 
     public record PlayVM(Guid MatchID, int UnitID, SkillName SkillName, HashSet<int> TargetIDs);
     public record PlayOutputVM(string PlayedByID, string UnitName, string SkillName, HashSet<int> TargetIDs, List<GameEvent> Events);
 
     public record UnitVM(int UnitID, string UnitName, IEnumerable<FlatPropertyVM> Properties, IEnumerable<SkillVM> Skills);
 
-    public record EditSkillVM(int SkillID, HashSet<int> BehaviorIDs);
+    public record EditSkillVM(int TeamID, int UnitID, int SkillID, HashSet<BehaviorName> BehaviorIDs);
     public record SkillVM(string Name, IEnumerable<FlatPropertyVM> Properties, IEnumerable<BehaviorVM> Behaviors);
     
     public record BehaviorVM(string Type, string TargetProperty, string TargetType, string TargetDirection, int? TargetQuantity, IEnumerable<MinMaxPropertyVM> MinMaxProperties, IEnumerable<CostVM> Costs);

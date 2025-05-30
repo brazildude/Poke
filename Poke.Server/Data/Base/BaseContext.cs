@@ -1,5 +1,6 @@
 using Poke.Server.Data.Base.Models.Units;
 using Poke.Server.Data.Player.Models;
+using Poke.Server.Data.Player.Models.Skills;
 using Poke.Server.Shared.Enums;
 
 namespace Poke.Server.Data.Base;
@@ -42,6 +43,26 @@ public class BaseContext
             UnitName.Warlock => Warlock.Create(),
             UnitName.Warrior => Warrior.Create(),
             _ => throw new ArgumentOutOfRangeException(nameof(unitName))
+        };
+    }
+
+    public static Skill GetSkill(SkillName skillName)
+    {
+        return skillName switch
+        {
+            SkillName.Cleave => Cleave.Create(),
+            SkillName.DivineLight => DivineLight.Create(),
+            SkillName.Fireball => Fireball.Create(),
+            SkillName.Frostbolt => Frostbolt.Create(),
+            SkillName.GlacialPuncture => GlacialPuncture.Create(),
+            SkillName.Hellfire => Hellfire.Create(),
+            SkillName.Lacerate => Lacerate.Create(),
+            SkillName.Nullstep => Nullstep.Create(),
+            SkillName.Shadowbolt => Shadowbolt.Create(),
+            SkillName.Slice => Slice.Create(),
+            SkillName.Smite => Smite.Create(),
+            SkillName.SmokeMirage => SmokeMirage.Create(),
+            _ => throw new ArgumentOutOfRangeException(nameof(skillName))
         };
     }
 }
