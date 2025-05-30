@@ -302,7 +302,8 @@ namespace Poke.Server.Data.Player.Migrations
                 {
                     b.HasOne("Poke.Server.Data.Player.Models.Behavior", "Behavior")
                         .WithMany("FlatProperties")
-                        .HasForeignKey("BehaviorID");
+                        .HasForeignKey("BehaviorID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Poke.Server.Data.Player.Models.Cost", "Cost")
                         .WithOne("FlatProperty")

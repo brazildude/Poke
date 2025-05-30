@@ -10,7 +10,7 @@ using Poke.Server.Data.Player;
 namespace Poke.Server.Data.Player.Migrations
 {
     [DbContext(typeof(PlayerContext))]
-    [Migration("20250528170042_InitialCreate")]
+    [Migration("20250530012812_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -305,7 +305,8 @@ namespace Poke.Server.Data.Player.Migrations
                 {
                     b.HasOne("Poke.Server.Data.Player.Models.Behavior", "Behavior")
                         .WithMany("FlatProperties")
-                        .HasForeignKey("BehaviorID");
+                        .HasForeignKey("BehaviorID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Poke.Server.Data.Player.Models.Cost", "Cost")
                         .WithOne("FlatProperty")

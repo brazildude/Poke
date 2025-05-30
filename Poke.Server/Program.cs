@@ -30,13 +30,6 @@ builder.Services.AddDbContext<MatchContext>(builder.Configuration["DatabaseProvi
     _ => throw new Exception("Invalid DatabaseProvider")
 });
 
-builder.Services.Configure<JsonOptions>(options =>
-{
-    //options.SerializerOptions.Converters.Add(new TimeSpanConverter());
-    //options.SerializerOptions.Converters.Add(new JsonDateTimeConverter());
-    //options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-});
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {

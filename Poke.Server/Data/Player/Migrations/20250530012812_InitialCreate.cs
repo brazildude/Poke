@@ -230,7 +230,8 @@ namespace Poke.Server.Data.Player.Migrations
                         column: x => x.BehaviorID,
                         principalSchema: "player",
                         principalTable: "player_behaviors",
-                        principalColumn: "BehaviorID");
+                        principalColumn: "BehaviorID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_player_flat_properties_player_costs_CostID",
                         column: x => x.CostID,

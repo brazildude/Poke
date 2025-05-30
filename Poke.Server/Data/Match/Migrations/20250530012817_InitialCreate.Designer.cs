@@ -11,7 +11,7 @@ using Poke.Server.Data.Match;
 namespace Poke.Server.Data.Match.Migrations
 {
     [DbContext(typeof(MatchContext))]
-    [Migration("20250528190628_InitialCreate")]
+    [Migration("20250530012817_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,6 @@ namespace Poke.Server.Data.Match.Migrations
             modelBuilder.Entity("Poke.Server.Data.Match.Models.Match", b =>
                 {
                     b.Property<Guid>("MatchID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsMatchOver")
